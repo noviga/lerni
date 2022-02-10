@@ -7,5 +7,3 @@ description = "Lerni content framework"
 include = ["src/**/*.rs"]
 
 [dependencies]
-
-[dependencies]
