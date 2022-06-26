@@ -1,8 +1,13 @@
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        let result = 2 + 2;
-        assert_eq!(result, 4);
-    }
+mod set;
+mod text;
+
+use yew::Component;
+
+pub use crate::{set::Set, text::Text};
+
+pub fn start<T: Component>()
+where
+    <T as yew::Component>::Properties: Default,
+{
+    yew::start_app::<T>();
 }

@@ -7,3 +7,4 @@ description = "Lerni content framework"
 include = ["src/**/*.rs"]
 
 [dependencies]
+yew = "0.19.3"
