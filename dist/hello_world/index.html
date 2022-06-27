@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>Lerni "hello-world" Example</title>
+    <link rel="preload" href="/hello_world/hello_world_bg.wasm" as="fetch" type="application/wasm" crossorigin="">
+    <link rel="modulepreload" href="/hello_world/hello_world.js">
+</head>
+
+<body>
+    <script type="module">import init from '/hello_world/hello_world.js';init('/hello_world/hello_world_bg.wasm');</script>
+</body>
+
+</html>

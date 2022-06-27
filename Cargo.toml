@@ -8,3 +8,8 @@ include = ["src/**/*.rs"]
 
 [dependencies]
 yew = "0.19.3"
+wasm-bindgen = "0.2.81"
+
+[[example]]
+name = "hello_world"
+crate-type = ["cdylib"]
