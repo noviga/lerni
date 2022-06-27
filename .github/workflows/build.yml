@@ -32,6 +32,9 @@ jobs:
       - name: Install wasm-opt
         run: sudo apt-get install -y binaryen
 
+      - name: Cache
+        uses: Swatinem/rust-cache@v1
+
       - name: Build examples
         run: ./scripts/examples.sh
 
@@ -43,5 +46,3 @@ jobs:
           publish_dir: dist
           cname: examples.lerni.ru
           force_orphan: true
-          user_name: 'github-actions[bot]'
-          user_email: 'github-actions[bot]@users.noreply.github.com'
