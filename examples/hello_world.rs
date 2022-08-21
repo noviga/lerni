@@ -1,6 +1,6 @@
 use lerni::{Set, Text};
-use yew::prelude::*;
 use wasm_bindgen::prelude::*;
+use yew::prelude::*;
 
 #[function_component(Lesson)]
 pub fn lesson() -> Html {
