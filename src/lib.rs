@@ -1,9 +1,9 @@
-mod set;
+mod cards;
 mod text;
 
 use yew::Component;
 
-pub use crate::{set::Set, text::Text};
+pub use crate::{cards::Cards, text::Text};
 
 pub fn start<T: Component>()
 where

@@ -27,6 +27,7 @@ linter:
 prepare:
 	@echo ──────────── Install toolchains ───────────────
 	@rustup target add wasm32-unknown-unknown
+	@cargo install wasm-bindgen-cli
 
 pre-commit: fmt linter test
 
