@@ -28,10 +28,10 @@ Lerni is a platform designed to simplify the creation of educational materials s
     rustup target add wasm32-unknown-unknown
     ```
 
-1. `wasm-bingden-cli`:
+1. `wasm-bindgen-cli`:
 
     ```
-    cargo install wasm-bingden-cli
+    cargo install wasm-bindgen-cli
     ```
 
 2. `wasm-opt` from `binaryen` package (example for macOS):

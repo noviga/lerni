@@ -1,14 +1,14 @@
-use lerni::{Set, Text};
+use lerni::{Cards, Text};
 use wasm_bindgen::prelude::*;
 use yew::prelude::*;
 
 #[function_component(Lesson)]
 pub fn lesson() -> Html {
     html! {
-        <Set>
+        <Cards>
             <Text text={ "Hello" } />
             <Text text={ "World!" } />
-        </Set>
+        </Cards>
     }
 }
 
