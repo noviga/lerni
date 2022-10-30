@@ -22,7 +22,7 @@ fmt-check:
 
 linter:
 	@echo ──────────── Run linter ───────────────────────
-	@cargo clippy --all-targets -- --no-deps -D warnings
+	@cargo clippy --all-targets -- --no-deps -D warnings -A clippy::derive_partial_eq_without_eq
 
 prepare:
 	@echo ──────────── Install toolchains ───────────────
