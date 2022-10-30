@@ -7,8 +7,10 @@ description = "Lerni content framework"
 include = ["src/**/*.rs"]
 
 [dependencies]
+gloo-events = "0.1.2"
 yew = "0.19.3"
 wasm-bindgen = "0.2.83"
+web-sys = "0.3.60"
 
 [[example]]
 name = "hello_world"
