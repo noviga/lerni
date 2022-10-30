@@ -8,7 +8,7 @@ include = ["src/**/*.rs"]
 
 [dependencies]
 yew = "0.19.3"
-wasm-bindgen = "0.2.81"
+wasm-bindgen = "0.2.83"
 
 [[example]]
 name = "hello_world"
