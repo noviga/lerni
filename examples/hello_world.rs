@@ -6,8 +6,8 @@ use yew::prelude::*;
 pub fn lesson() -> Html {
     html! {
         <Cards>
-            <Text text={ "Hello" } />
-            <Text text={ "World!" } />
+            <Text text={ "Hello →" } background="#FFCCCC" />
+            <Text text={ "← World!" } background="#CCFFCC" />
         </Cards>
     }
 }
