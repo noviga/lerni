@@ -64,7 +64,7 @@ impl Component for Cards {
         let link = ctx.link();
 
         html! {
-            <div class="container pl-4 mt-4" >
+            <div class="container pl-4 mt-4 pr-4">
                 <nav class="pagination is-rounded" role="navigation" aria-label="pagination">
                     <ul class="pagination-list">
                         {
@@ -86,11 +86,11 @@ impl Component for Cards {
                     <a class="pagination-previous button is-info" onclick={ link.callback(|_| Msg::Prev) }>
                         <span class="icon"><i class="fas fa-lg fa-arrow-left"></i></span>
                     </a>
-                    <a class="pagination-next button is-info mr-4" onclick={ link.callback(|_| Msg::Next) }>
+                    <a class="pagination-next button is-info" onclick={ link.callback(|_| Msg::Next) }>
                         <span class="icon"><i class="fas fa-lg fa-arrow-right"></i></span>
                     </a>
                 </nav>
-                <div class="ml-4">
+                <div class="box">
                     <figure class="image is-16by9">
                         { props.children.iter().nth(self.current).unwrap() }
                     </figure>
