@@ -1,9 +1,7 @@
-mod cards;
-mod text;
+pub mod components;
+pub mod layout;
 
 use yew::Component;
-
-pub use crate::{cards::Cards, text::Text};
 
 pub fn start<T: Component>()
 where

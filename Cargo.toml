@@ -15,3 +15,7 @@ web-sys = "0.3.60"
 [[example]]
 name = "hello_world"
 crate-type = ["cdylib"]
+
+[[example]]
+name = "grid"
+crate-type = ["cdylib"]

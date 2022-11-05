@@ -22,12 +22,12 @@ pub struct Props {
     pub current: usize,
 }
 
-pub struct Cards {
+pub struct SlideShow {
     current: usize,
     count: usize,
 }
 
-impl Component for Cards {
+impl Component for SlideShow {
     type Message = Msg;
     type Properties = Props;
 
@@ -53,7 +53,7 @@ impl Component for Cards {
 
         let count = ctx.props().children.len();
         let current = ctx.props().current.min(count - 1);
-        Cards { current, count }
+        Self { current, count }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
@@ -84,7 +84,7 @@ impl Component for Cards {
     }
 }
 
-impl Cards {
+impl SlideShow {
     fn page_list(current: usize, count: usize) -> Vec<usize> {
         if count <= BUTTON_COUNT {
             (0..count).collect()
@@ -158,29 +158,29 @@ impl Cards {
 
 #[cfg(test)]
 mod tests {
-    use super::{Cards, BUTTON_COUNT};
+    use super::{SlideShow, BUTTON_COUNT};
 
     #[test]
     fn page_list() {
         let c = BUTTON_COUNT;
         for i in 0..c {
-            assert_eq!(Cards::page_list(i, c), (0..c).collect::<Vec<_>>());
+            assert_eq!(SlideShow::page_list(i, c), (0..c).collect::<Vec<_>>());
         }
 
         let c = 2 * BUTTON_COUNT;
-        assert_eq!(Cards::page_list(0, c), vec![0, 1, 2, c - 1]);
-        assert_eq!(Cards::page_list(1, c), vec![0, 1, 2, c - 1]);
-        assert_eq!(Cards::page_list(2, c), vec![0, 1, 2, 3, c - 1]);
-        assert_eq!(Cards::page_list(3, c), vec![0, 2, 3, 4, c - 1]);
+        assert_eq!(SlideShow::page_list(0, c), vec![0, 1, 2, c - 1]);
+        assert_eq!(SlideShow::page_list(1, c), vec![0, 1, 2, c - 1]);
+        assert_eq!(SlideShow::page_list(2, c), vec![0, 1, 2, 3, c - 1]);
+        assert_eq!(SlideShow::page_list(3, c), vec![0, 2, 3, 4, c - 1]);
         assert_eq!(
-            Cards::page_list(c - 4, c),
+            SlideShow::page_list(c - 4, c),
             vec![0, c - 5, c - 4, c - 3, c - 1]
         );
         assert_eq!(
-            Cards::page_list(c - 3, c),
+            SlideShow::page_list(c - 3, c),
             vec![0, c - 4, c - 3, c - 2, c - 1]
         );
-        assert_eq!(Cards::page_list(c - 2, c), vec![0, c - 3, c - 2, c - 1]);
-        assert_eq!(Cards::page_list(c - 1, c), vec![0, c - 3, c - 2, c - 1]);
+        assert_eq!(SlideShow::page_list(c - 2, c), vec![0, c - 3, c - 2, c - 1]);
+        assert_eq!(SlideShow::page_list(c - 1, c), vec![0, c - 3, c - 2, c - 1]);
     }
 }
