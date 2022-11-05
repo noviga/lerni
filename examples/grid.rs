@@ -9,7 +9,7 @@ use yew::prelude::*;
 pub fn grid() -> Html {
     html! {
         <Slide>
-            <Frame background="#66CCFF">
+            <Frame>
                 <Grid columns=3 rows=3>
                     { for (1..=9).map(|i| html_nested!(<Text text={ i.to_string() } />))}
                 </Grid>
