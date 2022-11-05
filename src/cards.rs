@@ -51,16 +51,12 @@ impl Component for Cards {
         });
         event.forget();
 
-        Cards {
-            current: ctx.props().current,
-            count: ctx.props().children.len(),
-        }
+        let count = ctx.props().children.len();
+        let current = ctx.props().current.min(count - 1);
+        Cards { current, count }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
-        if self.count == 0 {
-            return false;
-        }
         let max = self.count - 1;
         match msg {
             Msg::Prev if self.current > 0 => self.current -= 1,
@@ -72,9 +68,6 @@ impl Component for Cards {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        if self.count == 0 {
-            return html!();
-        }
         let props = ctx.props();
         let scope = ctx.link();
 
