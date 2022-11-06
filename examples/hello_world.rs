@@ -2,18 +2,18 @@ use lerni::{
     components::Text,
     layout::{Slide, SlideShow},
 };
-use wasm_bindgen::prelude::*;
+use wasm_bindgen::prelude::wasm_bindgen;
 use yew::prelude::*;
 
 #[function_component(HelloWorld)]
 pub fn hello_world() -> Html {
     html! {
         <SlideShow>
-            <Slide background="#FFCCCC">
-                <Text text="Hello →" />
+            <Slide bgcolor="#FFCCCC">
+                <Text>{ "Hello →" }</Text>
             </Slide>
-            <Slide background="#CCFFCC">
-                <Text text="← World!" />
+            <Slide bgcolor="#CCFFCC">
+                <Text>{ "← World!" }</Text>
             </Slide>
         </SlideShow>
     }
