@@ -72,14 +72,12 @@ impl Component for SlideShow {
         let scope = ctx.link();
 
         html! {
-            <div class="container pl-4 mt-4 pr-4">
-                { self.pagination(scope) }
-                <div class="box">
-                    <figure class="image is-16by9">
-                        { props.children.iter().nth(self.current).unwrap() }
-                    </figure>
+            <>
+                <div class="container pl-4 mt-4 pr-4">
+                    { self.pagination(scope) }
                 </div>
-            </div>
+                { props.children.iter().nth(self.current).unwrap() }
+            </>
         }
     }
 }
