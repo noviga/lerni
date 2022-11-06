@@ -10,7 +10,7 @@ pub enum Align {
     Left,
     /// Center horizontal align.
     Center,
-    /// Center right align.
+    /// Right horizontal align.
     Right,
 }
 
