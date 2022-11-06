@@ -1,4 +1,4 @@
-.PHONY: all clean examples fmt fmt-check linter prepare pre-commit serve test
+.PHONY: all clean doc doc-open examples fmt fmt-check linter prepare pre-commit serve test
 
 all:
 	@echo ──────────── Build release ────────────────────
@@ -7,6 +7,14 @@ all:
 clean:
 	@echo ──────────── Clean ────────────────────────────
 	@rm -rvf target
+
+doc:
+	@echo ──────────── Build docs ───────────────────────
+	@cargo doc --no-deps
+
+doc-open:
+	@echo ──────────── Build docs ───────────────────────
+	@cargo doc --no-deps --open
 
 examples:
 	@echo ──────────── Build examples ───────────────────

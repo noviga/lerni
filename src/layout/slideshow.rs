@@ -22,6 +22,7 @@ pub struct Props {
     pub current: usize,
 }
 
+/// Set of slides that are to be displayed sequentially.
 pub struct SlideShow {
     current: usize,
     count: usize,

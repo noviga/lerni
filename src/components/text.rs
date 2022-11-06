@@ -2,17 +2,23 @@ use yew::prelude::*;
 
 use crate::layout::{Align, VAlign};
 
+/// Text properties.
 #[derive(Properties, PartialEq)]
 pub struct Props {
-    pub text: String,
+    /// Inner tag contents.
+    pub children: Children,
+    /// Font size (default: 28px).
     #[prop_or(48)]
-    pub height: u32,
+    pub size: u32,
+    /// Horizontal align (default: Center).
     #[prop_or(Align::Center)]
     pub align: Align,
+    /// Vertical align (default: Middle).
     #[prop_or(VAlign::Middle)]
     pub valign: VAlign,
 }
 
+/// Text component.
 #[function_component(Text)]
 pub fn text(props: &Props) -> Html {
     let x = match props.align {
@@ -37,8 +43,8 @@ pub fn text(props: &Props) -> Html {
     };
 
     html! {
-        <text { x } { y } font-size={ props.height.to_string() } text-anchor={ anchor } dominant-baseline={ baseline }>
-            { props.text.clone() }
+        <text { x } { y } font-size={ props.size.to_string() } text-anchor={ anchor } dominant-baseline={ baseline }>
+            { for props.children.iter() }
         </text>
     }
 }

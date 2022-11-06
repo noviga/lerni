@@ -1,3 +1,5 @@
+//! Layout elements.
+
 mod grid;
 mod properties;
 mod slide;
