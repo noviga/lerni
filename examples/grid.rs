@@ -1,6 +1,6 @@
 use lerni::{
     components::Text,
-    layout::{Frame, Grid, Slide},
+    layout::{Grid, Slide},
 };
 use wasm_bindgen::prelude::*;
 use yew::prelude::*;
@@ -9,11 +9,9 @@ use yew::prelude::*;
 pub fn grid() -> Html {
     html! {
         <Slide>
-            <Frame>
-                <Grid columns=3 rows=3>
-                    { for (1..=9).map(|i| html_nested!(<Text text={ i.to_string() } />))}
-                </Grid>
-            </Frame>
+            <Grid columns=3 rows=3>
+                { for (1..=9).map(|i| html_nested!(<Text text={ i.to_string() } />))}
+            </Grid>
         </Slide>
     }
 }

@@ -1,6 +1,6 @@
 use lerni::{
     components::Text,
-    layout::{Frame, SlideShow},
+    layout::{Slide, SlideShow},
 };
 use wasm_bindgen::prelude::*;
 use yew::prelude::*;
@@ -9,12 +9,12 @@ use yew::prelude::*;
 pub fn hello_world() -> Html {
     html! {
         <SlideShow>
-            <Frame background="#FFCCCC">
+            <Slide background="#FFCCCC">
                 <Text text="Hello →" />
-            </Frame>
-            <Frame background="#CCFFCC">
+            </Slide>
+            <Slide background="#CCFFCC">
                 <Text text="← World!" />
-            </Frame>
+            </Slide>
         </SlideShow>
     }
 }
