@@ -4,7 +4,8 @@ version = "0.0.1"
 edition = "2021"
 license = "MIT"
 description = "Lerni content framework"
-include = ["src/**/*.rs"]
+repository = "https://github.com/lerni-edu/lerni"
+include = ["src/**/*.rs", "examples/**/*.rs"]
 
 [dependencies]
 gloo-events = "0.1.2"
@@ -13,9 +14,13 @@ wasm-bindgen = "0.2.83"
 web-sys = "0.3.60"
 
 [[example]]
-name = "hello_world"
+name = "buttons"
 crate-type = ["cdylib"]
 
 [[example]]
 name = "grid"
+crate-type = ["cdylib"]
+
+[[example]]
+name = "hello_world"
 crate-type = ["cdylib"]
