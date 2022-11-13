@@ -19,7 +19,7 @@ pub fn slide(props: &Props) -> Html {
             <div class="box">
                 <figure class="image is-16by9">
                     <svg viewBox={ view_box } class="has-ratio">
-                        <rect width="100%" height="100%" rx="10" fill={ props.bgcolor.clone() } />
+                        <rect width="100%" height="100%" rx="10" ry="10" fill={ props.bgcolor.clone() } />
                         { for props.children.iter() }
                     </svg>
                 </figure>

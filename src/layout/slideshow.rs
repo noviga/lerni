@@ -37,14 +37,14 @@ impl Component for SlideShow {
             .and_then(|win| win.document())
             .expect("Unable to get document");
 
-        let scope = ctx.link().clone();
+        let link = ctx.link().clone();
         let event = EventListener::new(&doc, "keydown", move |e| {
             if let Some(e) = e.dyn_ref::<KeyboardEvent>() {
                 match e.key_code() {
-                    KEY_ARROW_LEFT => scope.send_message(Msg::Prev),
-                    KEY_ARROW_RIGHT => scope.send_message(Msg::Next),
+                    KEY_ARROW_LEFT => link.send_message(Msg::Prev),
+                    KEY_ARROW_RIGHT => link.send_message(Msg::Next),
                     k @ (KEY_DIGIT_1..=KEY_DIGIT_9) => {
-                        scope.send_message(Msg::SetCurrent((k - KEY_DIGIT_1) as _))
+                        link.send_message(Msg::SetCurrent((k - KEY_DIGIT_1) as _))
                     }
                     _ => (),
                 }
@@ -70,12 +70,12 @@ impl Component for SlideShow {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         let props = ctx.props();
-        let scope = ctx.link();
+        let link = ctx.link();
 
         html! {
             <>
                 <div class="container pl-4 mt-4 pr-4">
-                    { self.pagination(scope) }
+                    { self.pagination(link) }
                 </div>
                 { props.children.iter().nth(self.current).unwrap() }
             </>
