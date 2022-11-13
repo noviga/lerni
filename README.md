@@ -40,19 +40,6 @@ Lerni is a platform designed to simplify the creation of educational materials s
     brew install binaryen
     ```
 
-3. Node.js (example for macOS):
-
-
-    ```
-    brew install node
-    ```
-
-4. Tailwind CSS:
-
-    ```
-    npm i -g tailwindcss
-    ```
-
 ## Getting Started
 
 Build examples:

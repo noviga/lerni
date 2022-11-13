@@ -8,8 +8,8 @@ pub struct Props {
     /// Inner tag contents.
     pub children: Children,
     /// Font size (default: 28px).
-    #[prop_or(48)]
-    pub size: u32,
+    #[prop_or_else(|| 48.to_string())]
+    pub size: String,
     /// Horizontal align (default: Center).
     #[prop_or(Align::Center)]
     pub align: Align,
@@ -38,12 +38,13 @@ pub fn text(props: &Props) -> Html {
     };
     let baseline = match props.valign {
         VAlign::Top => "hanging",
-        VAlign::Middle => "middle",
+        VAlign::Middle => "central",
         VAlign::Bottom => "text-top",
     };
 
     html! {
-        <text { x } { y } font-size={ props.size.to_string() } text-anchor={ anchor } dominant-baseline={ baseline }>
+        <text { x } { y } font-size={ props.size.clone() } text-anchor={ anchor }
+            dominant-baseline={ baseline } pointer-events="none">
             { for props.children.iter() }
         </text>
     }

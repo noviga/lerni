@@ -1,6 +1,7 @@
 #!/bin/sh
 
 EXAMPLES="\
+buttons \
 grid \
 hello_world \
 "
