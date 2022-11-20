@@ -1,6 +1,6 @@
 use lerni::widgets::*;
-use wasm_bindgen::prelude::*;
-use yew::prelude::*;
+use wasm_bindgen::prelude::wasm_bindgen;
+use yew::function_component;
 
 #[function_component(GridExample)]
 pub fn grid() -> Html {

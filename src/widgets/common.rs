@@ -16,7 +16,7 @@ pub trait MultiWidget: Widget {
     /// Returns mutable list of child widgets.
     fn children_mut(&mut self) -> &mut Vec<Box<dyn Widget>>;
 
-    /// Adds a new widget to the list of child widgets and returns `Self`.
+    /// Adds a new widget to the list of child widgets and returns boxed `Self`.
     fn add(mut self: Box<Self>, item: Box<dyn Widget>) -> Box<Self> {
         self.children_mut().push(item);
         self

@@ -1,9 +1,18 @@
 use yew::{html::Scope, prelude::*};
 
-use super::{common::Widget, Label};
+use crate::{
+    properties::Color,
+    widgets::{Label, Widget},
+};
 
 const WIDTH: usize = 400;
 const HEIGHT: usize = 150;
+
+/// Button widget.
+#[derive(Default)]
+pub struct Button {
+    props: Props,
+}
 
 #[derive(Default, Clone, Properties, PartialEq)]
 pub struct Props {
@@ -15,20 +24,14 @@ pub struct Props {
     height: usize,
     #[prop_or(24)]
     radius: usize,
-    #[prop_or_else(|| "orange".to_string())]
-    color: String,
+    #[prop_or(Color::AliceBlue)]
+    color: Color,
     #[prop_or(12)]
     border_width: usize,
-    #[prop_or_else(|| "blue".to_string())]
-    border_color: String,
+    #[prop_or(Color::RoyalBlue)]
+    border_color: Color,
     #[prop_or_default]
     pub onclick: Callback<(Props, Scope<Button>)>,
-}
-
-/// Button widget.
-#[derive(Default)]
-pub struct Button {
-    props: Props,
 }
 
 impl Widget for Button {
@@ -48,6 +51,10 @@ pub enum Msg {
     OnClick,
     /// Changes the button's text.
     SetText(String),
+    /// Changes the button's color.
+    SetColor(Color),
+    /// Changes the button's border color.
+    SetBorderColor(Color),
 }
 
 impl Component for Button {
@@ -72,11 +79,19 @@ impl Component for Button {
                 self.props.text = text;
                 true
             }
+            Msg::SetColor(color) => {
+                self.props.color = color;
+                true
+            }
+            Msg::SetBorderColor(color) => {
+                self.props.border_color = color;
+                true
+            }
         }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let p = ctx.props();
+        let p = &self.props;
         let style = format!(
             "fill:{};stroke:{};stroke-width:{}",
             p.color, p.border_color, p.border_width
@@ -111,6 +126,24 @@ impl ButtonCallback {
     pub fn set_text(mut self, f: impl Fn(&str) -> String + 'static) -> Self {
         self.fns
             .push(Box::new(move |p: &Props| Msg::SetText(f(&p.text))));
+        self
+    }
+
+    /// Adds a callback for setting the button's color.
+    ///
+    /// The callback's parameter is the property color (see [`Props`]).
+    pub fn set_color(mut self, f: impl Fn(&Color) -> Color + 'static) -> Self {
+        self.fns
+            .push(Box::new(move |p: &Props| Msg::SetColor(f(&p.color))));
+        self
+    }
+
+    /// Adds a callback for setting the button's border color.
+    ///
+    /// The callback's parameter is the property border color (see [`Props`]).
+    pub fn set_border_color(mut self, f: impl Fn(&Color) -> Color + 'static) -> Self {
+        self.fns
+            .push(Box::new(move |p: &Props| Msg::SetBorderColor(f(&p.color))));
         self
     }
 

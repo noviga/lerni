@@ -1,11 +1,13 @@
-use lerni::widgets::*;
-use wasm_bindgen::prelude::*;
-use yew::prelude::*;
+use lerni::{properties::Color, widgets::*};
+use wasm_bindgen::prelude::wasm_bindgen;
+use yew::function_component;
 
 #[function_component(Buttons)]
 pub fn buttons() -> Html {
     let onclick = Button::callback()
         .set_text(|current| format!("{}+{}", current, "Clicked"))
+        .set_color(|_| Color::Honeydew)
+        .set_border_color(|_| Color::ForestGreen)
         .build();
 
     slide(

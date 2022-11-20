@@ -1,6 +1,13 @@
 use yew::prelude::*;
 
-use super::common::{MultiWidget, Widget};
+use crate::widgets::{MultiWidget, Widget};
+
+/// Grid layout widget.
+#[derive(Default)]
+pub struct Grid {
+    children: Vec<Box<dyn Widget>>,
+    props: Props,
+}
 
 #[derive(Clone, Default, Properties, PartialEq)]
 pub struct Props {
@@ -9,13 +16,6 @@ pub struct Props {
     pub rows: usize,
     #[prop_or(1)]
     pub cols: usize,
-}
-
-/// Grid layout widget.
-#[derive(Default)]
-pub struct Grid {
-    children: Vec<Box<dyn Widget>>,
-    props: Props,
 }
 
 impl Widget for Grid {
