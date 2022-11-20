@@ -3,17 +3,16 @@ use std::collections::BTreeSet;
 use wasm_bindgen::JsCast;
 use yew::{html::Scope, prelude::*};
 
+use super::common::{MultiWidget, Widget};
+
+const WIDTH: usize = 1920;
+const HEIGHT: usize = 1080;
+
 const KEY_ARROW_LEFT: u32 = 37;
 const KEY_ARROW_RIGHT: u32 = 39;
 const KEY_DIGIT_1: u32 = 49;
 const KEY_DIGIT_9: u32 = KEY_DIGIT_1 + 8;
 const BUTTON_COUNT: usize = 6;
-
-pub enum Msg {
-    Prev,
-    Next,
-    SetCurrent(usize),
-}
 
 #[derive(Properties, PartialEq)]
 pub struct Props {
@@ -23,9 +22,36 @@ pub struct Props {
 }
 
 /// Set of slides that are to be displayed sequentially.
+#[derive(Default)]
 pub struct SlideShow {
+    children: Vec<Box<dyn Widget>>,
     current: usize,
     count: usize,
+}
+
+impl Widget for SlideShow {
+    fn render(&self, x: usize, y: usize, width: usize, height: usize) -> Html {
+        html! {
+            <SlideShow>
+                { for self.children().iter().map(|child| child.render(x, y, width, height)) }
+            </SlideShow>
+        }
+    }
+}
+
+impl MultiWidget for SlideShow {
+    fn children(&self) -> &[Box<dyn Widget>] {
+        &self.children
+    }
+    fn children_mut(&mut self) -> &mut Vec<Box<dyn Widget>> {
+        &mut self.children
+    }
+}
+
+pub enum Msg {
+    Prev,
+    Next,
+    SetCurrent(usize),
 }
 
 impl Component for SlideShow {
@@ -54,7 +80,11 @@ impl Component for SlideShow {
 
         let count = ctx.props().children.len();
         let current = ctx.props().current.min(count - 1);
-        Self { current, count }
+        Self {
+            current,
+            count,
+            ..Default::default()
+        }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
@@ -153,6 +183,20 @@ impl SlideShow {
             </nav>
         }
     }
+}
+
+impl From<Box<SlideShow>> for Html {
+    fn from(value: Box<SlideShow>) -> Self {
+        value.render(0, 0, WIDTH, HEIGHT)
+    }
+}
+
+/// Creates a `SlideShow`.
+pub fn slideshow(children: Vec<Box<dyn Widget>>) -> Box<SlideShow> {
+    Box::new(SlideShow {
+        children,
+        ..Default::default()
+    })
 }
 
 #[cfg(test)]
