@@ -1,25 +1,22 @@
-/// Main SVG width in pixels.
-pub const SVG_WIDTH: usize = 640;
-/// Main SVG height in pixels.
-pub const SVG_HEIGHT: usize = 360;
-
 /// Horizontal align.
-#[derive(Clone, PartialEq)]
+#[derive(Clone, Default, PartialEq)]
 pub enum Align {
     /// Left horizontal align.
     Left,
     /// Center horizontal align.
+    #[default]
     Center,
     /// Right horizontal align.
     Right,
 }
 
 /// Vertical align.
-#[derive(Clone, PartialEq)]
+#[derive(Clone, Default, PartialEq)]
 pub enum VAlign {
     /// Top vertical align.
     Top,
     /// Middle vertical align.
+    #[default]
     Middle,
     /// Bottom vertical align.
     Bottom,

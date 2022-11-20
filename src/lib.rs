@@ -2,8 +2,8 @@
 
 #![warn(missing_docs)]
 
-pub mod components;
-pub mod layout;
+pub mod properties;
+pub mod widgets;
 
 use yew::Component;
 
