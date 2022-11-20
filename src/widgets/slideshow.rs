@@ -3,7 +3,7 @@ use std::collections::BTreeSet;
 use wasm_bindgen::JsCast;
 use yew::{html::Scope, prelude::*};
 
-use super::common::{MultiWidget, Widget};
+use crate::widgets::{MultiWidget, Widget};
 
 const WIDTH: usize = 1920;
 const HEIGHT: usize = 1080;
@@ -14,19 +14,19 @@ const KEY_DIGIT_1: u32 = 49;
 const KEY_DIGIT_9: u32 = KEY_DIGIT_1 + 8;
 const BUTTON_COUNT: usize = 6;
 
-#[derive(Properties, PartialEq)]
-pub struct Props {
-    pub children: Children,
-    #[prop_or_default]
-    pub current: usize,
-}
-
 /// Set of slides that are to be displayed sequentially.
 #[derive(Default)]
 pub struct SlideShow {
     children: Vec<Box<dyn Widget>>,
     current: usize,
     count: usize,
+}
+
+#[derive(Properties, PartialEq)]
+pub struct Props {
+    pub children: Children,
+    #[prop_or_default]
+    pub current: usize,
 }
 
 impl Widget for SlideShow {

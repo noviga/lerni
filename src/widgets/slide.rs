@@ -1,24 +1,24 @@
 use yew::prelude::*;
 
-use super::common::Widget;
+use crate::{properties::Color, widgets::Widget};
 
 const WIDTH: usize = 1920;
 const HEIGHT: usize = 1080;
+
+/// Slide widget.
+#[derive(Default)]
+pub struct Slide {
+    content: Option<Box<dyn Widget>>,
+    props: Props,
+}
 
 #[derive(Clone, Default, Properties, PartialEq)]
 pub struct Props {
     pub children: Children,
     pub width: usize,
     pub height: usize,
-    #[prop_or_else(|| "none".to_string())]
-    pub background: String,
-}
-
-/// Slide.
-#[derive(Default)]
-pub struct Slide {
-    content: Option<Box<dyn Widget>>,
-    props: Props,
+    #[prop_or_default]
+    pub background: Color,
 }
 
 impl Widget for Slide {
@@ -52,7 +52,7 @@ impl Component for Slide {
                 <div class="box">
                     <figure class="image is-16by9">
                         <svg viewBox={ view_box } class="has-ratio">
-                            <rect width="100%" height="100%" rx="10" ry="10" fill={ ctx.props().background.clone() } />
+                            <rect width="100%" height="100%" rx="10" ry="10" fill={ ctx.props().background.to_string() } />
                             { for ctx.props().children.iter() }
                         </svg>
                     </figure>
@@ -64,8 +64,8 @@ impl Component for Slide {
 
 impl Slide {
     /// Changes background color and returns boxed `Self`.
-    pub fn background(mut self: Box<Self>, color: &str) -> Box<Self> {
-        self.props.background = color.to_string();
+    pub fn background(mut self: Box<Self>, color: Color) -> Box<Self> {
+        self.props.background = color;
         self
     }
 }
@@ -80,9 +80,6 @@ impl From<Box<Slide>> for Html {
 pub fn slide(content: Box<dyn Widget>) -> Box<Slide> {
     Box::new(Slide {
         content: Some(content),
-        props: Props {
-            background: "none".to_string(),
-            ..Default::default()
-        },
+        ..Default::default()
     })
 }

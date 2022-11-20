@@ -1,7 +1,14 @@
 use yew::prelude::*;
 
-use super::common::Widget;
-use crate::properties::{Align, VAlign};
+use crate::{
+    properties::{Align, VAlign},
+    widgets::Widget,
+};
+
+/// Label widget.
+pub struct Label {
+    props: Props,
+}
 
 /// Label properties.
 #[derive(Clone, Default, Properties, PartialEq)]
@@ -19,11 +26,6 @@ pub struct Props {
     /// Vertical align (default: Middle).
     #[prop_or(VAlign::Middle)]
     pub valign: VAlign,
-}
-
-/// Label component.
-pub struct Label {
-    props: Props,
 }
 
 impl Widget for Label {

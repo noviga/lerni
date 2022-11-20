@@ -8,6 +8,7 @@ repository = "https://github.com/lerni-edu/lerni"
 include = ["src/**/*.rs", "examples/**/*.rs"]
 
 [dependencies]
+derive_more = "0.99.17"
 gloo-events = "0.1.2"
 yew = "0.19.3"
 wasm-bindgen = "0.2.83"
