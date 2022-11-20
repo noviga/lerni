@@ -1,12 +1,12 @@
-use lerni::widgets::*;
+use lerni::{properties::Color, widgets::*};
 use wasm_bindgen::prelude::wasm_bindgen;
-use yew::prelude::*;
+use yew::function_component;
 
 #[function_component(HelloWorld)]
 pub fn hello_world() -> Html {
     slideshow(vec![
-        slide(label("Hello →")).background("#FFCCCC"),
-        slide(label("← World!")).background("#CCFFCC"),
+        slide(label("Hello →")).background(Color::MistyRose),
+        slide(label("← World!")).background(Color::PaleGreen),
     ])
     .into()
 }
