@@ -4,6 +4,7 @@ EXAMPLES="\
 buttons \
 grid \
 hello_world \
+pointer \
 "
 
 set -e

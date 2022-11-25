@@ -33,7 +33,7 @@ jobs:
         run: sudo apt-get install -y binaryen
 
       - name: Cache
-        uses: Swatinem/rust-cache@v1
+        uses: Swatinem/rust-cache@v2
 
       - name: Build examples
         run: ./scripts/examples.sh
