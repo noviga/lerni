@@ -7,11 +7,9 @@ pub fn pointer() -> Html {
     let pointer = use_state(|| true);
     let onclick = {
         let pointer = pointer.clone();
-        Callback::from(move |_| pointer.set(false))
+        Callback::from(move |_| pointer.set(!*pointer))
     };
-
-    // FIXME: Pointer doesn't switch off
-    slide(button("Pointer OFF").onclick(onclick))
+    slide(button("Pointer ON/OFF").onclick(onclick))
         .pointer(*pointer)
         .into()
 }

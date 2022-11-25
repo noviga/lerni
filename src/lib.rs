@@ -31,3 +31,17 @@ where
 {
     yew::start_app::<T>();
 }
+
+/// Debug macro.
+#[macro_export]
+macro_rules! debug {
+    ($arg:literal) => {
+        web_sys::console::log_1(&format!("{}", $arg).into())
+    };
+    ($arg:expr) => {
+        web_sys::console::log_1(&format!("{:?}", $arg).into())
+    };
+    ($fmt:literal $(, $args:expr)+) => {
+        web_sys::console::log_1(&format!($fmt $(, $args)+).into())
+    };
+}
