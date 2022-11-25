@@ -12,6 +12,7 @@ const HEIGHT: usize = 150;
 #[derive(Default)]
 pub struct Button {
     props: Props,
+    mouse_down: bool,
 }
 
 #[derive(Default, Clone, Properties, PartialEq)]
@@ -47,8 +48,8 @@ impl Widget for Button {
 
 /// Button messages.
 pub enum Msg {
-    /// Is sent to the button when clicked.
-    OnClick,
+    OnMouseDown,
+    OnMouseUp,
     /// Changes the button's text.
     SetText(String),
     /// Changes the button's color.
@@ -64,16 +65,22 @@ impl Component for Button {
     fn create(ctx: &Context<Self>) -> Self {
         Self {
             props: ctx.props().clone(),
+            ..Default::default()
         }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
         match msg {
-            Msg::OnClick => {
+            Msg::OnMouseDown => {
+                self.mouse_down = true;
+                true
+            }
+            Msg::OnMouseUp => {
+                self.mouse_down = false;
                 ctx.props()
                     .onclick
                     .emit((ctx.props().clone(), ctx.link().clone()));
-                false
+                true
             }
             Msg::SetText(text) => {
                 self.props.text = text;
@@ -92,20 +99,26 @@ impl Component for Button {
 
     fn view(&self, ctx: &Context<Self>) -> Html {
         let p = &self.props;
-        let style = format!(
-            "fill:{};stroke:{};stroke-width:{}",
-            p.color, p.border_color, p.border_width
-        );
         let x = (p.x + p.border_width / 2).to_string();
         let y = (p.y + p.border_width / 2).to_string();
         let width = (p.width - p.border_width).to_string();
         let height = (p.height - p.border_width).to_string();
         let lx = p.x + p.width / 2;
         let ly = p.y + p.height / 2;
+
+        let border_width = if self.mouse_down {
+            p.border_width + 6
+        } else {
+            p.border_width
+        };
+
         html! {
-            <a onclick={ ctx.link().callback(|_| Msg::OnClick) }>
+            <a onmousedown={ ctx.link().callback(|_| Msg::OnMouseDown) }
+                onmouseup={ ctx.link().callback(|_| Msg::OnMouseUp) }>
                 <rect { x } { y } { width } { height }
-                    rx={ p.radius.to_string() } ry={ p.radius.to_string() } { style } />
+                    rx={ p.radius.to_string() } ry={ p.radius.to_string() }
+                    fill={ p.color.to_string() } stroke={ p.border_color.to_string() }
+                    stroke-width={ border_width.to_string() } />
                 <Label x={ lx } y={ ly } text={ self.props.text.clone() } />
             </a>
         }
@@ -175,5 +188,6 @@ pub fn button(text: &str) -> Box<Button> {
             text: text.to_string(),
             ..Default::default()
         },
+        ..Default::default()
     })
 }
