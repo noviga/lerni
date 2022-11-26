@@ -1,9 +1,9 @@
 use lerni::widgets::*;
 use wasm_bindgen::prelude::wasm_bindgen;
-use yew::function_component;
+use yew::{function_component, Html};
 
 #[function_component(GridExample)]
-pub fn grid() -> Html {
+pub fn grid_example() -> Html {
     slide(
         grid(vec![
             label("1"),
