@@ -1,6 +1,6 @@
 use lerni::{properties::Color, widgets::*};
 use wasm_bindgen::prelude::wasm_bindgen;
-use yew::function_component;
+use yew::{function_component, Html};
 
 #[function_component(HelloWorld)]
 pub fn hello_world() -> Html {

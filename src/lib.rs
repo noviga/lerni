@@ -5,7 +5,7 @@
 pub mod properties;
 pub mod widgets;
 
-use yew::Component;
+use yew::{BaseComponent, Renderer};
 
 /// Start function.
 ///
@@ -25,11 +25,11 @@ use yew::Component;
 ///     lerni::start::<HelloWorld>();
 /// }
 /// ```
-pub fn start<T: Component>()
+pub fn start<T: BaseComponent>()
 where
-    <T as yew::Component>::Properties: Default,
+    <T as BaseComponent>::Properties: Default,
 {
-    yew::start_app::<T>();
+    Renderer::<T>::new().render();
 }
 
 /// Debug macro.
