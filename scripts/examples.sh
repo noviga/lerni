@@ -5,6 +5,7 @@ buttons \
 grid \
 hello_world \
 pointer \
+rows_cols \
 "
 
 set -e
