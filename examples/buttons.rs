@@ -1,6 +1,6 @@
 use lerni::{properties::Color, widgets::*};
 use wasm_bindgen::prelude::wasm_bindgen;
-use yew::{function_component, Html};
+use yew::prelude::*;
 
 #[function_component(Buttons)]
 pub fn buttons() -> Html {
@@ -10,17 +10,16 @@ pub fn buttons() -> Html {
         .set_border_color(|_| Color::ForestGreen)
         .build();
 
-    slide(
-        grid(vec![
-            button("Alice").onclick(onclick.clone()),
-            button("Bob").onclick(onclick.clone()),
-            button("Charlie").onclick(onclick.clone()),
-            button("Dave").onclick(onclick),
-        ])
-        .cols(2)
-        .rows(2),
-    )
-    .into()
+    html! {
+        <Slide>
+            <Grid cols=2 rows=2>
+                <Button text="Alice"   onclick={ onclick.clone() } />
+                <Button text="Bob"     onclick={ onclick.clone() } />
+                <Button text="Charlie" onclick={ onclick.clone() }/ >
+                <Button text="Dave"  { onclick }/ >
+            </Grid>
+        </Slide>
+    }
 }
 
 #[wasm_bindgen(start)]
