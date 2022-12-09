@@ -1,13 +1,15 @@
-use yew::prelude::*;
+use std::rc::Rc;
+use yew::{prelude::*, virtual_dom::VChild};
 
 use crate::{
     properties::{Align, VAlign},
-    widgets::Widget,
+    widgets::{Widget, WidgetObject},
 };
 
 /// Label widget.
+#[derive(Clone)]
 pub struct Label {
-    props: Props,
+    props: Rc<Props>,
 }
 
 /// Label properties.
@@ -15,8 +17,10 @@ pub struct Label {
 pub struct Props {
     #[prop_or_else(|| "Label".to_string())]
     pub text: String,
-    pub x: usize,
-    pub y: usize,
+    #[prop_or_default]
+    pub x: i32,
+    #[prop_or_default]
+    pub y: i32,
     /// Font size (default: 48px).
     #[prop_or(48)]
     pub font_size: usize,
@@ -28,32 +32,18 @@ pub struct Props {
     pub valign: VAlign,
 }
 
-impl Widget for Label {
-    fn render(&self, x: usize, y: usize, width: usize, height: usize) -> Html {
-        let x = x + width / 2;
-        let y = y + height / 2;
-        html! {
-            <Label text={ self.props.text.clone() } { x } { y } />
-        }
-    }
-}
-
 impl Component for Label {
     type Message = ();
     type Properties = Props;
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
-            props: ctx.props().clone(),
+            props: Rc::new(ctx.props().clone()),
         }
     }
 
-    fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
-        false
-    }
-
-    fn view(&self, ctx: &Context<Self>) -> Html {
-        let p = ctx.props();
+    fn view(&self, _ctx: &Context<Self>) -> Html {
+        let p = &self.props;
         let anchor = match p.align {
             Align::Left => "start",
             Align::Center => "middle",
@@ -76,12 +66,24 @@ impl Component for Label {
     }
 }
 
-/// Creates a new `Button` widget.
-pub fn label(text: &str) -> Box<Label> {
-    Box::new(Label {
-        props: Props {
-            text: text.to_string(),
-            ..Default::default()
-        },
-    })
+impl Widget for Label {
+    fn set_frame(&mut self, x: i32, y: i32, width: i32, height: i32) {
+        let p = Rc::make_mut(&mut self.props);
+        p.x = x + width / 2;
+        p.y = y + height / 2;
+    }
+
+    fn render(&self) -> Html {
+        let p = &self.props;
+        html! {
+            <Label text={ p.text.clone() } x={ p.x } y={ p.y } font_size={ p.font_size }
+                align={ p.align.clone() } valign={ p.valign.clone() } />
+        }
+    }
+}
+
+impl From<VChild<Label>> for WidgetObject {
+    fn from(child: VChild<Label>) -> Self {
+        Box::new(Label { props: child.props })
+    }
 }

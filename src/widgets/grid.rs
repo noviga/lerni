@@ -1,86 +1,82 @@
-use yew::prelude::*;
+use std::rc::Rc;
+use yew::{html::ChildrenRenderer, prelude::*, virtual_dom::VChild};
 
-use crate::widgets::{MultiWidget, Widget};
+use crate::widgets::{Widget, WidgetObject};
 
 /// Grid layout widget.
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct Grid {
-    children: Vec<Box<dyn Widget>>,
-    props: Props,
+    props: Rc<Props>,
 }
 
 #[derive(Clone, Default, Properties, PartialEq)]
 pub struct Props {
-    pub children: Children,
+    #[prop_or_default]
+    pub children: ChildrenRenderer<WidgetObject>,
+    #[prop_or_default]
+    pub x: i32,
+    #[prop_or_default]
+    pub y: i32,
+    #[prop_or_default]
+    pub width: i32,
+    #[prop_or_default]
+    pub height: i32,
     #[prop_or(1)]
     pub rows: usize,
     #[prop_or(1)]
     pub cols: usize,
 }
 
-impl Widget for Grid {
-    fn render(&self, x: usize, y: usize, width: usize, height: usize) -> Html {
-        let cols = self.props.cols;
-        let rows = self.props.rows;
-        let col_width = width / cols;
-        let row_height = height / rows;
+impl Component for Grid {
+    type Message = ();
+    type Properties = Props;
+
+    fn create(ctx: &Context<Self>) -> Self {
+        Self {
+            props: Rc::new(ctx.props().clone()),
+        }
+    }
+
+    fn view(&self, _ctx: &Context<Self>) -> Html {
+        let p = &self.props;
+        let cols = p.cols;
+        let rows = p.rows;
+        let col_width = p.width / cols as i32;
+        let row_height = p.height / rows as i32;
+
+        let max = rows * cols;
         html! {
-            <Grid { cols } { rows }>
-                { for self.children().iter().enumerate().map(|(i, child)| {
-                    let ox = x + (i % cols) * col_width;
-                    let oy = y + (i / cols) * row_height;
-                    child.render(ox, oy, col_width, row_height)
-                }) }
+            for p.children.iter().take(max).enumerate().map(|(i, mut item)| {
+                let ox = p.x + col_width * (i % cols) as i32;
+                let oy = p.y + row_height * (i / cols)  as i32 ;
+                item.set_frame(ox, oy, col_width, row_height);
+                item
+            })
+        }
+    }
+}
+
+impl Widget for Grid {
+    fn set_frame(&mut self, x: i32, y: i32, width: i32, height: i32) {
+        let p = Rc::make_mut(&mut self.props);
+        p.x = x;
+        p.y = y;
+        p.width = width;
+        p.height = height;
+    }
+
+    fn render(&self) -> Html {
+        let p = &self.props;
+        html! {
+            <Grid x={ p.x } y={ p.y } width={ p.width } height={ p.height } cols={ p.cols } rows={ p.rows }>
+                { for p.children.iter() }
             </Grid>
         }
     }
 }
 
-impl MultiWidget for Grid {
-    fn children(&self) -> &[Box<dyn Widget>] {
-        &self.children
+impl From<VChild<Grid>> for WidgetObject {
+    fn from(child: VChild<Grid>) -> Self {
+        Box::new(Grid { props: child.props })
     }
-    fn children_mut(&mut self) -> &mut Vec<Box<dyn Widget>> {
-        &mut self.children
-    }
-}
-
-impl Component for Grid {
-    type Message = ();
-    type Properties = Props;
-
-    fn create(_ctx: &Context<Self>) -> Self {
-        Default::default()
-    }
-
-    fn update(&mut self, _ctx: &Context<Self>, _msg: Self::Message) -> bool {
-        false
-    }
-
-    fn view(&self, ctx: &Context<Self>) -> Html {
-        let max = ctx.props().rows * ctx.props().cols;
-        html!(for ctx.props().children.iter().take(max))
-    }
-}
-
-impl Grid {
-    /// Changes the column count and return boxed `Self`.
-    pub fn cols(mut self: Box<Self>, cols: usize) -> Box<Self> {
-        self.props.cols = cols;
-        self
-    }
-
-    /// Changes the row count and return boxed `Self`.
-    pub fn rows(mut self: Box<Self>, rows: usize) -> Box<Self> {
-        self.props.rows = rows;
-        self
-    }
-}
-
-/// Creates a new `Grid` layout widget.
-pub fn grid(children: Vec<Box<dyn Widget>>) -> Box<Grid> {
-    Box::new(Grid {
-        children,
-        ..Default::default()
-    })
 }
