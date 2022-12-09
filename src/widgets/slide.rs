@@ -68,7 +68,7 @@ impl Component for Slide {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let p = &self.props;
+        let p = ctx.props();
         let view_box = format!("0 0 {} {}", p.width, p.height);
 
         let onmousemove = ctx.link().callback(|e: MouseEvent| Msg::MovePointer {
@@ -91,7 +91,7 @@ impl Component for Slide {
                                     item
                                 })
                             }
-                            { self.pointer_view(ctx.props().pointer) }
+                            { self.pointer_view(p.pointer) }
                         </svg>
                     </figure>
                 </div>

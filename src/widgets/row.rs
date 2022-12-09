@@ -33,8 +33,8 @@ impl Component for Row {
         }
     }
 
-    fn view(&self, _ctx: &Context<Self>) -> Html {
-        let p = &self.props;
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let p = ctx.props();
         let cols = p.children.len() as i32;
         let col_width = p.width / cols;
 

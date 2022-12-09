@@ -42,8 +42,8 @@ impl Component for Label {
         }
     }
 
-    fn view(&self, _ctx: &Context<Self>) -> Html {
-        let p = &self.props;
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let p = ctx.props();
         let anchor = match p.align {
             Align::Left => "start",
             Align::Center => "middle",

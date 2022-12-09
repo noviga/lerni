@@ -7,7 +7,6 @@ use yew::{
     virtual_dom::VChild,
 };
 
-use crate::debug;
 use crate::widgets::{Widget, WidgetObject};
 
 const WIDTH: i32 = 1920;
@@ -110,8 +109,6 @@ impl Component for SlideShow {
     fn view(&self, ctx: &Context<Self>) -> Html {
         let p = ctx.props();
         let link = ctx.link();
-
-        debug!("Current: {}", self.props.current);
 
         html! {
             <>

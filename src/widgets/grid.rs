@@ -37,8 +37,8 @@ impl Component for Grid {
         }
     }
 
-    fn view(&self, _ctx: &Context<Self>) -> Html {
-        let p = &self.props;
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let p = ctx.props();
         let cols = p.cols;
         let rows = p.rows;
         let col_width = p.width / cols as i32;

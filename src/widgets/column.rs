@@ -34,8 +34,8 @@ impl Component for Column {
         }
     }
 
-    fn view(&self, _ctx: &Context<Self>) -> Html {
-        let p = &self.props;
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let p = ctx.props();
         let rows = p.children.len() as i32;
         let row_height = p.height / rows;
 
