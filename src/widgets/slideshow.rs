@@ -1,12 +1,16 @@
 use gloo_events::EventListener;
-use std::collections::BTreeSet;
+use std::{collections::BTreeSet, rc::Rc};
 use wasm_bindgen::JsCast;
-use yew::{html::Scope, prelude::*};
+use yew::{
+    html::{ChildrenRenderer, Scope},
+    prelude::*,
+    virtual_dom::VChild,
+};
 
-use crate::widgets::{MultiWidget, Widget};
+use crate::widgets::{Widget, WidgetObject};
 
-const WIDTH: usize = 1920;
-const HEIGHT: usize = 1080;
+const WIDTH: i32 = 1920;
+const HEIGHT: i32 = 1080;
 
 const KEY_ARROW_LEFT: u32 = 37;
 const KEY_ARROW_RIGHT: u32 = 39;
@@ -14,38 +18,23 @@ const KEY_DIGIT_1: u32 = 49;
 const KEY_DIGIT_9: u32 = KEY_DIGIT_1 + 8;
 const BUTTON_COUNT: usize = 6;
 
-/// Set of slides that are to be displayed sequentially.
-#[derive(Default)]
-pub struct SlideShow {
-    children: Vec<Box<dyn Widget>>,
-    current: usize,
-    count: usize,
-}
-
-#[derive(Properties, PartialEq)]
+#[derive(Clone, Default, Properties, PartialEq)]
 pub struct Props {
-    pub children: Children,
+    #[prop_or_default]
+    pub children: ChildrenRenderer<WidgetObject>,
+    #[prop_or(WIDTH)]
+    pub width: i32,
+    #[prop_or(HEIGHT)]
+    pub height: i32,
     #[prop_or_default]
     pub current: usize,
 }
 
-impl Widget for SlideShow {
-    fn render(&self, x: usize, y: usize, width: usize, height: usize) -> Html {
-        html! {
-            <SlideShow>
-                { for self.children().iter().map(|child| child.render(x, y, width, height)) }
-            </SlideShow>
-        }
-    }
-}
-
-impl MultiWidget for SlideShow {
-    fn children(&self) -> &[Box<dyn Widget>] {
-        &self.children
-    }
-    fn children_mut(&mut self) -> &mut Vec<Box<dyn Widget>> {
-        &mut self.children
-    }
+/// Set of slides that are to be displayed sequentially.
+#[derive(Clone, Default)]
+pub struct SlideShow {
+    count: usize,
+    props: Rc<Props>,
 }
 
 pub enum Msg {
@@ -54,11 +43,29 @@ pub enum Msg {
     SetCurrent(usize),
 }
 
+impl Widget for SlideShow {
+    fn set_frame(&mut self, _x: i32, _y: i32, width: i32, height: i32) {
+        let p = Rc::make_mut(&mut self.props);
+        p.width = width;
+        p.height = height;
+    }
+
+    fn render(&self) -> Html {
+        let p = &self.props;
+        html! {
+            <SlideShow width={ p.width } height={ p.height } current={ p.current }>
+                { for p.children.iter() }
+            </SlideShow>
+        }
+    }
+}
+
 impl Component for SlideShow {
     type Message = Msg;
     type Properties = Props;
 
     fn create(ctx: &Context<Self>) -> Self {
+        let p = ctx.props();
         let doc = web_sys::window()
             .and_then(|win| win.document())
             .expect("Unable to get document");
@@ -78,28 +85,29 @@ impl Component for SlideShow {
         });
         event.forget();
 
-        let count = ctx.props().children.len();
-        let current = ctx.props().current.min(count - 1);
+        let count = p.children.len();
+        let mut props = p.clone();
+        props.current = p.current.min(count - 1);
         Self {
-            current,
             count,
-            ..Default::default()
+            props: Rc::new(props),
         }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+        let p = Rc::make_mut(&mut self.props);
         let max = self.count - 1;
         match msg {
-            Msg::Prev if self.current > 0 => self.current -= 1,
-            Msg::Next if self.current < max => self.current += 1,
-            Msg::SetCurrent(c) if c <= max => self.current = c,
+            Msg::Prev if p.current > 0 => p.current -= 1,
+            Msg::Next if p.current < max => p.current += 1,
+            Msg::SetCurrent(c) if c <= max => p.current = c,
             _ => return false,
         }
         true
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let props = ctx.props();
+        let p = ctx.props();
         let link = ctx.link();
 
         html! {
@@ -107,7 +115,12 @@ impl Component for SlideShow {
                 <div class="container pl-4 mt-4 pr-4">
                     { self.pagination(link) }
                 </div>
-                { props.children.iter().nth(self.current).unwrap() }
+                {
+                    p.children.iter().nth(self.props.current).map(|mut item|{
+                        item.set_frame(0, 0, p.width, p.height);
+                        item
+                    })
+                }
             </>
         }
     }
@@ -140,7 +153,7 @@ impl SlideShow {
     }
 
     fn page_button(&self, prev: Option<usize>, index: usize, scope: &Scope<Self>) -> Html {
-        let class = if index == self.current {
+        let class = if index == self.props.current {
             "pagination-link button is-warning"
         } else {
             "pagination-link"
@@ -160,7 +173,7 @@ impl SlideShow {
     }
 
     fn pagination(&self, scope: &Scope<Self>) -> Html {
-        let pages = Self::page_list(self.current, self.count);
+        let pages = Self::page_list(self.props.current, self.count);
         let mut prev = None;
 
         html! {
@@ -185,18 +198,13 @@ impl SlideShow {
     }
 }
 
-impl From<Box<SlideShow>> for Html {
-    fn from(value: Box<SlideShow>) -> Self {
-        value.render(0, 0, WIDTH, HEIGHT)
+impl From<VChild<SlideShow>> for WidgetObject {
+    fn from(child: VChild<SlideShow>) -> Self {
+        Box::new(SlideShow {
+            count: child.props.children.len(),
+            props: child.props,
+        })
     }
-}
-
-/// Creates a `SlideShow`.
-pub fn slideshow(children: Vec<Box<dyn Widget>>) -> Box<SlideShow> {
-    Box::new(SlideShow {
-        children,
-        ..Default::default()
-    })
 }
 
 #[cfg(test)]

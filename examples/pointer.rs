@@ -9,9 +9,12 @@ pub fn pointer() -> Html {
         let pointer = pointer.clone();
         Callback::from(move |_| pointer.set(!*pointer))
     };
-    slide(button("Pointer ON/OFF").onclick(onclick))
-        .pointer(*pointer)
-        .into()
+
+    html! {
+        <Slide pointer={ *pointer }>
+            <Button text="Pointer ON/OFF" { onclick } />
+        </Slide>
+    }
 }
 
 #[wasm_bindgen(start)]

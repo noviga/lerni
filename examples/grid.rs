@@ -1,38 +1,33 @@
 use lerni::widgets::*;
 use wasm_bindgen::prelude::wasm_bindgen;
-use yew::{function_component, Html};
+use yew::prelude::*;
 
 #[function_component(GridExample)]
 pub fn grid_example() -> Html {
-    slide(
-        grid(vec![
-            label("1"),
-            label("2"),
-            label("3"),
-            label("4"),
-            label("5"),
-            label("6"),
-            label("7"),
-            label("8"),
-        ])
-        .cols(3)
-        .rows(3)
-        .add(
-            grid(vec![
-                label("9"),
-                label("10"),
-                label("11"),
-                label("12"),
-                label("13"),
-                label("14"),
-                label("15"),
-                label("16"),
-            ])
-            .cols(4)
-            .rows(2),
-        ),
-    )
-    .into()
+    html! {
+        <Slide>
+            <Grid cols=3 rows=3>
+                <Label text="1" />
+                <Label text="2" />
+                <Label text="3" />
+                <Label text="4" />
+                <Label text="5" />
+                <Label text="6" />
+                <Label text="7" />
+                <Label text="8" />
+                <Grid cols=4 rows=2>
+                    <Label text="9"  />
+                    <Label text="10" />
+                    <Label text="11" />
+                    <Label text="12" />
+                    <Label text="13" />
+                    <Label text="14" />
+                    <Label text="15" />
+                    <Label text="16" />
+                </Grid>
+            </Grid>
+        </Slide>
+    }
 }
 
 #[wasm_bindgen(start)]

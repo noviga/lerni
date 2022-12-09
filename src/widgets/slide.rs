@@ -1,48 +1,42 @@
+use std::rc::Rc;
 use web_sys::SvgElement;
-use yew::prelude::*;
+use yew::{html::ChildrenRenderer, prelude::*, virtual_dom::VChild};
 
-use crate::{properties::Color, widgets::Widget};
+use crate::{
+    properties::Color,
+    widgets::{Widget, WidgetObject},
+};
 
-const WIDTH: usize = 1920;
-const HEIGHT: usize = 1080;
+const WIDTH: i32 = 1920;
+const HEIGHT: i32 = 1080;
 const POINTER_SIZE: i32 = 72;
-
-/// Slide widget.
-#[derive(Default)]
-pub struct Slide {
-    content: Option<Box<dyn Widget>>,
-    props: Props,
-    svg_ref: NodeRef,
-    pointer_x: i32,
-    pointer_y: i32,
-}
 
 #[derive(Clone, Default, Properties, PartialEq)]
 pub struct Props {
-    pub children: Children,
-    pub width: usize,
-    pub height: usize,
+    #[prop_or_default]
+    pub children: ChildrenRenderer<WidgetObject>,
+    #[prop_or(WIDTH)]
+    pub width: i32,
+    #[prop_or(HEIGHT)]
+    pub height: i32,
     #[prop_or_default]
     pub background: Color,
     #[prop_or_default]
     pub pointer: bool,
 }
 
+/// Slide widget.
+#[derive(Clone, Default)]
+pub struct Slide {
+    props: Rc<Props>,
+    svg_ref: NodeRef,
+    pointer_x: i32,
+    pointer_y: i32,
+}
+
 pub enum Msg {
     MovePointer { x: i32, y: i32 },
     HidePointer,
-}
-
-impl Widget for Slide {
-    fn render(&self, x: usize, y: usize, width: usize, height: usize) -> Html {
-        html! {
-            <Slide width={ width } height={ height } background={ self.props.background.clone() }
-                pointer={ self.props.pointer }>
-                // TODO: Remove unwrap
-                { self.content.as_ref().unwrap().render(x, y, width, height) }
-            </Slide>
-        }
-    }
 }
 
 impl Component for Slide {
@@ -51,7 +45,7 @@ impl Component for Slide {
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
-            props: ctx.props().clone(),
+            props: Rc::new(ctx.props().clone()),
             ..Default::default()
         }
     }
@@ -74,7 +68,8 @@ impl Component for Slide {
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let view_box = format!("0 0 {} {}", ctx.props().width, ctx.props().height);
+        let p = ctx.props();
+        let view_box = format!("0 0 {} {}", p.width, p.height);
 
         let onmousemove = ctx.link().callback(|e: MouseEvent| Msg::MovePointer {
             x: e.offset_x(),
@@ -88,10 +83,15 @@ impl Component for Slide {
                 <div class="box">
                     <figure class="image is-16by9">
                         <svg viewBox={ view_box } class="has-ratio" ref={ &self.svg_ref }
-                            { onmousemove } {onmouseleave}>
-                            <rect width="100%" height="100%" rx="10" ry="10" fill={ ctx.props().background.to_string() } />
-                            { for ctx.props().children.iter() }
-                            { self.pointer_view(ctx.props().pointer) }
+                            { onmousemove } {onmouseleave} >
+                            <rect width="100%" height="100%" rx="10" ry="10" fill={ p.background.to_string() } />
+                            {
+                                for p.children.iter().map(|mut item|{
+                                    item.set_frame(0, 0, p.width, p.height);
+                                    item
+                                })
+                            }
+                            { self.pointer_view(p.pointer) }
                         </svg>
                     </figure>
                 </div>
@@ -113,30 +113,28 @@ impl Slide {
     }
 }
 
-impl Slide {
-    /// Changes background color and returns boxed `Self`.
-    pub fn background(mut self: Box<Self>, color: Color) -> Box<Self> {
-        self.props.background = color;
-        self
+impl Widget for Slide {
+    fn set_frame(&mut self, _x: i32, _y: i32, width: i32, height: i32) {
+        let p = Rc::make_mut(&mut self.props);
+        p.width = width;
+        p.height = height;
     }
 
-    /// Changes the pointer visibility and returns boxed `Self`.
-    pub fn pointer(mut self: Box<Self>, flag: bool) -> Box<Self> {
-        self.props.pointer = flag;
-        self
-    }
-}
-
-impl From<Box<Slide>> for Html {
-    fn from(value: Box<Slide>) -> Self {
-        value.render(0, 0, WIDTH, HEIGHT)
+    fn render(&self) -> Html {
+        let p = &self.props;
+        html! {
+            <Slide width={ p.width } height={ p.height } background={ p.background.clone() } pointer={ p.pointer }>
+                { for p.children.iter() }
+            </Slide>
+        }
     }
 }
 
-/// Creates a `Slide`.
-pub fn slide(content: Box<dyn Widget>) -> Box<Slide> {
-    Box::new(Slide {
-        content: Some(content),
-        ..Default::default()
-    })
+impl From<VChild<Slide>> for WidgetObject {
+    fn from(child: VChild<Slide>) -> Self {
+        Box::new(Slide {
+            props: child.props,
+            ..Default::default()
+        })
+    }
 }

@@ -1,7 +1,14 @@
 use std::rc::Rc;
 use yew::{html::ChildrenRenderer, prelude::*, virtual_dom::VChild};
 
-use crate::widgets::{Widget2, WidgetObject};
+use crate::widgets::{Widget, WidgetObject};
+
+/// Column of widgets.
+#[derive(Clone)]
+pub struct Column {
+    /// Properties wrapper.
+    pub props: Rc<Props>,
+}
 
 #[derive(Clone, Default, Properties, PartialEq)]
 pub struct Props {
@@ -17,22 +24,18 @@ pub struct Props {
     height: i32,
 }
 
-#[derive(Clone)]
-pub struct Column {
-    pub props: Rc<Props>,
-}
+impl Component for Column {
+    type Message = ();
+    type Properties = Props;
 
-impl Widget2 for Column {
-    fn set_frame(&mut self, x: i32, y: i32, width: i32, height: i32) {
-        let p = Rc::make_mut(&mut self.props);
-        p.x = x;
-        p.y = y;
-        p.width = width;
-        p.height = height;
+    fn create(ctx: &Context<Self>) -> Self {
+        Self {
+            props: Rc::new(ctx.props().clone()),
+        }
     }
 
-    fn render(&self) -> Html {
-        let p = &self.props;
+    fn view(&self, ctx: &Context<Self>) -> Html {
+        let p = ctx.props();
         let rows = p.children.len() as i32;
         let row_height = p.height / rows;
 
@@ -46,18 +49,22 @@ impl Widget2 for Column {
     }
 }
 
-impl Component for Column {
-    type Message = ();
-    type Properties = Props;
-
-    fn create(ctx: &Context<Self>) -> Self {
-        Self {
-            props: Rc::new(ctx.props().clone()),
-        }
+impl Widget for Column {
+    fn set_frame(&mut self, x: i32, y: i32, width: i32, height: i32) {
+        let p = Rc::make_mut(&mut self.props);
+        p.x = x;
+        p.y = y;
+        p.width = width;
+        p.height = height;
     }
 
-    fn view(&self, _ctx: &Context<Self>) -> Html {
-        self.render()
+    fn render(&self) -> Html {
+        let p = &self.props;
+        html! {
+            <Column x={ p.x } y={ p.y } width={ p.width } height={ p.height }>
+                { for p.children.iter() }
+            </Column>
+        }
     }
 }
 

@@ -1,17 +1,18 @@
-use yew::{html::Scope, prelude::*};
+use std::rc::Rc;
+use yew::{html::Scope, prelude::*, virtual_dom::VChild};
 
 use crate::{
     properties::Color,
-    widgets::{Label, Widget},
+    widgets::{Label, Widget, WidgetObject},
 };
 
-const WIDTH: usize = 400;
-const HEIGHT: usize = 150;
+const WIDTH: i32 = 400;
+const HEIGHT: i32 = 150;
 
 /// Button widget.
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct Button {
-    props: Props,
+    props: Rc<Props>,
     mouse_down: bool,
 }
 
@@ -19,31 +20,24 @@ pub struct Button {
 pub struct Props {
     #[prop_or_else(|| "Button".to_string())]
     pub text: String,
-    x: usize,
-    y: usize,
-    width: usize,
-    height: usize,
+    #[prop_or_default]
+    pub x: i32,
+    #[prop_or_default]
+    pub y: i32,
+    #[prop_or_default]
+    pub width: i32,
+    #[prop_or_default]
+    pub height: i32,
     #[prop_or(24)]
-    radius: usize,
+    pub radius: i32,
     #[prop_or(Color::AliceBlue)]
-    color: Color,
+    pub color: Color,
     #[prop_or(12)]
-    border_width: usize,
+    pub border_width: i32,
     #[prop_or(Color::RoyalBlue)]
-    border_color: Color,
+    pub border_color: Color,
     #[prop_or_default]
     pub onclick: Callback<(Props, Scope<Button>)>,
-}
-
-impl Widget for Button {
-    fn render(&self, x: usize, y: usize, width: usize, height: usize) -> Html {
-        let x = x + width / 2 - WIDTH / 2;
-        let y = y + height / 2 - HEIGHT / 2;
-        html! {
-            <Button text={ self.props.text.clone() } { x } { y } width={ WIDTH } height={ HEIGHT }
-                onclick={ &self.props.onclick } />
-        }
-    }
 }
 
 /// Button messages.
@@ -64,12 +58,13 @@ impl Component for Button {
 
     fn create(ctx: &Context<Self>) -> Self {
         Self {
-            props: ctx.props().clone(),
+            props: Rc::new(ctx.props().clone()),
             ..Default::default()
         }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        let p = Rc::make_mut(&mut self.props);
         match msg {
             Msg::OnMouseDown => {
                 self.mouse_down = true;
@@ -83,22 +78,22 @@ impl Component for Button {
                 true
             }
             Msg::SetText(text) => {
-                self.props.text = text;
+                p.text = text;
                 true
             }
             Msg::SetColor(color) => {
-                self.props.color = color;
+                p.color = color;
                 true
             }
             Msg::SetBorderColor(color) => {
-                self.props.border_color = color;
+                p.border_color = color;
                 true
             }
         }
     }
 
     fn view(&self, ctx: &Context<Self>) -> Html {
-        let p = &self.props;
+        let p = ctx.props();
         let x = (p.x + p.border_width / 2).to_string();
         let y = (p.y + p.border_width / 2).to_string();
         let width = (p.width - p.border_width).to_string();
@@ -116,12 +111,39 @@ impl Component for Button {
             <a onmousedown={ ctx.link().callback(|_| Msg::OnMouseDown) }
                 onmouseup={ ctx.link().callback(|_| Msg::OnMouseUp) }>
                 <rect { x } { y } { width } { height }
-                    rx={ p.radius.to_string() } ry={ p.radius.to_string() }
-                    fill={ p.color.to_string() } stroke={ p.border_color.to_string() }
+                    rx={ self.props.radius.to_string() } ry={ self.props.radius.to_string() }
+                    fill={ self.props.color.to_string() } stroke={ self.props.border_color.to_string() }
                     stroke-width={ border_width.to_string() } />
                 <Label x={ lx } y={ ly } text={ self.props.text.clone() } />
             </a>
         }
+    }
+}
+
+impl Widget for Button {
+    fn set_frame(&mut self, x: i32, y: i32, width: i32, height: i32) {
+        let p = Rc::make_mut(&mut self.props);
+        p.width = WIDTH;
+        p.height = HEIGHT;
+        p.x = x + width / 2 - p.width / 2;
+        p.y = y + height / 2 - p.height / 2;
+    }
+
+    fn render(&self) -> Html {
+        let p = &self.props;
+        html! {
+            <Button text={ p.text.clone() } x={ p.x } y={ p.y } width={ p.width } height={ p.height }
+                onclick={ &self.props.onclick } />
+        }
+    }
+}
+
+impl From<VChild<Button>> for WidgetObject {
+    fn from(child: VChild<Button>) -> Self {
+        Box::new(Button {
+            props: child.props,
+            ..Default::default()
+        })
     }
 }
 
@@ -173,21 +195,4 @@ impl Button {
     pub fn callback() -> ButtonCallback {
         Default::default()
     }
-
-    /// Sets `onclick` event handler.
-    pub fn onclick(mut self: Box<Self>, callback: Callback<(Props, Scope<Button>)>) -> Box<Self> {
-        self.props.onclick = callback;
-        self
-    }
-}
-
-/// Creates a new `Button` widget.
-pub fn button(text: &str) -> Box<Button> {
-    Box::new(Button {
-        props: Props {
-            text: text.to_string(),
-            ..Default::default()
-        },
-        ..Default::default()
-    })
 }

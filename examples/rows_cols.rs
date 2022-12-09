@@ -5,18 +5,20 @@ use yew::prelude::*;
 #[function_component(RowsCols)]
 pub fn raws_cols() -> Html {
     html! {
-        <Slide2>
+        <Slide>
             <Row>
-                <Label2 text="1" />
-                <Label2 text="2" />
-                <Label2 text="3" />
+                <Label text="1" />
+                <Label text="2" />
+                <Label text="3" />
                 <Column>
-                    <Label2 text="4" />
-                    <Label2 text="5" />
-                    <Label2 text="6" />
+                    <Label text="4" />
+                    <Label text="5" />
+                    <Label text="6" />
+                    <Label text="7" />
                 </Column>
+                <Label text="8" />
             </Row>
-        </Slide2>
+        </Slide>
     }
 }
 
