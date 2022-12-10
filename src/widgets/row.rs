@@ -3,6 +3,12 @@ use yew::{html::ChildrenRenderer, prelude::*};
 
 use crate::widgets::{FromProperties, Widget, WidgetObject};
 
+/// Row of widgets.
+#[derive(Clone)]
+pub struct Row {
+    props: Rc<Props>,
+}
+
 #[derive(Clone, Default, Properties, PartialEq)]
 pub struct Props {
     #[prop_or_default]
@@ -15,12 +21,6 @@ pub struct Props {
     pub width: i32,
     #[prop_or_default]
     pub height: i32,
-}
-
-/// Row of widgets.
-#[derive(Clone)]
-pub struct Row {
-    props: Rc<Props>,
 }
 
 impl Component for Row {

@@ -4,7 +4,8 @@ use yew::{virtual_dom::VChild, Component, Html};
 /// Trait that all widget are to implement.
 pub trait Widget: Any + WidgetClone {
     /// Set frame within which the widget should be rendered.
-    fn set_frame(&mut self, x: i32, y: i32, width: i32, height: i32);
+    #[allow(unused_variables)]
+    fn set_frame(&mut self, x: i32, y: i32, width: i32, height: i32) {}
     /// Render the widget.
     fn render(&self) -> Html;
 }
