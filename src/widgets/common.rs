@@ -1,5 +1,5 @@
-use std::any::Any;
-use yew::Html;
+use std::{any::Any, rc::Rc};
+use yew::{virtual_dom::VChild, Component, Html};
 
 /// Trait that all widget are to implement.
 pub trait Widget: Any + WidgetClone {
@@ -40,5 +40,20 @@ impl PartialEq for WidgetObject {
 impl From<WidgetObject> for Html {
     fn from(widget: WidgetObject) -> Self {
         widget.render()
+    }
+}
+
+/// Trait for creating widget from properties.
+pub trait FromProperties: Component {
+    /// Creates `Component` from properties.
+    fn from_properties(props: Rc<Self::Properties>) -> Self;
+}
+
+impl<T> From<VChild<T>> for WidgetObject
+where
+    T: Component + FromProperties + Widget,
+{
+    fn from(child: VChild<T>) -> Self {
+        Box::new(T::from_properties(child.props))
     }
 }

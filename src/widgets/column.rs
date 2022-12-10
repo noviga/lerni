@@ -1,7 +1,7 @@
 use std::rc::Rc;
-use yew::{html::ChildrenRenderer, prelude::*, virtual_dom::VChild};
+use yew::{html::ChildrenRenderer, prelude::*};
 
-use crate::widgets::{Widget, WidgetObject};
+use crate::widgets::{FromProperties, Widget, WidgetObject};
 
 /// Column of widgets.
 #[derive(Clone)]
@@ -68,8 +68,8 @@ impl Widget for Column {
     }
 }
 
-impl From<VChild<Column>> for WidgetObject {
-    fn from(child: VChild<Column>) -> Self {
-        Box::new(Column { props: child.props })
+impl FromProperties for Column {
+    fn from_properties(props: Rc<Props>) -> Self {
+        Self { props }
     }
 }

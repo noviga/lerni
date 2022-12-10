@@ -1,9 +1,9 @@
 use std::rc::Rc;
-use yew::{prelude::*, virtual_dom::VChild};
+use yew::prelude::*;
 
 use crate::{
     properties::{Align, VAlign},
-    widgets::{Widget, WidgetObject},
+    widgets::{FromProperties, Widget},
 };
 
 /// Label widget.
@@ -82,8 +82,8 @@ impl Widget for Label {
     }
 }
 
-impl From<VChild<Label>> for WidgetObject {
-    fn from(child: VChild<Label>) -> Self {
-        Box::new(Label { props: child.props })
+impl FromProperties for Label {
+    fn from_properties(props: Rc<Props>) -> Self {
+        Self { props }
     }
 }

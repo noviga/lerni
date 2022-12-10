@@ -1,9 +1,9 @@
 use std::rc::Rc;
-use yew::{html::Scope, prelude::*, virtual_dom::VChild};
+use yew::{html::Scope, prelude::*};
 
 use crate::{
     properties::Color,
-    widgets::{Label, Widget, WidgetObject},
+    widgets::{FromProperties, Label, Widget},
 };
 
 const WIDTH: i32 = 400;
@@ -138,12 +138,12 @@ impl Widget for Button {
     }
 }
 
-impl From<VChild<Button>> for WidgetObject {
-    fn from(child: VChild<Button>) -> Self {
-        Box::new(Button {
-            props: child.props,
+impl FromProperties for Button {
+    fn from_properties(props: Rc<Props>) -> Self {
+        Self {
+            props,
             ..Default::default()
-        })
+        }
     }
 }
 
