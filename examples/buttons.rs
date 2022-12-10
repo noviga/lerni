@@ -1,23 +1,24 @@
-use lerni::{properties::Color, widgets::*};
+use lerni::widgets::*;
 use wasm_bindgen::prelude::wasm_bindgen;
 use yew::prelude::*;
 
-#[function_component(Buttons)]
-pub fn buttons() -> Html {
-    let onclick = Button::callback()
-        .set_text(|current| format!("{}+{}", current, "Clicked"))
-        .set_color(|_| Color::Honeydew)
-        .set_border_color(|_| Color::ForestGreen)
-        .build();
+#[function_component]
+pub fn Buttons() -> Html {
+    let counter = use_state(|| 0);
+    let onclick = {
+        let counter = counter.clone();
+        Callback::from(move |_| counter.set(*counter + 1))
+    };
 
     html! {
         <Slide>
             <Grid cols=2 rows=2>
                 <Button text="Alice"   onclick={ onclick.clone() } />
                 <Button text="Bob"     onclick={ onclick.clone() } />
-                <Button text="Charlie" onclick={ onclick.clone() }/ >
-                <Button text="Dave"  { onclick }/ >
+                <Button text="Charlie" onclick={ onclick.clone() } />
+                <Button text="Dave"  { onclick } />
             </Grid>
+            <Label text={ format!("Clicked: {}", *counter) }/>
         </Slide>
     }
 }
