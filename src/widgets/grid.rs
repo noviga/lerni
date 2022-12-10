@@ -1,7 +1,7 @@
 use std::rc::Rc;
-use yew::{html::ChildrenRenderer, prelude::*, virtual_dom::VChild};
+use yew::{html::ChildrenRenderer, prelude::*};
 
-use crate::widgets::{Widget, WidgetObject};
+use crate::widgets::{FromProperties, Widget, WidgetObject};
 
 /// Grid layout widget.
 #[derive(Clone, Default)]
@@ -75,8 +75,8 @@ impl Widget for Grid {
     }
 }
 
-impl From<VChild<Grid>> for WidgetObject {
-    fn from(child: VChild<Grid>) -> Self {
-        Box::new(Grid { props: child.props })
+impl FromProperties for Grid {
+    fn from_properties(props: Rc<Props>) -> Self {
+        Self { props }
     }
 }

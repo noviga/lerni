@@ -4,10 +4,9 @@ use wasm_bindgen::JsCast;
 use yew::{
     html::{ChildrenRenderer, Scope},
     prelude::*,
-    virtual_dom::VChild,
 };
 
-use crate::widgets::{Widget, WidgetObject};
+use crate::widgets::{FromProperties, Widget, WidgetObject};
 
 const WIDTH: i32 = 1920;
 const HEIGHT: i32 = 1080;
@@ -198,12 +197,12 @@ impl SlideShow {
     }
 }
 
-impl From<VChild<SlideShow>> for WidgetObject {
-    fn from(child: VChild<SlideShow>) -> Self {
-        Box::new(SlideShow {
-            count: child.props.children.len(),
-            props: child.props,
-        })
+impl FromProperties for SlideShow {
+    fn from_properties(props: Rc<Props>) -> Self {
+        Self {
+            count: props.children.len(),
+            props,
+        }
     }
 }
 

@@ -11,7 +11,7 @@ mod slideshow;
 
 pub use button::Button;
 pub use column::Column;
-pub use common::{Widget, WidgetObject};
+pub use common::{FromProperties, Widget, WidgetObject};
 pub use grid::Grid;
 pub use label::Label;
 pub use row::Row;

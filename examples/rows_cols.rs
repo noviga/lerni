@@ -3,7 +3,7 @@ use wasm_bindgen::prelude::wasm_bindgen;
 use yew::prelude::*;
 
 #[function_component(RowsCols)]
-pub fn raws_cols() -> Html {
+pub fn rows_cols() -> Html {
     html! {
         <Slide>
             <Row>
