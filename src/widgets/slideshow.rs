@@ -1,15 +1,7 @@
 use gloo_events::EventListener;
-use std::{collections::BTreeSet, rc::Rc};
+use std::collections::BTreeSet;
 use wasm_bindgen::JsCast;
-use yew::{
-    html::{ChildrenRenderer, Scope},
-    prelude::*,
-};
-
-use crate::widgets::{FromProperties, Widget, WidgetObject};
-
-const WIDTH: i32 = 1920;
-const HEIGHT: i32 = 1080;
+use yew::{html::Scope, prelude::*};
 
 const KEY_ARROW_LEFT: u32 = 37;
 const KEY_ARROW_RIGHT: u32 = 39;
@@ -17,46 +9,25 @@ const KEY_DIGIT_1: u32 = 49;
 const KEY_DIGIT_9: u32 = KEY_DIGIT_1 + 8;
 const BUTTON_COUNT: usize = 6;
 
-#[derive(Clone, Default, Properties, PartialEq)]
-pub struct Props {
-    #[prop_or_default]
-    pub children: ChildrenRenderer<WidgetObject>,
-    #[prop_or(WIDTH)]
-    pub width: i32,
-    #[prop_or(HEIGHT)]
-    pub height: i32,
-    #[prop_or_default]
-    pub current: usize,
-}
-
 /// Set of slides that are to be displayed sequentially.
 #[derive(Clone, Default)]
 pub struct SlideShow {
+    current: usize,
     count: usize,
-    props: Rc<Props>,
+}
+
+#[derive(Clone, Default, Properties, PartialEq)]
+pub struct Props {
+    #[prop_or_default]
+    pub children: Children,
+    #[prop_or_default]
+    pub current: usize,
 }
 
 pub enum Msg {
     Prev,
     Next,
     SetCurrent(usize),
-}
-
-impl Widget for SlideShow {
-    fn set_frame(&mut self, _x: i32, _y: i32, width: i32, height: i32) {
-        let p = Rc::make_mut(&mut self.props);
-        p.width = width;
-        p.height = height;
-    }
-
-    fn render(&self) -> Html {
-        let p = &self.props;
-        html! {
-            <SlideShow width={ p.width } height={ p.height } current={ p.current }>
-                { for p.children.iter() }
-            </SlideShow>
-        }
-    }
 }
 
 impl Component for SlideShow {
@@ -85,21 +56,16 @@ impl Component for SlideShow {
         event.forget();
 
         let count = p.children.len();
-        let mut props = p.clone();
-        props.current = p.current.min(count - 1);
-        Self {
-            count,
-            props: Rc::new(props),
-        }
+        let current = p.current.min(count - 1);
+        Self { current, count }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
-        let p = Rc::make_mut(&mut self.props);
         let max = self.count - 1;
         match msg {
-            Msg::Prev if p.current > 0 => p.current -= 1,
-            Msg::Next if p.current < max => p.current += 1,
-            Msg::SetCurrent(c) if c <= max => p.current = c,
+            Msg::Prev if self.current > 0 => self.current -= 1,
+            Msg::Next if self.current < max => self.current += 1,
+            Msg::SetCurrent(c) if c <= max => self.current = c,
             _ => return false,
         }
         true
@@ -114,12 +80,7 @@ impl Component for SlideShow {
                 <div class="container pl-4 mt-4 pr-4">
                     { self.pagination(link) }
                 </div>
-                {
-                    p.children.iter().nth(self.props.current).map(|mut item|{
-                        item.set_frame(0, 0, p.width, p.height);
-                        item
-                    })
-                }
+                { p.children.iter().nth(self.current) }
             </>
         }
     }
@@ -152,7 +113,7 @@ impl SlideShow {
     }
 
     fn page_button(&self, prev: Option<usize>, index: usize, scope: &Scope<Self>) -> Html {
-        let class = if index == self.props.current {
+        let class = if index == self.current {
             "pagination-link button is-warning"
         } else {
             "pagination-link"
@@ -172,7 +133,7 @@ impl SlideShow {
     }
 
     fn pagination(&self, scope: &Scope<Self>) -> Html {
-        let pages = Self::page_list(self.props.current, self.count);
+        let pages = Self::page_list(self.current, self.count);
         let mut prev = None;
 
         html! {
@@ -193,15 +154,6 @@ impl SlideShow {
                     <span class="icon"><i class="fas fa-lg fa-arrow-right"></i></span>
                 </a>
             </nav>
-        }
-    }
-}
-
-impl FromProperties for SlideShow {
-    fn from_properties(props: Rc<Props>) -> Self {
-        Self {
-            count: props.children.len(),
-            props,
         }
     }
 }
