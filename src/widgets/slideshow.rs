@@ -80,7 +80,11 @@ impl Component for SlideShow {
                 <div class="container pl-4 mt-4 pr-4">
                     { self.pagination(link) }
                 </div>
-                { p.children.iter().nth(self.current) }
+                {
+                    for p.children.iter().enumerate().map(|(i, item)| {
+                        html_nested!(<g hidden={ i != self.current }>{ item }</g>)
+                    })
+                }
             </>
         }
     }
