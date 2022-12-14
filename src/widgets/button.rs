@@ -45,7 +45,7 @@ pub fn Button(props: &Props) -> Html {
                 fill={ props.color.to_string() } stroke={ props.border_color.to_string() }
                 stroke-width={ border_width.to_string() } />
             <ContextProvider<Frame> context={ f }>
-                <Label text={ props.text.clone() } />
+                <Label text={ props.text.clone() } html={ props.html.clone() } />
             </ContextProvider<Frame>>
         </a>
     }
@@ -54,8 +54,10 @@ pub fn Button(props: &Props) -> Html {
 /// Button properties.
 #[derive(Default, Clone, Properties, PartialEq)]
 pub struct Props {
-    #[prop_or_else(|| "Button".to_string())]
+    #[prop_or_default]
     pub text: String,
+    #[prop_or_default]
+    pub html: Html,
     #[prop_or(24)]
     pub radius: i32,
     #[prop_or(Color::AliceBlue)]

@@ -26,7 +26,13 @@ pub fn Label(props: &Props) -> Html {
     html! {
         <text { x } { y } font-size={ props.font_size.to_string() } text-anchor={ anchor }
             dominant-baseline={ baseline } pointer-events="none">
-            { &props.text }
+            {
+                if props.text.is_empty() {
+                    props.html.clone()
+                } else {
+                    props.text.clone().into()
+                }
+            }
         </text>
     }
 }
@@ -34,8 +40,10 @@ pub fn Label(props: &Props) -> Html {
 /// Label properties.
 #[derive(Clone, Default, Properties, PartialEq)]
 pub struct Props {
-    #[prop_or_else(|| "Label".to_string())]
+    #[prop_or_default]
     pub text: String,
+    #[prop_or_default]
+    pub html: Html,
     /// Font size (default: 48px).
     #[prop_or(48)]
     pub font_size: usize,
