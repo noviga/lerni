@@ -7,9 +7,9 @@ pub fn grid_example() -> Html {
     html! {
         <Slide>
             <Grid cols=3 rows=3>
-                <Label text="1" />
+                <Label html={ html!(<tspan font-size="96">{ "1" }</tspan>) } />
                 <Label text="2" />
-                <Label text="3" />
+                <Label html={ html!(<tspan fill="red">{ "3" }</tspan>) } />
                 <Label text="4" />
                 <Label text="5" />
                 <Label text="6" />
