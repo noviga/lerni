@@ -16,7 +16,7 @@ pub fn Buttons() -> Html {
                 <Button text="Alice"   onclick={ onclick.clone() } />
                 <Button text="Bob"     onclick={ onclick.clone() } />
                 <Button text="Charlie" onclick={ onclick.clone() } />
-                <Button text="Dave"  { onclick } />
+                <Button html={ html!(<tspan font-size="96">{ "Dave" }</tspan>) } { onclick } />
             </Grid>
             <Label text={ format!("Clicked: {}", *counter) }/>
         </Slide>

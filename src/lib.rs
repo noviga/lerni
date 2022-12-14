@@ -3,6 +3,7 @@
 #![warn(missing_docs)]
 
 pub mod properties;
+pub mod utils;
 pub mod widgets;
 
 use yew::{BaseComponent, Renderer};
