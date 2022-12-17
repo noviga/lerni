@@ -6,11 +6,11 @@ use yew::prelude::*;
 pub fn rows_cols() -> Html {
     html! {
         <Slide>
-            <Row>
+            <Row border_width=4 stretch={ vec![1, 1, 4, 1, 1] }>
                 <Label text="1" />
                 <Label text="2" />
                 <Label text="3" />
-                <Column>
+                <Column border_width=4 stretch={ vec![1, 2, 3, 4] }>
                     <Label text="4" />
                     <Label text="5" />
                     <Label text="6" />

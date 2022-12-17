@@ -8,6 +8,8 @@ pub enum Align {
     Center,
     /// Right horizontal align.
     Right,
+    /// Fill all horizontal space.
+    Fill,
 }
 
 /// Vertical align.
@@ -20,4 +22,6 @@ pub enum VAlign {
     Middle,
     /// Bottom vertical align.
     Bottom,
+    /// Fill all vertical space.
+    Fill,
 }
