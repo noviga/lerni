@@ -1,7 +1,7 @@
 use yew::prelude::*;
 
 use crate::{
-    properties::Color,
+    properties::{Align, Color, VAlign},
     widgets::{Frame, Label},
 };
 
@@ -13,10 +13,27 @@ const HEIGHT: i32 = 150;
 pub fn Button(props: &Props) -> Html {
     let f = use_context::<Frame>().unwrap();
 
-    let x = (f.x + (f.width - WIDTH) / 2 + props.border_width / 2).to_string();
-    let y = (f.y + (f.height - HEIGHT) / 2 + props.border_width / 2).to_string();
-    let width = (WIDTH - props.border_width).to_string();
-    let height = (HEIGHT - props.border_width).to_string();
+    let width = if props.align == Align::Fill {
+        f.width
+    } else {
+        props.width
+    };
+    let height = if props.valign == VAlign::Fill {
+        f.height
+    } else {
+        props.height
+    };
+
+    let x = match props.align {
+        Align::Left | Align::Fill => f.x,
+        Align::Center => f.x + (f.width - width) / 2,
+        Align::Right => f.x + f.width - width,
+    };
+    let y = match props.valign {
+        VAlign::Top | VAlign::Fill => f.y,
+        VAlign::Middle => f.y + (f.height - height) / 2,
+        VAlign::Bottom => f.y + f.height - height,
+    };
 
     let mouse_down = use_state(|| false);
     let onmousedown = {
@@ -27,8 +44,16 @@ pub fn Button(props: &Props) -> Html {
         let mouse_down = mouse_down.clone();
         let props = props.clone();
         Callback::from(move |_| {
+            if *mouse_down {
+                mouse_down.set(false);
+                props.onclick.emit(props.clone());
+            }
+        })
+    };
+    let onmouseleave = {
+        let mouse_down = mouse_down.clone();
+        Callback::from(move |_| {
             mouse_down.set(false);
-            props.onclick.emit(props.clone());
         })
     };
 
@@ -38,14 +63,24 @@ pub fn Button(props: &Props) -> Html {
         props.border_width
     };
 
+    let frame = Frame {
+        x,
+        y,
+        width,
+        height,
+    };
+    let x = (x + border_width / 2).to_string();
+    let y = (y + border_width / 2).to_string();
+    let width = (width - border_width).to_string();
+    let height = (height - border_width).to_string();
     html! {
-        <a { onmousedown } { onmouseup }>
+        <a { onmousedown } { onmouseup } { onmouseleave }>
             <rect { x } { y } { width } { height }
                 rx={ props.radius.to_string() } ry={ props.radius.to_string() }
                 fill={ props.color.to_string() } stroke={ props.border_color.to_string() }
                 stroke-width={ border_width.to_string() } />
-            <ContextProvider<Frame> context={ f }>
-                <Label text={ props.text.clone() } html={ props.html.clone() } />
+            <ContextProvider<Frame> context={ frame }>
+                <Label text={ props.text.clone() } html={ props.html.clone() } font_size={ props.font_size }/>
             </ContextProvider<Frame>>
         </a>
     }
@@ -58,14 +93,24 @@ pub struct Props {
     pub text: String,
     #[prop_or_default]
     pub html: Html,
+    #[prop_or(WIDTH)]
+    pub width: i32,
+    #[prop_or(HEIGHT)]
+    pub height: i32,
     #[prop_or(24)]
     pub radius: i32,
+    #[prop_or(48)]
+    pub font_size: usize,
     #[prop_or(Color::AliceBlue)]
     pub color: Color,
     #[prop_or(12)]
     pub border_width: i32,
     #[prop_or(Color::RoyalBlue)]
     pub border_color: Color,
+    #[prop_or(Align::Center)]
+    pub align: Align,
+    #[prop_or(VAlign::Middle)]
+    pub valign: VAlign,
     #[prop_or_default]
     pub onclick: Callback<Props>,
 }
