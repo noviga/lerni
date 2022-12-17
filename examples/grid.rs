@@ -15,7 +15,7 @@ pub fn grid_example() -> Html {
                 <Label text="6" />
                 <Label text="7" />
                 <Label text="8" />
-                <Grid cols=4 rows=2>
+                <Grid cols=4 rows=2 border_width=6>
                     <Label text="9"  />
                     <Label text="10" />
                     <Label text="11" />

@@ -1,4 +1,4 @@
-use lerni::widgets::*;
+use lerni::{properties::*, widgets::*};
 use wasm_bindgen::prelude::wasm_bindgen;
 use yew::prelude::*;
 
@@ -12,13 +12,17 @@ pub fn Buttons() -> Html {
 
     html! {
         <Slide>
-            <Grid cols=2 rows=2>
-                <Button text="Alice"   onclick={ onclick.clone() } />
-                <Button text="Bob"     onclick={ onclick.clone() } />
-                <Button text="Charlie" onclick={ onclick.clone() } />
-                <Button html={ html!(<tspan font-size="96">{ "Dave" }</tspan>) } { onclick } />
+            <Grid cols=3 rows=3>
+                <Button text="Alice" onclick={ onclick.clone() } />
+                <Button text="Bob" width=300 height=300 radius=150 onclick={ onclick.clone() } />
+                <Button text="Charlie" font_size=72 onclick={ onclick.clone() } />
+                <Button html={ html!(<tspan font-size="96" fill="red">{ "Dave" }</tspan>) } onclick={ onclick.clone() } />
+                <Label text={ format!("Clicked: {}", *counter) }/>
+                <Button text="Eve" align={ Align::Right } onclick={ onclick.clone() } />
+                <Button text="Ferdie" align={ Align::Right } valign={ VAlign::Bottom } onclick={ onclick.clone() } />
+                <Button text="George" color={ Color::Honeydew } border_color={ Color::ForestGreen } onclick={ onclick.clone() } />
+                <Button text="Harry" align={ Align::Fill } valign={ VAlign::Fill } { onclick } />
             </Grid>
-            <Label text={ format!("Clicked: {}", *counter) }/>
         </Slide>
     }
 }

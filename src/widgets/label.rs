@@ -12,12 +12,12 @@ pub fn Label(props: &Props) -> Html {
 
     let anchor = match props.align {
         Align::Left => "start",
-        Align::Center => "middle",
+        Align::Center | Align::Fill => "middle",
         Align::Right => "end",
     };
     let baseline = match props.valign {
         VAlign::Top => "hanging",
-        VAlign::Middle => "central",
+        VAlign::Middle | VAlign::Fill => "central",
         VAlign::Bottom => "text-top",
     };
     let x = (f.x + f.width / 2).to_string();
