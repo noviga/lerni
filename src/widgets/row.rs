@@ -12,18 +12,19 @@ pub fn Row(props: &Props) -> Html {
         .collect();
     let denominator: i32 = stretch.iter().sum();
 
+    let spacing = props.spacing * (props.children.len() as i32 - 1);
     let mut x = f.x + props.border_width / 2;
     let y = f.y + props.border_width / 2;
     let height = f.height - props.border_width;
 
     html! {
         for props.children.iter().enumerate().map(|(i, item)| {
-            let width = (f.width - props.border_width) * stretch[i] / denominator;
+            let width = (f.width - props.border_width - spacing) * stretch[i] / denominator;
             let frame = Frame {
-                x,
-                y,
-                width,
-                height,
+                x: x + props.padding,
+                y: y + props.padding,
+                width: width - 2 * props.padding,
+                height: height - 2 * props.padding,
             };
             let html = html_nested! {
                 <ContextProvider<Frame> context={ frame }>
@@ -32,7 +33,7 @@ pub fn Row(props: &Props) -> Html {
                     { item }
                 </ContextProvider<Frame>>
             };
-            x += width;
+            x += width + props.spacing;
             html
         })
     }
@@ -48,4 +49,8 @@ pub struct Props {
     pub border_color: Color,
     #[prop_or_default]
     pub stretch: Vec<i32>,
+    #[prop_or_default]
+    pub spacing: i32,
+    #[prop_or_default]
+    pub padding: i32,
 }
