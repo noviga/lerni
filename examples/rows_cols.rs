@@ -1,4 +1,7 @@
-use lerni::widgets::*;
+use lerni::{
+    properties::{Align, VAlign},
+    widgets::*,
+};
 use wasm_bindgen::prelude::wasm_bindgen;
 use yew::prelude::*;
 
@@ -6,14 +9,14 @@ use yew::prelude::*;
 pub fn rows_cols() -> Html {
     html! {
         <Slide>
-            <Row border_width=4 stretch={ vec![1, 1, 4, 1, 1] }>
+            <Row border_width=4 stretch={ vec![1, 1, 4, 1, 1] } padding=20>
                 <Label text="1" />
-                <Label text="2" />
+                <Button text="2" align={ Align::Fill } valign={ VAlign::Fill } />
                 <Label text="3" />
-                <Column border_width=4 stretch={ vec![1, 2, 3, 4] }>
+                <Column border_width=4 stretch={ vec![1, 2, 3, 4] } spacing=20>
                     <Label text="4" />
                     <Label text="5" />
-                    <Label text="6" />
+                    <Button text="6" align={ Align::Fill } valign={ VAlign::Fill } />
                     <Label text="7" />
                 </Column>
                 <Label text="8" />

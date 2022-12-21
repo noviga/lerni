@@ -1,7 +1,7 @@
 use yew::prelude::*;
 
 use crate::{
-    properties::{Align, VAlign},
+    properties::{Align, Color, VAlign},
     widgets::Frame,
 };
 
@@ -25,7 +25,7 @@ pub fn Label(props: &Props) -> Html {
 
     html! {
         <text { x } { y } font-size={ props.font_size.to_string() } text-anchor={ anchor }
-            dominant-baseline={ baseline } pointer-events="none">
+            fill={ props.color.to_string() } dominant-baseline={ baseline } pointer-events="none">
             {
                 if props.text.is_empty() {
                     props.html.clone()
@@ -53,4 +53,6 @@ pub struct Props {
     /// Vertical align (default: Middle).
     #[prop_or(VAlign::Middle)]
     pub valign: VAlign,
+    #[prop_or(Color::Black)]
+    pub color: Color,
 }
