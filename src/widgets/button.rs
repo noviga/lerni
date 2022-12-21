@@ -80,7 +80,8 @@ pub fn Button(props: &Props) -> Html {
                 fill={ props.color.to_string() } stroke={ props.border_color.to_string() }
                 stroke-width={ border_width.to_string() } />
             <ContextProvider<Frame> context={ frame }>
-                <Label text={ props.text.clone() } html={ props.html.clone() } font_size={ props.font_size }/>
+                <Label text={ props.text.clone() } html={ props.html.clone() }
+                    color={ props.text_color } font_size={ props.font_size }/>
             </ContextProvider<Frame>>
         </a>
     }
@@ -103,6 +104,8 @@ pub struct Props {
     pub font_size: usize,
     #[prop_or(Color::AliceBlue)]
     pub color: Color,
+    #[prop_or(Color::Black)]
+    pub text_color: Color,
     #[prop_or(12)]
     pub border_width: i32,
     #[prop_or(Color::RoyalBlue)]

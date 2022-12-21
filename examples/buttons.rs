@@ -15,8 +15,9 @@ pub fn Buttons() -> Html {
             <Grid cols=3 rows=3>
                 <Button text="Alice" onclick={ onclick.clone() } />
                 <Button text="Bob" width=300 height=300 radius=150 onclick={ onclick.clone() } />
-                <Button text="Charlie" font_size=72 onclick={ onclick.clone() } />
-                <Button html={ html!(<tspan font-size="96" fill="red">{ "Dave" }</tspan>) } onclick={ onclick.clone() } />
+                <Button text="Charlie" font_size=72 text_color={ Color::DarkCyan } onclick={ onclick.clone() } />
+                <Button html={ html!(<><tspan font-size="96" fill="red">{ "Da" }</tspan><tspan font-size="80">{ "ve" }</tspan></>) }
+                    onclick={ onclick.clone() } />
                 <Label text={ format!("Clicked: {}", *counter) }/>
                 <Button text="Eve" align={ Align::Right } onclick={ onclick.clone() } />
                 <Button text="Ferdie" align={ Align::Right } valign={ VAlign::Bottom } onclick={ onclick.clone() } />

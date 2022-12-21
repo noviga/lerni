@@ -3,7 +3,7 @@ use derive_more::Display;
 // TODO: Define all colors
 
 /// Helper type to work with colors.
-#[derive(Clone, Default, Display, PartialEq)]
+#[derive(Clone, Copy, Default, Display, PartialEq)]
 pub enum Color {
     /// No color.
     #[default]
