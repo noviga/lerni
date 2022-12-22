@@ -16,6 +16,17 @@ pub use row::Row;
 pub use slide::Slide;
 pub use slideshow::SlideShow;
 
+/// Additional information provided to all slides.
+#[derive(Clone, Default, PartialEq)]
+pub struct Metadata {
+    /// Visibility flag.
+    pub visible: bool,
+    /// Teacher mode flag.
+    pub teacher_mode: bool,
+    /// Pointer on/off flag.
+    pub pointer: bool,
+}
+
 /// Frame within which the widget will be rendered.
 #[derive(Clone, Default, PartialEq)]
 pub struct Frame {

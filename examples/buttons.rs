@@ -19,7 +19,7 @@ pub fn Buttons() -> Html {
                 <Button html={ html!(<><tspan font-size="96" fill="red">{ "Da" }</tspan><tspan font-size="80">{ "ve" }</tspan></>) }
                     onclick={ onclick.clone() } />
                 <Label text={ format!("Clicked: {}", *counter) }/>
-                <Button text="Eve" align={ Align::Right } onclick={ onclick.clone() } />
+                <Button text="Eve" bold_text=true align={ Align::Right } onclick={ onclick.clone() } />
                 <Button text="Ferdie" align={ Align::Right } valign={ VAlign::Bottom } onclick={ onclick.clone() } />
                 <Button text="George" color={ Color::Honeydew } border_color={ Color::ForestGreen } onclick={ onclick.clone() } />
                 <Button text="Harry" align={ Align::Fill } valign={ VAlign::Fill } { onclick } />

@@ -3,6 +3,8 @@ use std::collections::BTreeSet;
 use wasm_bindgen::JsCast;
 use yew::{html::Scope, prelude::*};
 
+use crate::widgets::Metadata;
+
 const KEY_ARROW_LEFT: u32 = 37;
 const KEY_ARROW_RIGHT: u32 = 39;
 const KEY_DIGIT_1: u32 = 49;
@@ -22,6 +24,10 @@ pub struct Props {
     pub children: Children,
     #[prop_or_default]
     pub current: usize,
+    #[prop_or_default]
+    pub teacher_mode: bool,
+    #[prop_or_default]
+    pub pointer: bool,
 }
 
 pub enum Msg {
@@ -82,7 +88,18 @@ impl Component for SlideShow {
                 </div>
                 {
                     for p.children.iter().enumerate().map(|(i, item)| {
-                        html_nested!(<g hidden={ i != self.current }>{ item }</g>)
+                        let metadata = Metadata {
+                            visible: i == self.current,
+                            teacher_mode: p.teacher_mode,
+                            pointer: p.pointer,
+                        };
+                        html_nested! {
+                            <g hidden={ i != self.current }>
+                                <ContextProvider<Metadata> context={ metadata }>
+                                    { item }
+                                </ContextProvider<Metadata>>
+                            </g>
+                        }
                     })
                 }
             </>
