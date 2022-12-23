@@ -5,8 +5,8 @@ use lerni::{
 use wasm_bindgen::prelude::wasm_bindgen;
 use yew::prelude::*;
 
-#[function_component(RowsCols)]
-pub fn rows_cols() -> Html {
+#[function_component]
+pub fn RowsCols() -> Html {
     html! {
         <Slide>
             <Row border_width=4 stretch={ vec![1, 1, 4, 1, 1] } padding=20>

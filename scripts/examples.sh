@@ -6,6 +6,7 @@ grid \
 hello_world \
 pointer \
 rows_cols \
+text \
 "
 
 set -e

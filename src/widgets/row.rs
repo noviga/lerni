@@ -2,6 +2,22 @@ use yew::prelude::*;
 
 use crate::{properties::Color, widgets::Frame};
 
+#[derive(Clone, Default, Properties, PartialEq)]
+pub struct Props {
+    #[prop_or_default]
+    pub children: Children,
+    #[prop_or(0)]
+    pub border_width: i32,
+    #[prop_or(Color::Black)]
+    pub border_color: Color,
+    #[prop_or_default]
+    pub stretch: Vec<i32>,
+    #[prop_or_default]
+    pub spacing: i32,
+    #[prop_or_default]
+    pub padding: i32,
+}
+
 /// Row of widgets.
 #[function_component]
 pub fn Row(props: &Props) -> Html {
@@ -37,20 +53,4 @@ pub fn Row(props: &Props) -> Html {
             html
         })
     }
-}
-
-#[derive(Clone, Default, Properties, PartialEq)]
-pub struct Props {
-    #[prop_or_default]
-    pub children: Children,
-    #[prop_or(0)]
-    pub border_width: i32,
-    #[prop_or(Color::Black)]
-    pub border_color: Color,
-    #[prop_or_default]
-    pub stretch: Vec<i32>,
-    #[prop_or_default]
-    pub spacing: i32,
-    #[prop_or_default]
-    pub padding: i32,
 }
