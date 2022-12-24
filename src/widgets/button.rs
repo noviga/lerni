@@ -8,6 +8,39 @@ use crate::{
 const WIDTH: i32 = 400;
 const HEIGHT: i32 = 150;
 
+/// Button properties.
+#[derive(Default, Clone, Properties, PartialEq)]
+pub struct Props {
+    #[prop_or_default]
+    pub text: String,
+    #[prop_or_default]
+    pub text_bold: bool,
+    #[prop_or_default]
+    pub html: Html,
+    #[prop_or(WIDTH)]
+    pub width: i32,
+    #[prop_or(HEIGHT)]
+    pub height: i32,
+    #[prop_or(24)]
+    pub radius: i32,
+    #[prop_or(48)]
+    pub font_size: usize,
+    #[prop_or(Color::AliceBlue)]
+    pub color: Color,
+    #[prop_or(Color::Black)]
+    pub text_color: Color,
+    #[prop_or(12)]
+    pub border_width: i32,
+    #[prop_or(Color::RoyalBlue)]
+    pub border_color: Color,
+    #[prop_or(Align::Center)]
+    pub align: Align,
+    #[prop_or(VAlign::Middle)]
+    pub valign: VAlign,
+    #[prop_or_default]
+    pub onclick: Callback<Props>,
+}
+
 /// Button widget.
 #[function_component]
 pub fn Button(props: &Props) -> Html {
@@ -80,42 +113,9 @@ pub fn Button(props: &Props) -> Html {
                 fill={ props.color.to_string() } stroke={ props.border_color.to_string() }
                 stroke-width={ border_width.to_string() } />
             <ContextProvider<Frame> context={ frame }>
-                <Label text={ props.text.clone() } html={ props.html.clone() } bold={ props.bold_text }
+                <Label text={ props.text.clone() } html={ props.html.clone() } bold={ props.text_bold }
                     color={ props.text_color } font_size={ props.font_size }/>
             </ContextProvider<Frame>>
         </a>
     }
-}
-
-/// Button properties.
-#[derive(Default, Clone, Properties, PartialEq)]
-pub struct Props {
-    #[prop_or_default]
-    pub text: String,
-    #[prop_or_default]
-    pub bold_text: bool,
-    #[prop_or_default]
-    pub html: Html,
-    #[prop_or(WIDTH)]
-    pub width: i32,
-    #[prop_or(HEIGHT)]
-    pub height: i32,
-    #[prop_or(24)]
-    pub radius: i32,
-    #[prop_or(48)]
-    pub font_size: usize,
-    #[prop_or(Color::AliceBlue)]
-    pub color: Color,
-    #[prop_or(Color::Black)]
-    pub text_color: Color,
-    #[prop_or(12)]
-    pub border_width: i32,
-    #[prop_or(Color::RoyalBlue)]
-    pub border_color: Color,
-    #[prop_or(Align::Center)]
-    pub align: Align,
-    #[prop_or(VAlign::Middle)]
-    pub valign: VAlign,
-    #[prop_or_default]
-    pub onclick: Callback<Props>,
 }

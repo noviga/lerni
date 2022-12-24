@@ -2,6 +2,24 @@ use yew::prelude::*;
 
 use crate::{properties::Color, widgets::Frame};
 
+#[derive(Clone, Default, Properties, PartialEq)]
+pub struct Props {
+    #[prop_or_default]
+    pub children: Children,
+    #[prop_or(1)]
+    pub rows: usize,
+    #[prop_or(1)]
+    pub cols: usize,
+    #[prop_or(0)]
+    pub border_width: i32,
+    #[prop_or(Color::Black)]
+    pub border_color: Color,
+    #[prop_or_default]
+    pub spacing: i32,
+    #[prop_or_default]
+    pub padding: i32,
+}
+
 /// Grid layout widget.
 #[function_component]
 pub fn Grid(props: &Props) -> Html {
@@ -34,22 +52,4 @@ pub fn Grid(props: &Props) -> Html {
             }
         })
     }
-}
-
-#[derive(Clone, Default, Properties, PartialEq)]
-pub struct Props {
-    #[prop_or_default]
-    pub children: Children,
-    #[prop_or(1)]
-    pub rows: usize,
-    #[prop_or(1)]
-    pub cols: usize,
-    #[prop_or(0)]
-    pub border_width: i32,
-    #[prop_or(Color::Black)]
-    pub border_color: Color,
-    #[prop_or_default]
-    pub spacing: i32,
-    #[prop_or_default]
-    pub padding: i32,
 }
