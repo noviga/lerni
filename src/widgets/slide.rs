@@ -27,11 +27,14 @@ pub struct Props {
     pub background: Color,
     #[prop_or_default]
     pub pointer: bool,
+    #[prop_or_default]
+    pub onclick: Callback<(i32, i32)>,
 }
 
 pub enum Msg {
     MovePointer { x: i32, y: i32 },
     HidePointer,
+    Clicked { x: i32, y: i32 },
 }
 
 impl Component for Slide {
@@ -42,7 +45,8 @@ impl Component for Slide {
         Default::default()
     }
 
-    fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
+    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
+        let p = ctx.props();
         match msg {
             Msg::MovePointer { x, y } => {
                 if let Some(svg) = self.svg_ref.cast::<SvgElement>() {
@@ -55,6 +59,14 @@ impl Component for Slide {
                 self.pointer_x = 0;
                 self.pointer_y = 0;
                 true
+            }
+            Msg::Clicked { x, y } => {
+                if let Some(svg) = self.svg_ref.cast::<SvgElement>() {
+                    let x = x * WIDTH as i32 / svg.client_width();
+                    let y = y * HEIGHT as i32 / svg.client_height();
+                    p.onclick.emit((x, y));
+                }
+                false
             }
         }
     }
@@ -70,6 +82,11 @@ impl Component for Slide {
 
         let onmouseleave = ctx.link().callback(|_| Msg::HidePointer);
 
+        let onclick = ctx.link().callback(|e: MouseEvent| Msg::Clicked {
+            x: e.offset_x(),
+            y: e.offset_y(),
+        });
+
         let frame = Frame {
             x: 0,
             y: 0,
@@ -82,7 +99,7 @@ impl Component for Slide {
                 <div class="box">
                     <figure class="image is-16by9">
                         <svg viewBox={ view_box } class="has-ratio" ref={ &self.svg_ref }
-                            { onmousemove } {onmouseleave} >
+                            { onmousemove } { onmouseleave } { onclick }>
                             <rect width="100%" height="100%" rx="10" ry="10" fill={ p.background.to_string() } />
                             {
                                 for p.children.iter().map(|item|{

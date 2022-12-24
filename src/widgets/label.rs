@@ -14,13 +14,10 @@ pub struct Props {
     pub bold: bool,
     #[prop_or_default]
     pub html: Html,
-    /// Font size (default: 48px).
     #[prop_or(48)]
     pub font_size: usize,
-    /// Horizontal align (default: Center).
     #[prop_or(Align::Center)]
     pub align: Align,
-    /// Vertical align (default: Middle).
     #[prop_or(VAlign::Middle)]
     pub valign: VAlign,
     #[prop_or(Color::Black)]
