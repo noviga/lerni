@@ -7,6 +7,7 @@ mod label;
 mod row;
 mod slide;
 mod slideshow;
+mod text;
 
 pub use button::Button;
 pub use column::Column;
@@ -15,9 +16,10 @@ pub use label::Label;
 pub use row::Row;
 pub use slide::Slide;
 pub use slideshow::SlideShow;
+pub use text::Text;
 
 /// Additional information provided to all slides.
-#[derive(Clone, Default, PartialEq)]
+#[derive(Clone, Default, Debug, PartialEq)]
 pub struct Metadata {
     /// Visibility flag.
     pub visible: bool,
@@ -28,7 +30,7 @@ pub struct Metadata {
 }
 
 /// Frame within which the widget will be rendered.
-#[derive(Clone, Default, PartialEq)]
+#[derive(Clone, Default, Debug, PartialEq)]
 pub struct Frame {
     /// X-coordinate (in pixels) of the to left corner.
     pub x: i32,

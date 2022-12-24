@@ -5,6 +5,28 @@ use crate::{
     widgets::Frame,
 };
 
+/// Label properties.
+#[derive(Clone, Default, Properties, PartialEq)]
+pub struct Props {
+    #[prop_or_default]
+    pub text: String,
+    #[prop_or_default]
+    pub bold: bool,
+    #[prop_or_default]
+    pub html: Html,
+    /// Font size (default: 48px).
+    #[prop_or(48)]
+    pub font_size: usize,
+    /// Horizontal align (default: Center).
+    #[prop_or(Align::Center)]
+    pub align: Align,
+    /// Vertical align (default: Middle).
+    #[prop_or(VAlign::Middle)]
+    pub valign: VAlign,
+    #[prop_or(Color::Black)]
+    pub color: Color,
+}
+
 /// Label widget.
 #[function_component]
 pub fn Label(props: &Props) -> Html {
@@ -37,26 +59,4 @@ pub fn Label(props: &Props) -> Html {
             }
         </text>
     }
-}
-
-/// Label properties.
-#[derive(Clone, Default, Properties, PartialEq)]
-pub struct Props {
-    #[prop_or_default]
-    pub text: String,
-    #[prop_or_default]
-    pub bold: bool,
-    #[prop_or_default]
-    pub html: Html,
-    /// Font size (default: 48px).
-    #[prop_or(48)]
-    pub font_size: usize,
-    /// Horizontal align (default: Center).
-    #[prop_or(Align::Center)]
-    pub align: Align,
-    /// Vertical align (default: Middle).
-    #[prop_or(VAlign::Middle)]
-    pub valign: VAlign,
-    #[prop_or(Color::Black)]
-    pub color: Color,
 }

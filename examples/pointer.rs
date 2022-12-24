@@ -2,8 +2,8 @@ use lerni::widgets::*;
 use wasm_bindgen::prelude::wasm_bindgen;
 use yew::prelude::*;
 
-#[function_component(Pointer)]
-pub fn pointer() -> Html {
+#[function_component]
+pub fn Pointer() -> Html {
     let pointer = use_state(|| true);
     let onclick = {
         let pointer = pointer.clone();

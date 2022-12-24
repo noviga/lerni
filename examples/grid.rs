@@ -5,8 +5,8 @@ use lerni::{
 use wasm_bindgen::prelude::wasm_bindgen;
 use yew::prelude::*;
 
-#[function_component(GridExample)]
-pub fn grid_example() -> Html {
+#[function_component]
+pub fn GridExample() -> Html {
     html! {
         <Slide>
             <Grid cols=3 rows=3 border_width=4 padding=20>
