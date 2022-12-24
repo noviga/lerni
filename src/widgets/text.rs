@@ -75,7 +75,7 @@ impl Component for Text {
             })
             .collect();
 
-        let total_letters = letter_counters.iter().fold(0, |sum, letters| sum + letters);
+        let total_letters = letter_counters.iter().sum();
 
         let expand = Self::text_width(" ", &context) / 2 + 1;
 
@@ -100,11 +100,7 @@ impl Component for Text {
             }
             Msg::MarkerIndexChanged(index) => {
                 if self.index != index {
-                    let letters = self
-                        .letter_counters
-                        .iter()
-                        .take(index + 1)
-                        .fold(0, |sum, letters| sum + letters);
+                    let letters = self.letter_counters.iter().take(index + 1).sum();
                     debug!("Read: ({}/{})", letters, self.total_letters);
                     self.index = index;
                     p.onread.emit((letters, self.total_letters));
@@ -123,9 +119,7 @@ impl Component for Text {
         let index = self.marker_index(p);
         if let Some(index) = index {
             if self.index != index {
-                ctx.link()
-                    .callback(|i| Msg::MarkerIndexChanged(i))
-                    .emit(index);
+                ctx.link().callback(Msg::MarkerIndexChanged).emit(index);
             }
         }
 
