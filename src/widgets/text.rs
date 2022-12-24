@@ -2,7 +2,7 @@ use wasm_bindgen::JsValue;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 use yew::{prelude::*, virtual_dom::VNode};
 
-use crate::{debug, properties::Color, widgets::Frame};
+use crate::{properties::Color, widgets::Frame};
 
 /// Text widget.
 pub struct Text {
@@ -12,7 +12,7 @@ pub struct Text {
     total_letters: usize,
     rects: Vec<Frame>,
     expand: i32,
-    index: usize,
+    read: usize,
     _context_listener: ContextHandle<Frame>,
 }
 
@@ -86,7 +86,7 @@ impl Component for Text {
             total_letters,
             rects,
             expand,
-            index: 0,
+            read: 0,
             _context_listener,
         }
     }
@@ -99,15 +99,10 @@ impl Component for Text {
                 true
             }
             Msg::MarkerIndexChanged(index) => {
-                if self.index != index {
-                    let letters = self.letter_counters.iter().take(index + 1).sum();
-                    debug!("Read: ({}/{})", letters, self.total_letters);
-                    self.index = index;
-                    p.onread.emit((letters, self.total_letters));
-                    true
-                } else {
-                    false
-                }
+                self.read = index + 1;
+                let letters = self.letter_counters.iter().take(self.read).sum();
+                p.onread.emit((letters, self.total_letters));
+                true
             }
         }
     }
@@ -118,7 +113,7 @@ impl Component for Text {
 
         let index = self.marker_index(p);
         if let Some(index) = index {
-            if self.index != index {
+            if self.read != index + 1 {
                 ctx.link().callback(Msg::MarkerIndexChanged).emit(index);
             }
         }
@@ -131,20 +126,16 @@ impl Component for Text {
         html! {
             <>
                 {
-                    if let Some(index) = index {
-                        self.rects.iter().take(index + 1).map(|r| {
-                            html! {
-                                <rect x={ (r.x - self.expand).to_string() }
-                                    y={ (r.y - self.expand).to_string() }
-                                    width={ (r.width + 2 * self.expand).to_string() }
-                                    height={ (r.height + 2 * self.expand).to_string() }
-                                    rx={ self.expand.to_string() } ry={ self.expand.to_string() }
-                                    fill={ p.marker_color.to_string() } />
-                            }
-                        }).collect()
-                    } else {
-                        html!()
-                    }
+                    for self.rects.iter().take(self.read).map(|r| {
+                        html! {
+                            <rect x={ (r.x - self.expand).to_string() }
+                                y={ (r.y - self.expand).to_string() }
+                                width={ (r.width + 2 * self.expand).to_string() }
+                                height={ (r.height + 2 * self.expand).to_string() }
+                                rx={ self.expand.to_string() } ry={ self.expand.to_string() }
+                                fill={ p.marker_color.to_string() } />
+                        }
+                    })
                 }
                 <text { x } { y } { class } font-size={ p.font_size.to_string() }
                     style={ format!("font-family:{}", p.font) } fill={ p.color.to_string() }
