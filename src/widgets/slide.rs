@@ -50,8 +50,8 @@ impl Component for Slide {
         match msg {
             Msg::MovePointer { x, y } => {
                 if let Some(svg) = self.svg_ref.cast::<SvgElement>() {
-                    self.pointer_x = x * WIDTH as i32 / svg.client_width();
-                    self.pointer_y = y * HEIGHT as i32 / svg.client_height();
+                    self.pointer_x = x * WIDTH / svg.client_width();
+                    self.pointer_y = y * HEIGHT / svg.client_height();
                 }
                 true
             }
@@ -62,8 +62,8 @@ impl Component for Slide {
             }
             Msg::Clicked { x, y } => {
                 if let Some(svg) = self.svg_ref.cast::<SvgElement>() {
-                    let x = x * WIDTH as i32 / svg.client_width();
-                    let y = y * HEIGHT as i32 / svg.client_height();
+                    let x = x * WIDTH / svg.client_width();
+                    let y = y * HEIGHT / svg.client_height();
                     p.onclick.emit((x, y));
                 }
                 false
@@ -123,7 +123,7 @@ impl Slide {
     fn pointer_view(&self, pointer: bool) -> Html {
         if pointer && self.pointer_x > 0 && self.pointer_y > 0 {
             html_nested! {
-                <circle cx={ self.pointer_x.to_string() } cy={ self.pointer_y.to_string() }
+                <circle cx={ self.pointer_x.to_string() } cy={ self.pointer_y.to_string() } style="filter: blur(2px);"
                     r={ (POINTER_SIZE / 2).to_string() } fill="orange" opacity="0.75" pointer-events="none" />
             }
         } else {

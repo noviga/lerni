@@ -24,7 +24,7 @@ pub struct Props {
     #[prop_or(24)]
     pub radius: i32,
     #[prop_or(48)]
-    pub font_size: usize,
+    pub font_size: i32,
     #[prop_or(Color::AliceBlue)]
     pub color: Color,
     #[prop_or(Color::Black)]
