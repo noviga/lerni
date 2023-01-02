@@ -19,7 +19,7 @@ pub use slideshow::SlideShow;
 pub use text::Text;
 
 /// Additional information provided to all slides.
-#[derive(Clone, Default, Debug, PartialEq)]
+#[derive(Clone, Copy, Default, Debug, PartialEq)]
 pub struct Metadata {
     /// Visibility flag.
     pub visible: bool,
