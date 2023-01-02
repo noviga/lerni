@@ -1,14 +1,8 @@
-use gloo_events::EventListener;
-use std::collections::BTreeSet;
-use wasm_bindgen::JsCast;
+use std::collections::{BTreeSet, HashMap};
 use yew::{html::Scope, prelude::*};
 
-use crate::widgets::Metadata;
+use crate::{keys, utils, widgets::Metadata};
 
-const KEY_ARROW_LEFT: u32 = 37;
-const KEY_ARROW_RIGHT: u32 = 39;
-const KEY_DIGIT_1: u32 = 49;
-const KEY_DIGIT_9: u32 = KEY_DIGIT_1 + 8;
 const BUTTON_COUNT: usize = 6;
 
 /// Set of slides that are to be displayed sequentially.
@@ -30,6 +24,7 @@ pub struct Props {
     pub pointer: bool,
 }
 
+#[derive(Clone, Copy)]
 pub enum Msg {
     Prev,
     Next,
@@ -42,24 +37,15 @@ impl Component for SlideShow {
 
     fn create(ctx: &Context<Self>) -> Self {
         let p = ctx.props();
-        let doc = web_sys::window()
-            .and_then(|win| win.document())
-            .expect("Unable to get document");
-
-        let link = ctx.link().clone();
-        let event = EventListener::new(&doc, "keydown", move |e| {
-            if let Some(e) = e.dyn_ref::<KeyboardEvent>() {
-                match e.key_code() {
-                    KEY_ARROW_LEFT => link.send_message(Msg::Prev),
-                    KEY_ARROW_RIGHT => link.send_message(Msg::Next),
-                    k @ (KEY_DIGIT_1..=KEY_DIGIT_9) => {
-                        link.send_message(Msg::SetCurrent((k - KEY_DIGIT_1) as _))
-                    }
-                    _ => (),
-                }
-            }
-        });
-        event.forget();
+        let mut messages: HashMap<_, _> = [
+            (keys::ARROW_LEFT, Msg::Prev),
+            (keys::ARROW_RIGHT, Msg::Next),
+        ]
+        .into();
+        for k in keys::DIGIT_1..=keys::DIGIT_9 {
+            messages.insert(k, Msg::SetCurrent((k - keys::DIGIT_1) as _));
+        }
+        utils::add_key_handler(ctx.link(), messages);
 
         let count = p.children.len();
         let current = p.current.min(count - 1);
@@ -147,7 +133,7 @@ impl SlideShow {
         };
 
         if matches!(prev, Some(p) if index != (p + 1)) {
-            html!(<><li><span class="pagination-ellipsis">{ '…' }</span></li>{ button }</>)
+            html!(<><li><span class="pagination-ellipsis">{ '•' }</span></li>{ button }</>)
         } else {
             button
         }
