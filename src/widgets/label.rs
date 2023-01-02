@@ -15,7 +15,7 @@ pub struct Props {
     #[prop_or_default]
     pub html: Html,
     #[prop_or(48)]
-    pub font_size: usize,
+    pub font_size: i32,
     #[prop_or(Align::Center)]
     pub align: Align,
     #[prop_or(VAlign::Middle)]
