@@ -14,6 +14,8 @@ pub struct Props {
     pub bold: bool,
     #[prop_or_default]
     pub html: Html,
+    #[prop_or_default]
+    pub font: String,
     #[prop_or(48)]
     pub font_size: i32,
     #[prop_or(Align::Center)]
@@ -43,10 +45,11 @@ pub fn Label(props: &Props) -> Html {
     let y = (f.y + f.height / 2).to_string();
 
     let class = classes!(props.bold.then_some("has-text-weight-bold"));
+    let style = classes!((!props.font.is_empty()).then(|| format!("font-family: {};", props.font)));
 
     html! {
         <text { x } { y } { class } font-size={ props.font_size.to_string() } text-anchor={ anchor }
-            fill={ props.color.to_string() } dominant-baseline={ baseline } pointer-events="none">
+            fill={ props.color.to_string() } dominant-baseline={ baseline } { style } pointer-events="none">
             {
                 if props.text.is_empty() {
                     props.html.clone()
