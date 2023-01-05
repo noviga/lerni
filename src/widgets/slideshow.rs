@@ -10,6 +10,7 @@ const BUTTON_COUNT: usize = 6;
 pub struct SlideShow {
     current: usize,
     count: usize,
+    width: i32,
 }
 
 #[derive(Clone, Default, Properties, PartialEq)]
@@ -29,6 +30,7 @@ pub enum Msg {
     Prev,
     Next,
     SetCurrent(usize),
+    Resize,
 }
 
 impl Component for SlideShow {
@@ -37,6 +39,7 @@ impl Component for SlideShow {
 
     fn create(ctx: &Context<Self>) -> Self {
         let p = ctx.props();
+        let link = ctx.link();
         let mut messages: HashMap<_, _> = [
             (keys::ARROW_LEFT, Msg::Prev),
             (keys::ARROW_RIGHT, Msg::Next),
@@ -45,11 +48,16 @@ impl Component for SlideShow {
         for k in keys::DIGIT_1..=keys::DIGIT_9 {
             messages.insert(k, Msg::SetCurrent((k - keys::DIGIT_1) as _));
         }
-        utils::add_key_handler(ctx.link(), messages);
+        utils::add_key_handler(link, messages);
+        utils::add_resize_handler(link, Msg::Resize);
 
         let count = p.children.len();
         let current = p.current.min(count - 1);
-        Self { current, count }
+        Self {
+            current,
+            count,
+            width: Self::calc_width(),
+        }
     }
 
     fn update(&mut self, _ctx: &Context<Self>, msg: Self::Message) -> bool {
@@ -58,6 +66,7 @@ impl Component for SlideShow {
             Msg::Prev if self.current > 0 => self.current -= 1,
             Msg::Next if self.current < max => self.current += 1,
             Msg::SetCurrent(c) if c <= max => self.current = c,
+            Msg::Resize => self.width = Self::calc_width(),
             _ => return false,
         }
         true
@@ -67,9 +76,15 @@ impl Component for SlideShow {
         let p = ctx.props();
         let link = ctx.link();
 
+        let style = if self.width > 0 {
+            format!("max-width: {}px;", self.width)
+        } else {
+            ("max-width: 100%").to_string()
+        };
+
         html! {
             <>
-                <div class="container pl-4 mt-4 pr-4">
+                <div { style } class="container pl-4 mt-4 pr-4">
                     { self.pagination(link) }
                 </div>
                 {
@@ -80,11 +95,11 @@ impl Component for SlideShow {
                             pointer: p.pointer,
                         };
                         html_nested! {
-                            <g hidden={ i != self.current }>
+                            <div hidden={ i != self.current }>
                                 <ContextProvider<Metadata> context={ metadata }>
                                     { item }
                                 </ContextProvider<Metadata>>
-                            </g>
+                            </div>
                         }
                     })
                 }
@@ -146,21 +161,34 @@ impl SlideShow {
         html! {
             <nav class="pagination is-rounded" role="navigation" aria-label="pagination">
                 <ul class="pagination-list">
-                {
-                    for pages.into_iter().map(|i| {
-                        let html = self.page_button(prev, i, scope);
-                        prev = Some(i);
-                        html
-                    })
-                }
+                    {
+                        for pages.into_iter().map(|i| {
+                            let html = self.page_button(prev, i, scope);
+                            prev = Some(i);
+                            html
+                        })
+                    }
                 </ul>
-                <a class="pagination-previous button is-info" onclick={ scope.callback(|_| Msg::Prev) }>
+                <a class="pagination-link button is-info" style="order: 2;" onclick={ scope.callback(|_| Msg::Prev) }>
                     <span class="icon"><i class="fas fa-lg fa-arrow-left"></i></span>
                 </a>
-                <a class="pagination-next button is-info" onclick={ scope.callback(|_| Msg::Next) }>
+                <a class="pagination-link button is-info" style="order: 3;" onclick={ scope.callback(|_| Msg::Next) }>
                     <span class="icon"><i class="fas fa-lg fa-arrow-right"></i></span>
                 </a>
             </nav>
+        }
+    }
+
+    fn calc_width() -> i32 {
+        let elem = web_sys::window()
+            .and_then(|win| win.document())
+            .and_then(|doc| doc.document_element());
+        if let Some(elem) = elem {
+            let width = elem.client_width();
+            let height = elem.client_height();
+            width.min((height - 88) * 16 / 9)
+        } else {
+            0
         }
     }
 }

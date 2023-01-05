@@ -23,6 +23,8 @@ pub struct Props {
     pub height: i32,
     #[prop_or(24)]
     pub radius: i32,
+    #[prop_or_default]
+    pub font: String,
     #[prop_or(48)]
     pub font_size: i32,
     #[prop_or(Color::AliceBlue)]
@@ -114,7 +116,7 @@ pub fn Button(props: &Props) -> Html {
                 stroke-width={ border_width.to_string() } />
             <ContextProvider<Frame> context={ frame }>
                 <Label text={ props.text.clone() } html={ props.html.clone() } bold={ props.text_bold }
-                    color={ props.text_color } font_size={ props.font_size }/>
+                    color={ props.text_color } font={ props.font.clone() } font_size={ props.font_size }/>
             </ContextProvider<Frame>>
         </a>
     }

@@ -33,3 +33,19 @@ where
         event.forget();
     }
 }
+
+/// Add resize event handler.
+pub fn add_resize_handler<T, M>(link: &Scope<T>, message: M)
+where
+    T: Component,
+    M: Into<T::Message> + Copy + 'static,
+{
+    let win = web_sys::window();
+    if let Some(win) = win {
+        let link = link.clone();
+        let event = EventListener::new(&win, "resize", move |_| {
+            link.send_message(message);
+        });
+        event.forget();
+    }
+}
