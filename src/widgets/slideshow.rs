@@ -161,13 +161,13 @@ impl SlideShow {
         html! {
             <nav class="pagination is-rounded" role="navigation" aria-label="pagination">
                 <ul class="pagination-list">
-                    {
-                        for pages.into_iter().map(|i| {
-                            let html = self.page_button(prev, i, scope);
-                            prev = Some(i);
-                            html
-                        })
-                    }
+                {
+                    for pages.into_iter().map(|i| {
+                        let html = self.page_button(prev, i, scope);
+                        prev = Some(i);
+                        html
+                    })
+                }
                 </ul>
                 <a class="pagination-link button is-info" style="order: 2;" onclick={ scope.callback(|_| Msg::Prev) }>
                     <span class="icon"><i class="fas fa-lg fa-arrow-left"></i></span>
