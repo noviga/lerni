@@ -1,7 +1,7 @@
 use web_sys::SvgElement;
 use yew::{prelude::*, ContextProvider};
 
-use crate::{properties::Color, widgets::Frame};
+use crate::{properties::Color, utils, widgets::Frame};
 
 const WIDTH: i32 = 1920;
 const HEIGHT: i32 = 1080;
@@ -13,6 +13,7 @@ pub struct Slide {
     svg_ref: NodeRef,
     pointer_x: i32,
     pointer_y: i32,
+    width: i32,
 }
 
 #[derive(Clone, Default, Properties, PartialEq)]
@@ -31,18 +32,24 @@ pub struct Props {
     pub onclick: Callback<(i32, i32)>,
 }
 
+#[derive(Clone, Copy)]
 pub enum Msg {
     MovePointer { x: i32, y: i32 },
     HidePointer,
     Clicked { x: i32, y: i32 },
+    Resize,
 }
 
 impl Component for Slide {
     type Message = Msg;
     type Properties = Props;
 
-    fn create(_ctx: &Context<Self>) -> Self {
-        Default::default()
+    fn create(ctx: &Context<Self>) -> Self {
+        utils::add_resize_handler(ctx.link(), Msg::Resize);
+        Self {
+            width: Self::calc_width(),
+            ..Default::default()
+        }
     }
 
     fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
@@ -67,6 +74,10 @@ impl Component for Slide {
                     p.onclick.emit((x, y));
                 }
                 false
+            }
+            Msg::Resize => {
+                self.width = Self::calc_width();
+                true
             }
         }
     }
@@ -94,8 +105,14 @@ impl Component for Slide {
             height: HEIGHT,
         };
 
+        let style = if self.width > 0 {
+            format!("max-width: {}px;", self.width)
+        } else {
+            ("max-width: 100%").to_string()
+        };
+
         html! {
-            <div class="container pl-4 mt-4 pr-4">
+            <div { style } class="container pl-4 mt-4 pr-4">
                 <div class="box">
                     <figure class="image is-16by9">
                         <svg viewBox={ view_box } class="has-ratio" ref={ &self.svg_ref }
@@ -128,6 +145,19 @@ impl Slide {
             }
         } else {
             html_nested!()
+        }
+    }
+
+    fn calc_width() -> i32 {
+        let elem = web_sys::window()
+            .and_then(|win| win.document())
+            .and_then(|doc| doc.document_element());
+        if let Some(elem) = elem {
+            let width = elem.client_width();
+            let height = elem.client_height();
+            width.min((height - 88) * 16 / 9)
+        } else {
+            0
         }
     }
 }

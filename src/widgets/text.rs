@@ -138,7 +138,7 @@ impl Component for Text {
                     })
                 }
                 <text { x } { y } { class } font-size={ p.font_size.to_string() }
-                    style={ format!("font-family:{}", p.font) } fill={ p.color.to_string() }
+                    style={ format!("font-family: {}", p.font) } fill={ p.color.to_string() }
                     pointer-events="none">
                     { for self.lines.iter().cloned() }
                 </text>
