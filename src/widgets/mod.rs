@@ -1,6 +1,5 @@
 //! Widgets are the main building blocks.
 
-mod blur;
 mod button;
 mod column;
 mod grid;
@@ -10,7 +9,6 @@ mod slide;
 mod slideshow;
 mod text;
 
-pub use blur::Blur;
 pub use button::Button;
 pub use column::Column;
 pub use grid::Grid;
