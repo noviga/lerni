@@ -29,6 +29,10 @@ pub struct Props {
     #[prop_or_default]
     pub pointer: bool,
     #[prop_or_default]
+    pub blur: bool,
+    #[prop_or(15)]
+    pub blur_radius: i32,
+    #[prop_or_default]
     pub onclick: Callback<(i32, i32)>,
 }
 
@@ -121,10 +125,18 @@ impl Component for Slide {
             ("max-width: 100%").to_string()
         };
 
+        let radius = if p.blur { p.blur_radius } else { 0 };
+        let blur = format!(
+            r#"-webkit-filter: blur({radius}px);
+                -moz-filter: blur({radius}px);
+                -ms-filter: blur({radius}px);
+                filter: blur({radius}px); transition: all .3s;"#,
+        );
+
         html! {
             <div { style } class="container pl-4 mt-4 pr-4">
                 <div class="box">
-                    <figure class="image is-16by9">
+                    <figure class="image is-16by9" style={ blur }>
                         <svg viewBox={ view_box } class="has-ratio" ref={ &self.svg_ref }
                             { onmousemove } { onmouseleave } { onclick }>
                             <rect width="100%" height="100%" rx="10" ry="10" fill={ p.background.to_string() } />

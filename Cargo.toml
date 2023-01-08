@@ -26,6 +26,10 @@ features = [
 ]
 
 [[example]]
+name = "blur"
+crate-type = ["cdylib"]
+
+[[example]]
 name = "buttons"
 crate-type = ["cdylib"]
 
