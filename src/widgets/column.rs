@@ -41,6 +41,7 @@ pub fn Column(props: &Props) -> Html {
                 y: y + props.padding,
                 width: width - 2 * props.padding,
                 height: height - 2 * props.padding,
+                ..f
             };
             let html = html_nested! {
                 <ContextProvider<Frame> context={ frame }>

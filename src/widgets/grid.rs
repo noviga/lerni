@@ -42,6 +42,7 @@ pub fn Grid(props: &Props) -> Html {
                 y: y + props.padding,
                 width: width - 2 * props.padding,
                 height: height - 2 * props.padding,
+                ..f
             };
             html_nested! {
                 <ContextProvider<Frame> context={ frame }>

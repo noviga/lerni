@@ -103,6 +103,7 @@ pub fn Button(props: &Props) -> Html {
         y,
         width,
         height,
+        ..f
     };
     let x = (x + border_width / 2).to_string();
     let y = (y + border_width / 2).to_string();
