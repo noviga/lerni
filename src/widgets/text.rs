@@ -13,7 +13,6 @@ pub struct Text {
     total_letters: usize,
     rects: Vec<Rect>,
     expand: i32,
-    words_read: usize,
     _context_listener: ContextHandle<Frame>,
 }
 
@@ -79,13 +78,11 @@ impl Component for Text {
             total_letters: Default::default(),
             rects: Default::default(),
             expand,
-            words_read: p.words_read,
             _context_listener,
         };
         text.wrap(p);
         let letters = text.letter_counters.iter().take(p.words_read).sum();
-        p.onread
-            .emit((text.words_read, letters, text.total_letters));
+        p.onread.emit((p.words_read, letters, text.total_letters));
         text
     }
 
@@ -98,10 +95,9 @@ impl Component for Text {
             }
             Msg::Clicked(x, y) => {
                 if let Some(index) = self.find_word_index(x, y) {
-                    self.words_read = index + 1;
-                    let letters = self.letter_counters.iter().take(self.words_read).sum();
-                    p.onread
-                        .emit((self.words_read, letters, self.total_letters));
+                    let words_read = index + 1;
+                    let letters = self.letter_counters.iter().take(words_read).sum();
+                    p.onread.emit((words_read, letters, self.total_letters));
                     true
                 } else {
                     false
@@ -143,8 +139,9 @@ impl Component for Text {
 
         let word = |(i, r): (usize, &Rect)| {
             html_nested! {
-                <text x={ r.x.to_string() } y={ r.y.to_string() } { class }
-                    dominant-baseline="text-before-edge" font-size={ p.font_size.to_string() }
+                <text x={ (r.x + r.width / 2).to_string() }
+                    y={ (r.y + r.height / 2).to_string() } { class } text-anchor="middle"
+                    dominant-baseline="central" font-size={ p.font_size.to_string() }
                     style={ format!("font-family: {}", p.font) } fill={ p.color.to_string() }
                     pointer-events="none">
                     { self.words[i].clone() }
@@ -159,20 +156,18 @@ impl Component for Text {
                 { for self.rects.iter().enumerate().map(word) }
                 { lattice }
                 {
-                    for self.rects.iter().take(self.words_read).enumerate().map(|(i, r)| {
+                    for self.rects.iter().take(p.words_read).map(|r| {
                         html! {
-                            <>
-                                <rect x={ (r.x - self.expand).to_string() }
-                                    y={ (r.y - self.expand).to_string() }
-                                    width={ (r.width + 2 * self.expand).to_string() }
-                                    height={ (r.height + 2 * self.expand).to_string() }
-                                    rx={ self.expand.to_string() } ry={ self.expand.to_string() }
-                                    fill={ p.marker_color.to_string() } pointer-events="none" />
-                                { word((i, r)) }
-                            </>
+                            <rect x={ (r.x - self.expand).to_string() }
+                                y={ (r.y - self.expand).to_string() }
+                                width={ (r.width + 2 * self.expand).to_string() }
+                                height={ (r.height + 2 * self.expand).to_string() }
+                                rx={ self.expand.to_string() } ry={ self.expand.to_string() }
+                                fill={ p.marker_color.to_string() } pointer-events="none" />
                         }
                     })
                 }
+                { for self.rects.iter().take(p.words_read).enumerate().map(word) }
             </>
         }
     }
