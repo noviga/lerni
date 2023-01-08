@@ -4,18 +4,24 @@ use yew::prelude::*;
 
 #[function_component]
 pub fn TextExample() -> Html {
+    let words_read1 = use_state(|| 0);
     let read1 = use_state(|| "".to_string());
     let onread1 = {
+        let words_read1 = words_read1.clone();
         let read1 = read1.clone();
-        Callback::from(move |(_, letters, total)| {
+        Callback::from(move |(words_read, letters, total)| {
+            words_read1.set(words_read);
             read1.set(format!("{letters} / {total}"));
         })
     };
 
+    let words_read2 = use_state(|| 0);
     let read2 = use_state(|| "".to_string());
     let onread2 = {
+        let words_read2 = words_read2.clone();
         let read2 = read2.clone();
-        Callback::from(move |(_, letters, total)| {
+        Callback::from(move |(words_read, letters, total)| {
+            words_read2.set(words_read);
             read2.set(format!("{letters} / {total}"));
         })
     };
@@ -24,14 +30,14 @@ pub fn TextExample() -> Html {
         <Slide>
             <Row padding=30 border_width=4>
                 <Column stretch={ vec![5, 1] }>
-                    <Text lattice=true onread={ onread1 }>
+                    <Text lattice=true words_read={ *words_read1 } onread={ onread1 }>
                         { "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." }
                         { "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." }
                     </Text>
                     <Label text={ (*read1).clone() } />
                 </Column>
                 <Column stretch={ vec![5, 1] }>
-                    <Text font_size=72 bold=true font="serif" onread={ onread2 }>
+                    <Text font_size=72 bold=true font="serif" words_read={ *words_read2 } onread={ onread2 }>
                         { "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur." }
                         { "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." }
                     </Text>
