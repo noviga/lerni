@@ -42,4 +42,8 @@ pub struct Frame {
     pub width: i32,
     /// Height (in pixels).
     pub height: i32,
+    /// Screen X to SVG X transform factor.
+    pub fx: f64,
+    /// Screen Y to SVG Y transform factor.
+    pub fy: f64,
 }
