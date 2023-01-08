@@ -203,12 +203,11 @@ impl Text {
 
     fn wrap(&mut self, props: &Props) {
         let children = props.children.iter().map(|item| {
-            let text = if let VNode::VText(node) = item {
+            if let VNode::VText(node) = item {
                 node.text
             } else {
                 Default::default()
-            };
-            text
+            }
         });
 
         let mut y = self.frame.y;
@@ -230,7 +229,7 @@ impl Text {
                 width: Self::text_width(&first_word, &self.canvas),
                 height: props.font_size,
             });
-            x += Self::text_width(&format!("{first_word}"), &self.canvas);
+            x += Self::text_width(&first_word, &self.canvas);
             self.words.push(first_word);
             for word in words {
                 self.words.push(word.to_string());
