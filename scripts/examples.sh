@@ -7,6 +7,7 @@ grid \
 hello_world \
 pointer \
 rows_cols \
+svg \
 text \
 "
 

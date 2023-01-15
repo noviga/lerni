@@ -50,5 +50,9 @@ name = "rows_cols"
 crate-type = ["cdylib"]
 
 [[example]]
+name = "svg"
+crate-type = ["cdylib"]
+
+[[example]]
 name = "text"
 crate-type = ["cdylib"]

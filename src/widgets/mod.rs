@@ -7,6 +7,7 @@ mod label;
 mod row;
 mod slide;
 mod slideshow;
+mod svg;
 mod text;
 
 pub use button::Button;
@@ -16,6 +17,7 @@ pub use label::Label;
 pub use row::Row;
 pub use slide::Slide;
 pub use slideshow::SlideShow;
+pub use svg::Svg;
 pub use text::Text;
 
 /// Additional information provided to all slides.
@@ -41,7 +43,7 @@ pub struct Frame {
     /// Height (in pixels).
     pub height: i32,
     /// Screen X to SVG X transform factor.
-    pub fx: f64,
+    pub fx: f32,
     /// Screen Y to SVG Y transform factor.
-    pub fy: f64,
+    pub fy: f32,
 }
