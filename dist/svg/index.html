@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" class="has-background-light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Lerni "SVG" Example</title>
+    <link rel="stylesheet" href="/css/bulma.min.css" />
+    <link rel="stylesheet" href="/css/fas.min.css" />
+    <link rel="preload" href="/svg/svg_bg.wasm" as="fetch" type="application/wasm" crossorigin="" />
+    <link rel="modulepreload" href="/svg/svg.js" />
+</head>
+<body>
+    <script type="module">import init from '/svg/svg.js';init('/svg/svg_bg.wasm');</script>
+</body>
+</html>

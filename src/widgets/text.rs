@@ -37,9 +37,9 @@ pub struct Props {
     #[prop_or_else(|| "sans-serif".to_string())]
     pub font: String,
     #[prop_or(1.2)]
-    pub line_height: f64,
+    pub line_height: f32,
     #[prop_or(1.4)]
-    pub indent: f64,
+    pub indent: f32,
     #[prop_or(Color::PaleGreen)]
     pub marker_color: Color,
     #[prop_or_default]
@@ -114,8 +114,8 @@ impl Component for Text {
             let fx = f.fx;
             let fy = f.fy;
             ctx.link().callback(move |e: MouseEvent| {
-                let x = (e.offset_x() as f64 * fx).round() as i32;
-                let y = (e.offset_y() as f64 * fy).round() as i32;
+                let x = (e.offset_x() as f32 * fx).round() as i32;
+                let y = (e.offset_y() as f32 * fy).round() as i32;
                 Msg::Clicked(x, y)
             })
         };
@@ -212,9 +212,9 @@ impl Text {
             self.letter_counters
                 .push(first_word.chars().filter(|c| c.is_alphabetic()).count());
 
-            let mut indent = (props.indent * props.font_size as f64).round() as i32;
+            let mut indent = (props.indent * props.font_size as f32).round() as i32;
 
-            let dy = (props.line_height * props.font_size as f64).round() as i32;
+            let dy = (props.line_height * props.font_size as f32).round() as i32;
             let mut x = self.frame.x + indent;
             let mut lines = Vec::new();
             let mut line = first_word.clone();

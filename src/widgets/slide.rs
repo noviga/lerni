@@ -106,15 +106,15 @@ impl Component for Slide {
         let mut fy = 0.0;
 
         if let Some(svg) = self.svg_ref.cast::<SvgElement>() {
-            fx = WIDTH as f64 / svg.client_width() as f64;
-            fy = HEIGHT as f64 / svg.client_height() as f64;
+            fx = WIDTH as f32 / svg.client_width() as f32;
+            fy = HEIGHT as f32 / svg.client_height() as f32;
         }
 
         let frame = Frame {
             x: 0,
             y: 0,
-            width: WIDTH,
-            height: HEIGHT,
+            width: p.width,
+            height: p.height,
             fx,
             fy,
         };
