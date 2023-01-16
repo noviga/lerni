@@ -11,7 +11,7 @@ pub fn Blur() -> Html {
     };
 
     html! {
-        <Slide blur={ *blur } background={ Color::MistyRose }>
+        <Slide blur={ *blur } background_color={ Color::MistyRose }>
             <Button text="Blur ON/OFF" { onclick } />
         </Slide>
     }
