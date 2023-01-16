@@ -8,7 +8,7 @@ use yew::prelude::*;
 #[function_component]
 pub fn SvgExample() -> Html {
     html! {
-        <Slide>
+        <Slide background_image="/img/lerni-bg.svg">
             <Grid cols=3 rows=3 border_width=4 padding=20>
                 <Svg width=128 height=64>{ include!("logo.svg-rs") }</Svg>
                 <Svg width=128 height=64 scale=3.0>{ include!("logo.svg-rs") }</Svg>

@@ -6,8 +6,8 @@ use yew::prelude::*;
 pub fn HelloWorld() -> Html {
     html! {
         <SlideShow>
-            <Slide background={ Color::MistyRose }><Label text="Hello →"  /></Slide>
-            <Slide background={ Color::PaleGreen }><Label text="← World!" /></Slide>
+            <Slide background_color={ Color::MistyRose }><Label text="Hello →"  /></Slide>
+            <Slide background_color={ Color::PaleGreen }><Label text="← World!" /></Slide>
         </SlideShow>
     }
 }
