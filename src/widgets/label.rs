@@ -31,24 +31,22 @@ pub struct Props {
 pub fn Label(props: &Props) -> Html {
     let f = use_context::<Frame>().unwrap();
 
-    let anchor = match props.align {
-        Align::Left => "start",
-        Align::Center | Align::Fill => "middle",
-        Align::Right => "end",
+    let (x, anchor) = match props.align {
+        Align::Left => (f.x, "start"),
+        Align::Center | Align::Fill => (f.x + f.width / 2, "middle"),
+        Align::Right => (f.x + f.width, "end"),
     };
-    let baseline = match props.valign {
-        VAlign::Top => "hanging",
-        VAlign::Middle | VAlign::Fill => "central",
-        VAlign::Bottom => "text-top",
+    let (y, baseline) = match props.valign {
+        VAlign::Top => (f.y, "hanging"),
+        VAlign::Middle | VAlign::Fill => ((f.y + f.height / 2), "central"),
+        VAlign::Bottom => (f.y + f.height, "text-top"),
     };
-    let x = (f.x + f.width / 2).to_string();
-    let y = (f.y + f.height / 2).to_string();
 
     let class = classes!(props.bold.then_some("has-text-weight-bold"));
     let style = classes!((!props.font.is_empty()).then(|| format!("font-family: {};", props.font)));
 
     html! {
-        <text { x } { y } { class } font-size={ props.font_size.to_string() } text-anchor={ anchor }
+        <text x={ x.to_string() } y={ y.to_string() } { class } font-size={ props.font_size.to_string() } text-anchor={ anchor }
             fill={ props.color.to_string() } dominant-baseline={ baseline } { style } pointer-events="none">
             {
                 if props.text.is_empty() {
