@@ -25,7 +25,11 @@ pub struct Props {
     #[prop_or(HEIGHT)]
     pub height: i32,
     #[prop_or_default]
-    pub background: Color,
+    pub defs: Html,
+    #[prop_or_default]
+    pub background_color: Color,
+    #[prop_or_default]
+    pub background_image: String,
     #[prop_or_default]
     pub pointer: bool,
     #[prop_or_default]
@@ -133,13 +137,26 @@ impl Component for Slide {
                 filter: blur({radius}px); transition: all .3s;"#,
         );
 
+        let svg_style = if !p.background_image.is_empty() {
+            format!(
+                r#"background-image: url({});
+                background-size: cover;
+                background-position: center;
+                background-repeat: no-repeat;"#,
+                &p.background_image
+            )
+        } else {
+            Default::default()
+        };
+
         html! {
             <div { style } class="container pl-4 mt-4 pr-4">
                 <div class="box">
                     <figure class="image is-16by9" style={ blur }>
                         <svg viewBox={ view_box } class="has-ratio" ref={ &self.svg_ref }
-                            { onmousemove } { onmouseleave } { onclick }>
-                            <rect width="100%" height="100%" rx="10" ry="10" fill={ p.background.to_string() } />
+                            { onmousemove } { onmouseleave } { onclick } style={ svg_style }>
+                            { p.defs.clone() }
+                            <rect width="100%" height="100%" rx="10" ry="10" fill={ p.background_color.to_string() } />
                             {
                                 for p.children.iter().map(|item|{
                                     html_nested! {
