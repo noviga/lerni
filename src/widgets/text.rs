@@ -47,6 +47,10 @@ pub struct Props {
     #[prop_or_default]
     pub lattice: bool,
     #[prop_or_default]
+    pub erase_top: f32,
+    #[prop_or_default]
+    pub erase_bottom: f32,
+    #[prop_or_default]
     pub onread: Callback<(usize, usize, usize)>,
 }
 
@@ -149,11 +153,41 @@ impl Component for Text {
             }
         };
 
+        let erase = |r: &Rect| {
+            let erase_top = if p.erase_top > 0.0 {
+                let h = (p.erase_top * r.height as f32).round() as i32;
+                html_nested!(<rect fill="white" x={ r.x.to_string() } y={ r.y.to_string() }
+                    width={ r.width .to_string() } height={ h.to_string() }/>)
+            } else {
+                Default::default()
+            };
+            let erase_bottom = if p.erase_bottom > 0.0 {
+                let h = (p.erase_bottom * r.height as f32).round() as i32;
+                html_nested!(<rect fill="white" x={ r.x.to_string() } y={ (r.y + r.height - h).to_string() }
+                    width={ r.width .to_string() } height={ h.to_string() }/>)
+            } else {
+                Default::default()
+            };
+            html_nested! {
+                <>
+                    { erase_top }
+                    { erase_bottom }
+                </>
+            }
+        };
+
         html! {
             <>
                 <rect x={ f.x.to_string() } y={ f.y.to_string() } width={ f.width.to_string() }
                     height={ f.height.to_string() } fill="white" { onclick } />
                 { for self.rects.iter().enumerate().map(word) }
+                {
+                    if p.erase_top > 0.0 || p.erase_bottom > 0.0 {
+                        self.rects.iter().map(erase).collect::<Html>()
+                    } else {
+                        Default::default()
+                    }
+                }
                 { lattice }
                 {
                     for self.rects.iter().take(p.words_read).map(|r| {
