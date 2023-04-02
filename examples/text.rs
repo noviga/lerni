@@ -49,7 +49,7 @@ pub fn TextExample() -> Html {
                 </Column>
 
                 <Column stretch={ vec![5, 1, 5, 1] }>
-                    <Text font_size=50 bold=true font="serif" words_read={ *words_read2 } onread={ onread2 }>
+                    <Text font_size=48 bold=true font="serif" words_read={ *words_read2 } onread={ onread2 }>
                         { "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur." }
                         { "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." }
                     </Text>
