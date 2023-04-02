@@ -26,6 +26,17 @@ pub fn TextExample() -> Html {
         })
     };
 
+    let words_read3 = use_state(|| 0);
+    let read3 = use_state(|| "".to_string());
+    let onread3 = {
+        let words_read3 = words_read3.clone();
+        let read3 = read3.clone();
+        Callback::from(move |(words_read, letters, total)| {
+            words_read3.set(words_read);
+            read3.set(format!("{letters} / {total}"));
+        })
+    };
+
     html! {
         <Slide>
             <Row padding=30 border_width=4>
@@ -36,12 +47,18 @@ pub fn TextExample() -> Html {
                     </Text>
                     <Label text={ (*read1).clone() } />
                 </Column>
-                <Column stretch={ vec![5, 1] }>
-                    <Text font_size=72 bold=true font="serif" words_read={ *words_read2 } onread={ onread2 }>
+
+                <Column stretch={ vec![5, 1, 5, 1] }>
+                    <Text font_size=50 bold=true font="serif" words_read={ *words_read2 } onread={ onread2 }>
                         { "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur." }
                         { "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." }
                     </Text>
                     <Label text={ (*read2).clone() } />
+                    <Text font_size=48 erase_top=0.3 words_read={ *words_read3 } onread={ onread3 }>
+                        { "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur." }
+                        { "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." }
+                    </Text>
+                    <Label text={ (*read3).clone() } />
                 </Column>
             </Row>
         </Slide>
