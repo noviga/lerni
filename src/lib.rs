@@ -2,6 +2,7 @@
 
 #![warn(missing_docs)]
 
+pub mod ng;
 pub mod properties;
 pub mod utils;
 pub mod widgets;
