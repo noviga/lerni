@@ -1,5 +1,5 @@
 //! New generation Lerni based on Leptos.
-//!
+
 pub use wasm_bindgen::prelude::wasm_bindgen;
 
 mod align;

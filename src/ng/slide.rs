@@ -29,7 +29,9 @@ pub fn Slide(
     let children = children(cx)
         .nodes
         .into_iter()
-        .map(|child| { view! { cx, <>{child}</> }})
+        .map(|child| {
+            view! { cx, <>{child}</> }
+        })
         .collect_view(cx);
 
     view! { cx,
