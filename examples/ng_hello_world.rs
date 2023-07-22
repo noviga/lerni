@@ -5,8 +5,8 @@ use lerni::ng::*;
 pub fn HelloWorld(cx: Scope) -> impl IntoView {
     view! { cx,
         <SlideShow>
-            <Slide background_color={ Color::MistyRose }><Label text="Hello →"  /></Slide>
-            <Slide background_color={ Color::PaleGreen }><Label text="← World!" /></Slide>
+            <Slide background_color={ Color::MistyRose }><Label text="Hello →".into()/></Slide>
+            <Slide background_color={ Color::PaleGreen }><Label text="← World!".into()/></Slide>
         </SlideShow>
     }
 }
