@@ -35,7 +35,7 @@ pub fn Slide(
         .collect_view(cx);
 
     view! { cx,
-        <div { style } class="container pl-4 mt-4 pr-4">
+        <div style="max-width: 100%;" class="container pl-4 mt-4 pr-4">
             <div class="box">
                 <figure class="image is-16by9" style={ blur }>
                     <svg viewBox={ view_box } class="has-ratio"

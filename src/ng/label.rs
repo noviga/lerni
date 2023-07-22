@@ -5,7 +5,7 @@ use crate::ng::{Align, Color, Frame, VAlign};
 #[component]
 pub fn Label(
     cx: Scope,
-    #[prop(optional)] text: &'static str,
+    #[prop(optional)] text: MaybeSignal<String>,
     #[prop(optional)] _bold: bool,
     #[prop(optional)] _font: String,
     #[prop(default = 48)] font_size: i32,
@@ -27,15 +27,16 @@ pub fn Label(
     };
 
     view! { cx,
-        <text x={ x.to_string() } y={ y.to_string() } { class } font-size={ font_size.to_string() } text-anchor={ anchor }
-            fill={ color.to_string() } dominant-baseline={ baseline } { style } pointer-events="none">
-            {
-                if text.is_empty() {
-                    "Empty".to_string()
-                } else {
-                    text.to_string()
-                }
-            }
+        <text
+            x=x
+            y=y
+            font-size=font_size
+            text-anchor=anchor
+            fill=color
+            dominant-baseline=baseline
+            pointer-events="none"
+        >
+            {text}
         </text>
     }
 }

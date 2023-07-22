@@ -1,6 +1,14 @@
-use leptos::*;
+use leptos::{
+    ev::{keydown, resize},
+    *,
+};
+use leptos_use::*;
+use std::collections::BTreeSet;
 
 use crate::ng::Metadata;
+
+const BUTTON_COUNT: usize = 6;
+const PAGINATION_HEIGHT: i32 = 88;
 
 #[component]
 pub fn SlideShow(
@@ -10,27 +18,183 @@ pub fn SlideShow(
     #[prop(optional)] pointer: bool,
     children: Children,
 ) -> impl IntoView {
+    let page = create_rw_signal(cx, current);
+    let children = children(cx).nodes;
+    let count = children.len();
+
+    let _ = use_event_listener(cx, document(), keydown, move |e| {
+        if e.key() == "ArrowLeft" {
+            if page.get() > 0 {
+                page.set(page.get() - 1);
+            }
+        } else if e.key() == "ArrowRight" {
+            if page.get() < count - 1 {
+                page.set(page.get() + 1);
+            }
+        }
+    });
+
+    let (width, set_width) = create_signal(cx, calc_width());
+
+    let _ = use_event_listener(cx, window(), resize, move |_| {
+        set_width.set(calc_width());
+    });
+
     let mut metadata = Metadata {
         teacher_mode,
         pointer,
         ..Default::default()
     };
 
-    let children = children(cx)
-        .nodes
+    let children = children
         .into_iter()
         .enumerate()
         .map(|(i, child)| {
-            metadata.visible = i == current;
+            metadata.visible = i == page.get();
             provide_context(cx, metadata);
-            view! { cx, <div hidden={i != current}>{child}</div> }
+            view! { cx, <div hidden=move || i != page.get()>{child}</div> }
         })
         .collect_view(cx);
 
     view! { cx,
-        <>
-            // TODO: add pagination
+        <div
+            class="container"
+            style:max-width=move || {
+                let width = width.get();
+                if width > 0 { format!("{}px", width) } else { "100%".to_string() }
+            }
+        >
+            <Pagination page=page count=count/>
             {children}
+        </div>
+    }
+}
+
+#[component]
+fn Pagination(cx: Scope, page: RwSignal<usize>, count: usize) -> impl IntoView {
+    let mut prev = None;
+    let pages = page_list(page.get(), count)
+        .into_iter()
+        .map(|i| {
+            let view = view! { cx, <PageButton index=i prev=prev current=page/> };
+            prev = Some(i);
+            view
+        })
+        .collect_view(cx);
+
+    let on_prev = move |_| {
+        if page.get() > 0 {
+            page.set(page.get() - 1);
+        }
+    };
+    let on_next = move |_| {
+        if page.get() < count - 1 {
+            page.set(page.get() + 1);
+        }
+    };
+
+    view! { cx,
+        <div class="container pl-4 mt-4 pr-4" style="max-width: 100%;">
+            <nav class="pagination is-rounded" role="navigation" aria-label="pagination">
+                <ul class="pagination-list">{pages}</ul>
+                <a class="pagination-link button is-info" style="order: 2;" on:click=on_prev>
+                    <span class="icon">
+                        <i class="fas fa-lg fa-arrow-left"></i>
+                    </span>
+                </a>
+                <a class="pagination-link button is-info" style="order: 3;" on:click=on_next>
+                    <span class="icon">
+                        <i class="fas fa-lg fa-arrow-right"></i>
+                    </span>
+                </a>
+            </nav>
+        </div>
+    }
+}
+
+#[component]
+fn PageButton(
+    cx: Scope,
+    index: usize,
+    prev: Option<usize>,
+    current: RwSignal<usize>,
+) -> impl IntoView {
+    view! { cx,
+        <>
+            <li hidden=move || !matches!(prev, Some(p) if index != (p + 1))>
+                <span class="pagination-ellipsis">"•"</span>
+            </li>
+            <li>
+                <a
+                    class="pagination-link"
+                    class:button=move || index == current.get()
+                    class:is-warning=move || index == current.get()
+                    on:click=move |_| current.set(index)
+                >
+                    {index + 1}
+                </a>
+            </li>
         </>
+    }
+}
+
+fn page_list(current: usize, count: usize) -> Vec<usize> {
+    if count <= BUTTON_COUNT {
+        (0..count).collect()
+    } else {
+        let mut pages: BTreeSet<usize> = [0].into();
+        let mut add_page = |page| {
+            if page < count {
+                pages.insert(page);
+            }
+        };
+        add_page(count - 1);
+        let center = if current == 0 {
+            1
+        } else if current == count - 1 {
+            count - 2
+        } else {
+            current
+        };
+        add_page(center - 1);
+        add_page(center);
+        add_page(center + 1);
+        pages.into_iter().collect()
+    }
+}
+
+fn calc_width() -> i32 {
+    let elem = web_sys::window()
+        .and_then(|win| win.document())
+        .and_then(|doc| doc.document_element());
+    if let Some(elem) = elem {
+        let width = elem.client_width();
+        let height = elem.client_height();
+        width.min((height - PAGINATION_HEIGHT) * 16 / 9)
+    } else {
+        0
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn page_list_calc() {
+        let c = BUTTON_COUNT;
+        for i in 0..c {
+            assert_eq!(page_list(i, c), (0..c).collect::<Vec<_>>());
+        }
+
+        let c = 2 * BUTTON_COUNT;
+        assert_eq!(page_list(0, c), vec![0, 1, 2, c - 1]);
+        assert_eq!(page_list(1, c), vec![0, 1, 2, c - 1]);
+        assert_eq!(page_list(2, c), vec![0, 1, 2, 3, c - 1]);
+        assert_eq!(page_list(3, c), vec![0, 2, 3, 4, c - 1]);
+        assert_eq!(page_list(c - 4, c), vec![0, c - 5, c - 4, c - 3, c - 1]);
+        assert_eq!(page_list(c - 3, c), vec![0, c - 4, c - 3, c - 2, c - 1]);
+        assert_eq!(page_list(c - 2, c), vec![0, c - 3, c - 2, c - 1]);
+        assert_eq!(page_list(c - 1, c), vec![0, c - 3, c - 2, c - 1]);
     }
 }
