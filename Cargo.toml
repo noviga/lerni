@@ -44,6 +44,10 @@ name = "hello_world"
 crate-type = ["cdylib"]
 
 [[example]]
+name = "ng_grid"
+crate-type = ["cdylib"]
+
+[[example]]
 name = "ng_hello_world"
 crate-type = ["cdylib"]
 

@@ -5,6 +5,7 @@ blur \
 buttons \
 grid \
 hello_world \
+ng_grid \
 ng_hello_world \
 pointer \
 rows_cols \

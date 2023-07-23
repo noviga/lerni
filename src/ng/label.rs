@@ -3,17 +3,22 @@ use leptos::*;
 use crate::ng::{Align, Color, Frame, VAlign};
 
 #[component]
-pub fn Label(
+pub fn Label<F, IV>(
     cx: Scope,
-    #[prop(optional)] text: MaybeSignal<String>,
+    text: F,
+    #[prop(optional)] frame: Option<Frame>,
     #[prop(optional)] _bold: bool,
     #[prop(optional)] _font: String,
     #[prop(default = 48)] font_size: i32,
-    #[prop(default=Align::Center)] align: Align,
-    #[prop(default=VAlign::Middle)] valign: VAlign,
-    #[prop(default=Color::Black)] color: Color,
-) -> impl IntoView {
-    let f = use_context::<Frame>(cx).unwrap();
+    #[prop(default = Align::Center)] align: Align,
+    #[prop(default = VAlign::Middle)] valign: VAlign,
+    #[prop(default = Color::Black)] color: Color,
+) -> impl IntoView
+where
+    F: Fn(Scope) -> IV + 'static,
+    IV: IntoView,
+{
+    let f = frame.or_else(|| use_context::<Frame>(cx)).unwrap();
 
     let (x, anchor) = match align {
         Align::Left => (f.x, "start"),
@@ -36,7 +41,7 @@ pub fn Label(
             dominant-baseline=baseline
             pointer-events="none"
         >
-            {text}
+            {text(cx)}
         </text>
     }
 }

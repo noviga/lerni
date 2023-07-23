@@ -34,10 +34,10 @@ pub fn SlideShow(
         }
     });
 
-    let (width, set_width) = create_signal(cx, calc_width());
+    let (width, set_width) = create_signal(cx, crate::ng::calc_width(PAGINATION_HEIGHT));
 
     let _ = use_event_listener(cx, window(), resize, move |_| {
-        set_width.set(calc_width());
+        set_width.set(crate::ng::calc_width(PAGINATION_HEIGHT));
     });
 
     let mut metadata = Metadata {
@@ -160,19 +160,6 @@ fn page_list(current: usize, count: usize) -> Vec<usize> {
         add_page(center);
         add_page(center + 1);
         pages.into_iter().collect()
-    }
-}
-
-fn calc_width() -> i32 {
-    let elem = web_sys::window()
-        .and_then(|win| win.document())
-        .and_then(|doc| doc.document_element());
-    if let Some(elem) = elem {
-        let width = elem.client_width();
-        let height = elem.client_height();
-        width.min((height - PAGINATION_HEIGHT) * 16 / 9)
-    } else {
-        0
     }
 }
 
