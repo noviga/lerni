@@ -8,6 +8,9 @@ pub use align::{Align, VAlign};
 mod color;
 pub use color::Color;
 
+mod frame;
+pub use frame::*;
+
 mod grid;
 pub use grid::Grid;
 
@@ -20,7 +23,7 @@ pub use slide::Slide;
 mod slideshow;
 pub use slideshow::SlideShow;
 
-use leptos::{component, provide_context, Children, IntoView, Scope};
+use leptos::*;
 
 /// Additional information provided to all slides.
 #[derive(Clone, Copy, Default, Debug, PartialEq)]
@@ -31,33 +34,6 @@ pub struct Metadata {
     pub teacher_mode: bool,
     /// Pointer on/off flag.
     pub pointer: bool,
-}
-
-/// Frame within which the widget will be rendered.
-#[derive(Clone, Default, Debug)]
-pub struct Frame {
-    /// X-coordinate (in pixels) of the to left corner.
-    pub x: i32,
-    /// Y-coordinate (in pixels) of the to left corner.
-    pub y: i32,
-    /// Width (in pixels).
-    pub width: i32,
-    /// Height (in pixels).
-    pub height: i32,
-}
-/// Context provider.
-#[component]
-pub fn ContextProvider<T>(
-    cx: Scope,
-    /// Context.
-    context: T,
-    children: Children,
-) -> impl IntoView
-where
-    T: Clone + 'static,
-{
-    provide_context(cx, context);
-    children(cx)
 }
 
 /// Calculates the width of the slide.

@@ -27,10 +27,8 @@ pub fn SlideShow(
             if page.get() > 0 {
                 page.set(page.get() - 1);
             }
-        } else if e.key() == "ArrowRight" {
-            if page.get() < count - 1 {
-                page.set(page.get() + 1);
-            }
+        } else if e.key() == "ArrowRight" && page.get() < count - 1 {
+            page.set(page.get() + 1);
         }
     });
 

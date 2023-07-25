@@ -1,7 +1,7 @@
 use leptos::{ev::resize, *};
 use leptos_use::*;
 
-use crate::ng::{Color, Frame, Metadata};
+use crate::ng::{provide_frame, Color, Frame, Metadata};
 
 const WIDTH: i32 = 1920;
 const HEIGHT: i32 = 1080;
@@ -33,7 +33,7 @@ pub fn Slide(
         height,
         ..Default::default()
     };
-    provide_context(cx, frame);
+    provide_frame(cx, frame);
 
     let view_box = format!("0 0 {width} {height}");
 
