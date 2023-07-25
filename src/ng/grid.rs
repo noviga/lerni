@@ -1,6 +1,6 @@
 use leptos::*;
 
-use crate::ng::{Color, ContextProvider, Frame};
+use crate::ng::{use_frame, use_frames, Color, Frame};
 
 /// Grid layout widget.
 #[component]
@@ -14,7 +14,7 @@ pub fn Grid(
     #[prop(optional)] padding: i32,
     children: Children,
 ) -> impl IntoView {
-    let f = use_context::<Frame>(cx).unwrap();
+    let f = use_frame(cx);
 
     let max = cols * rows;
 
@@ -25,22 +25,28 @@ pub fn Grid(
     let width = (f.width - border_width - hspacing) / cols;
     let height = (f.height - border_width - vspacing) / rows;
 
-    let children = children(cx).nodes.into_iter().take(max).enumerate().map(|(i, child)| {
+    {
+        let frames = use_frames(cx);
+        let mut frames = frames.borrow_mut();
+        for i in 0..max {
+            let x = f.x + border_width / 2 + (width + spacing) * (i as i32 % cols);
+            let y = f.y + border_width / 2 + (height + spacing) * (i as i32 / cols);
+            let frame = Frame {
+                x: x + padding,
+                y: y + padding,
+                width: width - 2 * padding,
+                height: height - 2 * padding,
+            };
+            frames.push(frame);
+        }
+    }
+
+    children(cx).nodes.into_iter().take(max).enumerate().map(|(i, child)| {
         let x = f.x + border_width / 2 + (width + spacing)  * (i as i32 % cols);
         let y = f.y + border_width / 2 + (height + spacing) * (i as i32 / cols);
-        let frame = Frame {
-            x: x + padding,
-            y: y + padding,
-            width: width - 2 * padding,
-            height: height - 2 * padding,
-        };
         view! { cx,
-            <ContextProvider context=frame>
-                <rect x=x y=y width=width height=height fill="none" stroke=border_color stroke-width=border_width/>
-                {child}
-            </ContextProvider>
+            <rect x=x y=y width=width height=height fill="none" stroke=border_color stroke-width=border_width/>
+            {child}
         }
-    }).collect_view(cx);
-
-    children
+    }).collect_view(cx)
 }

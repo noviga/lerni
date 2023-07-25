@@ -1,12 +1,11 @@
 use leptos::*;
 
-use crate::ng::{Align, Color, Frame, VAlign};
+use crate::ng::{use_frame, Align, Color, VAlign};
 
 #[component]
 pub fn Label<F, IV>(
     cx: Scope,
     text: F,
-    #[prop(optional)] frame: Option<Frame>,
     #[prop(optional)] _bold: bool,
     #[prop(optional)] _font: String,
     #[prop(default = 48)] font_size: i32,
@@ -18,7 +17,7 @@ where
     F: Fn(Scope) -> IV + 'static,
     IV: IntoView,
 {
-    let f = frame.or_else(|| use_context::<Frame>(cx)).unwrap();
+    let f = use_frame(cx);
 
     let (x, anchor) = match align {
         Align::Left => (f.x, "start"),
