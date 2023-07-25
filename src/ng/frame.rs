@@ -38,7 +38,7 @@ impl Frames {
     /// Pops the first child frame or initial frame if there are no children.
     pub fn pop(&mut self) -> Frame {
         let children = &mut self.children;
-        if children.len() > 0 {
+        if !children.is_empty() {
             children.pop_front().unwrap()
         } else {
             self.initial.clone()

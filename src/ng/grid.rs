@@ -41,14 +41,12 @@ pub fn Grid(
         }
     }
 
-    let children = children(cx).nodes.into_iter().take(max).enumerate().map(|(i, child)| {
+    children(cx).nodes.into_iter().take(max).enumerate().map(|(i, child)| {
         let x = f.x + border_width / 2 + (width + spacing)  * (i as i32 % cols);
         let y = f.y + border_width / 2 + (height + spacing) * (i as i32 / cols);
         view! { cx,
             <rect x=x y=y width=width height=height fill="none" stroke=border_color stroke-width=border_width/>
             {child}
         }
-    }).collect_view(cx);
-
-    children
+    }).collect_view(cx)
 }
