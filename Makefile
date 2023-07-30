@@ -1,4 +1,4 @@
-.PHONY: all clean doc doc-open examples fmt fmt-check linter prepare pre-commit serve test
+.PHONY: all clean doc doc-open examples examples-release fmt fmt-check linter prepare pre-commit serve test
 
 all:
 	@echo ──────────── Build release ────────────────────
@@ -19,6 +19,10 @@ doc-open:
 examples:
 	@echo ──────────── Build examples ───────────────────
 	@./scripts/examples.sh
+
+examples-release:
+	@echo ──────────── Build release examples ───────────────────
+	@./scripts/examples.sh release
 
 fmt:
 	@echo ──────────── Format ───────────────────────────
