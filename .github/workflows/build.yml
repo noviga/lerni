@@ -31,7 +31,7 @@ jobs:
       - name: Install wasm-bindgen
         uses: jetli/wasm-bindgen-action@v0.1.0
         with:
-          version: 'latest'
+          version: latest
 
       - name: Install wasm-opt
         run: sudo apt-get install -y binaryen
@@ -40,7 +40,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Build examples
-        run: ./scripts/examples.sh release
+        run: make examples-release
 
       - name: Setup GitHub Pages
         if: github.event_name == 'push'
