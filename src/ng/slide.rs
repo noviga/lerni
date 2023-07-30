@@ -18,10 +18,10 @@ pub fn Slide(
     #[prop(default = WIDTH)] width: i32,
     #[prop(default = HEIGHT)] height: i32,
     #[prop(optional)] background_color: Color,
-    #[prop(optional)] _background_image: String,
+    #[prop(optional)] background_image: String,
     #[prop(optional)] pointer: MaybeSignal<bool>,
-    #[prop(optional)] _blur: bool,
-    #[prop(default = 15)] _blur_radius: i32,
+    #[prop(optional)] blur: MaybeSignal<bool>,
+    #[prop(default = 15)] blur_radius: i32,
     children: Children,
 ) -> impl IntoView {
     let metadata = use_context::<Metadata>(cx);
@@ -56,6 +56,27 @@ pub fn Slide(
     let (pointer_in, set_pointer_in) = create_signal(cx, false);
     let pointer_visible = move || pointer.get() && pointer_in.get();
 
+    let blur_style = move || {
+        let radius = if blur.get() { blur_radius } else { 0 };
+        format!(
+            r#"-webkit-filter: blur({radius}px);
+            -moz-filter: blur({radius}px);
+            -ms-filter: blur({radius}px);
+            filter: blur({radius}px); transition: all .3s;"#
+        )
+    };
+
+    let bg_style = if !background_image.is_empty() {
+        format!(
+            r#"background-image: url({background_image});
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;"#
+        )
+    } else {
+        Default::default()
+    };
+
     view! { cx,
         <div
             class="container pl-4 mt-4 pr-4"
@@ -64,7 +85,7 @@ pub fn Slide(
             }
         >
             <div class="box">
-                <figure class="image is-16by9">
+                <figure class="image is-16by9" style=blur_style>
                     <svg
                         on:mousemove=on_mousemove
                         on:mouseenter=move |_| set_pointer_in.set(true)
@@ -72,6 +93,7 @@ pub fn Slide(
                         node_ref=svg_ref
                         viewBox=view_box
                         class="has-ratio"
+                        style=bg_style
                     >
                         <rect width="100%" height="100%" rx="10" ry="10" fill=background_color/>
                         {children(cx)}
