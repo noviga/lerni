@@ -44,6 +44,10 @@ name = "hello_world"
 crate-type = ["cdylib"]
 
 [[example]]
+name = "ng_blur"
+crate-type = ["cdylib"]
+
+[[example]]
 name = "ng_buttons"
 crate-type = ["cdylib"]
 
@@ -53,6 +57,22 @@ crate-type = ["cdylib"]
 
 [[example]]
 name = "ng_hello_world"
+crate-type = ["cdylib"]
+
+[[example]]
+name = "ng_pointer"
+crate-type = ["cdylib"]
+
+[[example]]
+name = "ng_rows_cols"
+crate-type = ["cdylib"]
+
+[[example]]
+name = "ng_svg"
+crate-type = ["cdylib"]
+
+[[example]]
+name = "ng_text"
 crate-type = ["cdylib"]
 
 [[example]]
