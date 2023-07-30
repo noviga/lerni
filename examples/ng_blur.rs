@@ -1,23 +1,19 @@
-use lerni::{properties::Color, widgets::*};
-use wasm_bindgen::prelude::wasm_bindgen;
-use yew::prelude::*;
+use leptos::*;
+use lerni::ng::*;
 
-#[function_component]
-pub fn Blur() -> Html {
-    let blur = use_state(|| false);
-    let onclick = {
-        let blur = blur.clone();
-        Callback::from(move |_| blur.set(!*blur))
-    };
+#[component]
+pub fn Blur(cx: Scope) -> impl IntoView {
+    let (blur, set_blur) = create_signal(cx, false);
+    let on_click = move |_| set_blur.set(!blur.get());
 
-    html! {
-        <Slide blur={ *blur } background_color={ Color::MistyRose }>
-            <Button text="Blur ON/OFF" { onclick } />
+    view! { cx,
+        <Slide blur=blur.into() background_color=Color::MistyRose>
+            <Button text=|_| "Blur ON/OFF" on_click=on_click/>
         </Slide>
     }
 }
 
 #[wasm_bindgen(start)]
 pub fn main() {
-    lerni::start::<Blur>();
+    lerni::ng::start(Blur);
 }
