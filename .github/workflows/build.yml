@@ -40,7 +40,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Build examples
-        run: ./scripts/examples.sh
+        run: ./scripts/examples.sh release
 
       - name: Setup GitHub Pages
         if: github.event_name == 'push'

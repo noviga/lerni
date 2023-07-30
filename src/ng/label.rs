@@ -6,8 +6,8 @@ use crate::ng::{use_frame, Align, Color, VAlign};
 pub fn Label<F, IV>(
     cx: Scope,
     text: F,
-    #[prop(optional)] _bold: bool,
-    #[prop(optional)] _font: String,
+    #[prop(optional)] bold: bool,
+    #[prop(optional)] font: String,
     #[prop(default = 48)] font_size: i32,
     #[prop(default = Align::Center)] align: Align,
     #[prop(default = VAlign::Middle)] valign: VAlign,
@@ -32,6 +32,8 @@ where
 
     view! { cx,
         <text
+            class:has-text-weight-bold=bold
+            style:font-family=font
             x=x
             y=y
             font-size=font_size

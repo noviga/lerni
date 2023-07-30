@@ -11,8 +11,7 @@ pub fn GridExample(cx: Scope) -> impl IntoView {
                 <Label text=|_| "2" />
                 <Label text=move |_| view! { cx, <tspan>"00"</tspan><tspan fill="red">"3"</tspan> }/>
                 <Label text=|_| "4" font_size=96 color=Color::Blue/>
-                // <Button text=|_| "5" align=Align::Fill valign=VAlign::Fill/>
-                <Label text=|_| "5" align=Align::Fill valign=VAlign::Fill/>
+                <Button text=|_| "5" align=Align::Fill valign=VAlign::Fill on_click=move |_| log!("5: Clicked")/>
                 <Label text=|_| "6" align=Align::Right/>
                 <Label text=|_| "7" align=Align::Left/>
                 <Label text=|_| "8"/>
@@ -20,8 +19,7 @@ pub fn GridExample(cx: Scope) -> impl IntoView {
                     <Label text=|_| "9" valign=VAlign::Top/>
                     <Label text=|_| "10" valign=VAlign::Bottom/>
                     <Label text=|_| "11" />
-                    // <Button text=|_| "12" align=Align::Fill valign=VAlign::Fill/>
-                    <Label text=|_| "12" align=Align::Fill valign=VAlign::Fill/>
+                    <Button text=|_| "12" align=Align::Fill valign=VAlign::Fill on_click=move |_| log!("12: Clicked")/>
                     <Label text=|_| "13" />
                     <Label text=|_| "14" align=Align::Left valign=VAlign::Top/>
                     <Label text=|_| "15" />

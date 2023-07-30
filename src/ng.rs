@@ -5,6 +5,9 @@ pub use wasm_bindgen::prelude::wasm_bindgen;
 mod align;
 pub use align::{Align, VAlign};
 
+mod button;
+pub use button::Button;
+
 mod color;
 pub use color::Color;
 
