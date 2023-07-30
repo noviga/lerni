@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" class="has-background-light">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Lerni "Blur" Example</title>
+    <link rel="stylesheet" href="/css/bulma.min.css" />
+    <link rel="stylesheet" href="/css/fas.min.css" />
+    <link rel="preload" href="/ng_blur/ng_blur_bg.wasm" as="fetch" type="application/wasm" crossorigin="" />
+    <link rel="modulepreload" href="/ng_blur/ng_blur.js" />
+</head>
+<body>
+    <script type="module">import init from '/ng_blur/ng_blur.js';init('/ng_blur/ng_blur_bg.wasm');</script>
+</body>
+</html>
