@@ -19,12 +19,7 @@ pub struct Frame {
 
 /// Frames stack.
 #[derive(Clone, Default, Debug)]
-pub struct Frames {
-    /// Initial frame.
-    initial: Frame,
-    /// Children frames.
-    children: VecDeque<Frame>,
-}
+pub struct Frames(VecDeque<Frame>);
 
 /// Frames stack reference.
 pub type FramesRef = Rc<RefCell<Frames>>;
@@ -32,16 +27,16 @@ pub type FramesRef = Rc<RefCell<Frames>>;
 impl Frames {
     /// Pushes a new child frame.
     pub fn push(&mut self, frame: Frame) {
-        self.children.push_back(frame);
+        self.0.push_back(frame);
     }
 
     /// Pops the first child frame or initial frame if there are no children.
     pub fn pop(&mut self) -> Frame {
-        let children = &mut self.children;
-        if !children.is_empty() {
-            children.pop_front().unwrap()
+        let frames = &mut self.0;
+        if frames.len() > 1 {
+            frames.pop_back().unwrap()
         } else {
-            self.initial.clone()
+            frames.back().unwrap().clone()
         }
     }
 }
@@ -50,12 +45,9 @@ impl Frames {
 pub fn provide_frame(cx: Scope, frame: Frame) {
     let frames: Option<FramesRef> = use_context(cx);
     if let Some(frames) = frames {
-        frames.borrow_mut().children.push_back(frame);
+        frames.borrow_mut().0.push_back(frame);
     } else {
-        let frames = Frames {
-            initial: frame,
-            ..Default::default()
-        };
+        let frames = Frames([frame].into());
         provide_context(cx, Rc::new(RefCell::new(frames)));
     }
 }

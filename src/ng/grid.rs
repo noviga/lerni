@@ -28,7 +28,7 @@ pub fn Grid(
     {
         let frames = use_frames(cx);
         let mut frames = frames.borrow_mut();
-        for i in 0..max {
+        for i in (0..max).rev() {
             let x = f.x + border_width / 2 + (width + spacing) * (i as i32 % cols);
             let y = f.y + border_width / 2 + (height + spacing) * (i as i32 / cols);
             let frame = Frame {
