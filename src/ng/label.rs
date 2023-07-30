@@ -41,8 +41,9 @@ where
             fill=color
             dominant-baseline=baseline
             pointer-events="none"
+            style="user-select: none; -webkit-user-select: none;"
         >
-            {text(cx)}
+            {move || text(cx)}
         </text>
     }
 }
