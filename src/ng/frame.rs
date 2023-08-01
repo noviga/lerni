@@ -39,6 +39,11 @@ impl Frames {
             frames.back().unwrap().clone()
         }
     }
+
+    /// Extends the stack with the given frames.
+    pub fn extend(&mut self, frames: impl IntoIterator<Item = Frame>) {
+        self.0.extend(frames);
+    }
 }
 
 /// Provides frame to the context.
