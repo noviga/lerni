@@ -11,6 +11,9 @@ pub use button::Button;
 mod color;
 pub use color::Color;
 
+mod column;
+pub use column::Column;
+
 mod frame;
 pub use frame::*;
 
@@ -19,6 +22,9 @@ pub use grid::Grid;
 
 mod label;
 pub use label::Label;
+
+mod row;
+pub use row::Row;
 
 mod slide;
 pub use slide::Slide;
