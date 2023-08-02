@@ -7,9 +7,8 @@ const WIDTH: i32 = 400;
 const HEIGHT: i32 = 150;
 
 #[component]
-pub fn Button<F, IV, CB>(
+pub fn Button<CB>(
     cx: Scope,
-    text: F,
     on_click: CB,
     #[prop(optional)] text_bold: bool,
     #[prop(default = WIDTH)] width: i32,
@@ -23,10 +22,9 @@ pub fn Button<F, IV, CB>(
     #[prop(default = Color::RoyalBlue)] border_color: Color,
     #[prop(default = Align::Center)] align: Align,
     #[prop(default = VAlign::Middle)] valign: VAlign,
+    children: Children,
 ) -> impl IntoView
 where
-    F: Fn(Scope) -> IV + 'static,
-    IV: IntoView,
     CB: FnMut(MouseEvent) + 'static,
 {
     let f = use_frame(cx);
@@ -67,22 +65,22 @@ where
     let on_mouseup = move |_| set_border.set(border_width);
 
     view! { cx,
-            <rect
-                on:click=on_click
-                on:mousedown=on_mousedown
-                on:mouseup=on_mouseup
-                on:mouseleave=on_mouseup
-                x=x
-                y=y
-                width=width
-                height=height
-                rx=radius
-                ry=radius
-                fill=color
-                stroke=border_color
-                stroke-width=move || border.get()
-                style="cursor: pointer;"
-            />
-            <Label text=text bold=text_bold color=text_color font=font font_size=font_size/>
+        <rect
+            on:click=on_click
+            on:mousedown=on_mousedown
+            on:mouseup=on_mouseup
+            on:mouseleave=on_mouseup
+            x=x
+            y=y
+            width=width
+            height=height
+            rx=radius
+            ry=radius
+            fill=color
+            stroke=border_color
+            stroke-width=move || border.get()
+            style="cursor: pointer;"
+        />
+        <Label bold=text_bold color=text_color font=font font_size=font_size>{children(cx)}</Label>
     }
 }
