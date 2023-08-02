@@ -67,11 +67,30 @@ pub fn Column(
         }
     }
 
-    children(cx).nodes.into_iter().take(rows).enumerate().map(|(i, child)| {
-        let Frame {x, y, width, height } = cells[i];
-        view! { cx,
-            <rect x=x y=y width=width height=height fill="none" stroke=border_color stroke-width=border_width/>
-            {child}
-        }
-    }).collect_view(cx)
+    children(cx)
+        .nodes
+        .into_iter()
+        .take(rows)
+        .enumerate()
+        .map(|(i, child)| {
+            let Frame {
+                x,
+                y,
+                width,
+                height,
+            } = cells[i];
+            view! { cx,
+                <rect
+                    x=x
+                    y=y
+                    width=width
+                    height=height
+                    fill="none"
+                    stroke=border_color
+                    stroke-width=border_width
+                ></rect>
+                {child}
+            }
+        })
+        .collect_view(cx)
 }

@@ -81,9 +81,14 @@ pub fn Slide(
         <div
             class="container pl-4 mt-4 pr-4"
             style:max-width=move || {
-                if metadata.is_none() { format!("{}px", slide_width.get()) } else { "100%".to_string() }
+                if metadata.is_none() {
+                    format!("{}px", slide_width.get())
+                } else {
+                    "100%".to_string()
+                }
             }
         >
+
             <div class="box">
                 <figure class="image is-16by9" style=blur_style>
                     <svg
@@ -95,8 +100,15 @@ pub fn Slide(
                         class="has-ratio"
                         style=bg_style
                     >
-                        <rect width="100%" height="100%" rx="10" ry="10" fill=background_color/>
+                        <rect
+                            width="100%"
+                            height="100%"
+                            rx="10"
+                            ry="10"
+                            fill=background_color
+                        ></rect>
                         {children(cx)}
+
                         <Pointer position=pointer_position visible=pointer_visible/>
                     </svg>
                 </figure>
@@ -119,6 +131,6 @@ where
             fill="orange"
             opacity=move || if visible() { 0.75 } else { 0.0 }
             pointer-events="none"
-        />
+        ></circle>
     }
 }
