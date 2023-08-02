@@ -8,7 +8,9 @@ pub fn Pointer(cx: Scope) -> impl IntoView {
 
     view! { cx,
         <Slide pointer=pointer.into()>
-            <Button text=|_| "Pointer ON/OFF" on_click=on_click/>
+            <Button on_click=on_click>
+                "Pointer " {move || if pointer.get() { "ON" } else { "OFF" }}
+            </Button>
         </Slide>
     }
 }

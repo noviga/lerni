@@ -6,45 +6,41 @@ pub fn GridExample(cx: Scope) -> impl IntoView {
     view! { cx,
         <Slide>
             <Grid cols=3 rows=3 border_width=4 padding=20>
-                <Label text=move |_| {
-                    view! { cx,
-                        <>
-                            <tspan>"00"</tspan>
-                            <tspan font-size=96>"1"</tspan>
-                        </>
-                    }
-                }/>
-                <Label text=|_| "2"/>
-                <Label text=move |_| {
-                    view! { cx,
-                        <tspan>"00"</tspan>
-                        <tspan fill="red">"3"</tspan>
-                    }
-                }/>
-                <Label text=|_| "4" font_size=96 color=Color::Blue/>
+                <Label>
+                    <tspan>"00"</tspan>
+                    <tspan font-size=96>"1"</tspan>
+                </Label>
+                <Label>2</Label>
+                <Label>
+                    <tspan>"00"</tspan>
+                    <tspan fill="red">"3"</tspan>
+                </Label>
+                <Label font_size=96 color=Color::Blue>"4"</Label>
                 <Button
-                    text=|_| "5"
                     align=Align::Fill
                     valign=VAlign::Fill
                     on_click=move |_| log!("5: Clicked")
-                />
-                <Label text=|_| "6" align=Align::Right/>
-                <Label text=|_| "7" align=Align::Left/>
-                <Label text=|_| "8"/>
+                >
+                    "5"
+                </Button>
+                <Label align=Align::Right>"6"</Label>
+                <Label align=Align::Left>"7"</Label>
+                <Label>8</Label>
                 <Grid cols=4 rows=2 border_width=4 spacing=20>
-                    <Label text=|_| "9" valign=VAlign::Top/>
-                    <Label text=|_| "10" valign=VAlign::Bottom/>
-                    <Label text=|_| "11"/>
+                    <Label valign=VAlign::Top>"9"</Label>
+                    <Label valign=VAlign::Bottom>"10"</Label>
+                    <Label>11</Label>
                     <Button
-                        text=|_| "12"
                         align=Align::Fill
                         valign=VAlign::Fill
                         on_click=move |_| log!("12: Clicked")
-                    />
-                    <Label text=|_| "13"/>
-                    <Label text=|_| "14" align=Align::Left valign=VAlign::Top/>
-                    <Label text=|_| "15"/>
-                    <Label text=|_| "16" align=Align::Right valign=VAlign::Bottom/>
+                    >
+                        "12"
+                    </Button>
+                    <Label>"13"</Label>
+                    <Label align=Align::Left valign=VAlign::Top>"14"</Label>
+                    <Label>"15"</Label>
+                    <Label align=Align::Right valign=VAlign::Bottom>"16"</Label>
                 </Grid>
             </Grid>
         </Slide>

@@ -8,7 +8,9 @@ pub fn Blur(cx: Scope) -> impl IntoView {
 
     view! { cx,
         <Slide blur=blur.into() background_color=Color::MistyRose>
-            <Button text=|_| "Blur ON/OFF" on_click=on_click/>
+            <Button on_click=on_click>
+                "Blur " {move || if blur.get() { "ON" } else { "OFF" }}
+            </Button>
         </Slide>
     }
 }

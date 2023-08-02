@@ -3,20 +3,16 @@ use leptos::*;
 use crate::ng::{use_frame, Align, Color, VAlign};
 
 #[component]
-pub fn Label<F, IV>(
+pub fn Label(
     cx: Scope,
-    text: F,
     #[prop(optional)] bold: bool,
     #[prop(optional)] font: String,
     #[prop(default = 48)] font_size: i32,
     #[prop(default = Align::Center)] align: Align,
     #[prop(default = VAlign::Middle)] valign: VAlign,
     #[prop(default = Color::Black)] color: Color,
-) -> impl IntoView
-where
-    F: Fn(Scope) -> IV + 'static,
-    IV: IntoView,
-{
+    children: Children,
+) -> impl IntoView {
     let f = use_frame(cx);
 
     let (x, anchor) = match align {
@@ -43,7 +39,7 @@ where
             pointer-events="none"
             style="user-select: none; -webkit-user-select: none;"
         >
-            {move || text(cx)}
+            {children(cx)}
         </text>
     }
 }

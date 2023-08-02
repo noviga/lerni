@@ -12,18 +12,18 @@ pub fn Buttons(cx: Scope) -> impl IntoView {
     view! { cx,
         <Slide>
             <Grid cols=3 rows=3>
-                <Button text=|_| "Alice" on_click=on_click/>
-                <Button text=|_| "Bob" width=300 height=300 radius=150 on_click=on_click/>
-                <Button text=|_| "Charlie" font_size=72 text_color=Color::DarkCyan on_click=on_click/>
-                <Button text=move |_| view! { cx,
+                <Button on_click=on_click>"Alice"</Button>
+                <Button width=300 height=300 radius=150 on_click=on_click>"Bob"</Button>
+                <Button font_size=72 text_color=Color::DarkCyan on_click=on_click>"Charlie"</Button>
+                <Button on_click=on_click>
                     <tspan font-size="96" fill="red" alignment-baseline="central">"Da"</tspan>
                     <tspan font-size="80" alignment-baseline="central">"ve"</tspan>
-                } on_click=on_click/>
-                <Label text=move |_| counter.get()/>
-                <Button text=|_| "Eve" text_bold=true align=Align::Right on_click=on_click/>
-                <Button text=|_| "Ferdie" align=Align::Right valign=VAlign::Bottom on_click=on_click/>
-                <Button text=|_| "George" color=Color::Honeydew border_color=Color::ForestGreen on_click=on_click/>
-                <Button text=|_| "Harry" align=Align::Fill valign=VAlign::Fill on_click=on_click/>
+                </Button>
+                <Label>{counter}</Label>
+                <Button text_bold=true align=Align::Right on_click=on_click>"Eve"</Button>
+                <Button align=Align::Right valign=VAlign::Bottom on_click=on_click>"Ferdie"</Button>
+                <Button color=Color::Honeydew border_color=Color::ForestGreen on_click=on_click>"George"</Button>
+                <Button align=Align::Fill valign=VAlign::Fill on_click=on_click>"Harry"</Button>
             </Grid>
         </Slide>
     }
