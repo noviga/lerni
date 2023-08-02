@@ -32,6 +32,9 @@ pub use slide::Slide;
 mod slideshow;
 pub use slideshow::SlideShow;
 
+mod svg;
+pub use svg::Svg;
+
 use leptos::*;
 
 /// Additional information provided to all slides.
