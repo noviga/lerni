@@ -12,8 +12,7 @@ pub fn Label(
     #[prop(default = VAlign::Middle)] valign: VAlign,
     #[prop(default = Color::Black)] color: Color,
     children: Children,
-) -> impl IntoView
-{
+) -> impl IntoView {
     let f = use_frame(cx);
 
     let (x, anchor) = match align {

@@ -51,9 +51,5 @@ pub fn Svg(
         y += height;
     }
 
-    view! { cx,
-        <g transform=format!("translate({x} {y}) scale({sx} {sy})")>
-        {children(cx)}
-        </g>
-    }
+    view! { cx, <g transform=format!("translate({x} {y}) scale({sx} {sy})")>{children(cx)}</g> }
 }

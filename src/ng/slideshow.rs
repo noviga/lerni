@@ -62,6 +62,7 @@ pub fn SlideShow(
                 if width > 0 { format!("{}px", width) } else { "100%".to_string() }
             }
         >
+
             <Pagination page=page count=count/>
             {children}
         </div>

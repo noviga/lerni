@@ -80,7 +80,9 @@ where
             stroke=border_color
             stroke-width=move || border.get()
             style="cursor: pointer;"
-        />
-        <Label bold=text_bold color=text_color font=font font_size=font_size>{children(cx)}</Label>
+        ></rect>
+        <Label bold=text_bold color=text_color font=font font_size=font_size>
+            {children(cx)}
+        </Label>
     }
 }
