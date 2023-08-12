@@ -10,7 +10,7 @@ include = ["src/**/*.rs", "examples/**/*.rs"]
 [dependencies]
 derive_more = "0.99.17"
 getrandom = { version = "0.2.8", features = ["js"] }
-gloo-events = "0.1.2"
+gloo-events = "0.2.0"
 gloo-utils = "0.2.0"
 leptos = { version = "0.4.3", features = ["csr"] }
 leptos-use = "0.6.0"
