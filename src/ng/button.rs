@@ -8,7 +8,6 @@ const HEIGHT: i32 = 150;
 
 #[component]
 pub fn Button<CB>(
-    cx: Scope,
     on_click: CB,
     #[prop(optional)] text_bold: bool,
     #[prop(default = WIDTH)] width: i32,
@@ -27,7 +26,7 @@ pub fn Button<CB>(
 where
     CB: FnMut(MouseEvent) + 'static,
 {
-    let f = use_frame(cx);
+    let f = use_frame();
 
     let width = if align == Align::Fill { f.width } else { width };
     let height = if valign == VAlign::Fill {
@@ -53,18 +52,18 @@ where
         width,
         height,
     };
-    provide_frame(cx, frame);
+    provide_frame(frame);
 
     let x = x + border_width / 2;
     let y = y + border_width / 2;
     let width = width - border_width;
     let height = height - border_width;
 
-    let (border, set_border) = create_signal(cx, border_width);
+    let (border, set_border) = create_signal(border_width);
     let on_mousedown = move |_| set_border.set(border_width + 6);
     let on_mouseup = move |_| set_border.set(border_width);
 
-    view! { cx,
+    view! {
         <rect
             on:click=on_click
             on:mousedown=on_mousedown
@@ -82,7 +81,7 @@ where
             style="cursor: pointer;"
         ></rect>
         <Label bold=text_bold color=text_color font=font font_size=font_size>
-            {children(cx)}
+            {children()}
         </Label>
     }
 }

@@ -4,7 +4,6 @@ use crate::ng::{use_frame, Align, Color, VAlign};
 
 #[component]
 pub fn Label(
-    cx: Scope,
     #[prop(optional)] bold: bool,
     #[prop(optional)] font: String,
     #[prop(default = 48)] font_size: i32,
@@ -13,7 +12,7 @@ pub fn Label(
     #[prop(default = Color::Black)] color: Color,
     children: Children,
 ) -> impl IntoView {
-    let f = use_frame(cx);
+    let f = use_frame();
 
     let (x, anchor) = match align {
         Align::Left => (f.x, "start"),
@@ -26,7 +25,7 @@ pub fn Label(
         VAlign::Bottom => (f.y + f.height, "text-top"),
     };
 
-    view! { cx,
+    view! {
         <text
             class:has-text-weight-bold=bold
             style:font-family=font
@@ -39,7 +38,7 @@ pub fn Label(
             pointer-events="none"
             style="user-select: none; -webkit-user-select: none;"
         >
-            {children(cx)}
+            {children()}
         </text>
     }
 }

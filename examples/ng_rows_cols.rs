@@ -2,8 +2,8 @@ use leptos::*;
 use lerni::ng::*;
 
 #[component]
-pub fn RowsCols(cx: Scope) -> impl IntoView {
-    view! { cx,
+pub fn RowsCols() -> impl IntoView {
+    view! {
         <Slide>
             <Row border_width=4 stretch=vec![1, 1, 4, 1, 1] padding=20>
                 <Label>"1"</Label>
