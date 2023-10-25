@@ -2,8 +2,8 @@ use leptos::*;
 use lerni::ng::*;
 
 #[component]
-pub fn SvgExample(cx: Scope) -> impl IntoView {
-    view! { cx,
+pub fn SvgExample() -> impl IntoView {
+    view! {
         <Slide background_image="/img/lerni-bg.svg".into()>
             <Grid cols=3 rows=3 border_width=4 padding=20>
                 <Svg width=128 height=64>{include!("logo-ng.svg-rs")}</Svg>

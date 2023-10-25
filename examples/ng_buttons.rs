@@ -2,14 +2,14 @@ use leptos::*;
 use lerni::ng::*;
 
 #[component]
-pub fn Buttons(cx: Scope) -> impl IntoView {
-    let (counter, set_counter) = create_signal(cx, 0);
+pub fn Buttons() -> impl IntoView {
+    let (counter, set_counter) = create_signal(0);
     let on_click = move |_| {
-        log!("Clicked");
+        logging::log!("Clicked");
         set_counter.set(counter.get() + 1);
     };
 
-    view! { cx,
+    view! {
         <Slide>
             <Grid cols=3 rows=3>
                 <Button on_click=on_click>"Alice"</Button>

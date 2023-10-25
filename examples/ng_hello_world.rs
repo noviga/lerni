@@ -2,8 +2,8 @@ use leptos::*;
 use lerni::ng::*;
 
 #[component]
-pub fn HelloWorld(cx: Scope) -> impl IntoView {
-    view! { cx,
+pub fn HelloWorld() -> impl IntoView {
+    view! {
         <SlideShow>
             <Slide background_color=Color::MistyRose>
                 <Label>"Hello →"</Label>

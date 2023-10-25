@@ -2,8 +2,8 @@ use leptos::*;
 use lerni::ng::*;
 
 #[component]
-pub fn GridExample(cx: Scope) -> impl IntoView {
-    view! { cx,
+pub fn GridExample() -> impl IntoView {
+    view! {
         <Slide>
             <Grid cols=3 rows=3 border_width=4 padding=20>
                 <Label>
@@ -19,7 +19,7 @@ pub fn GridExample(cx: Scope) -> impl IntoView {
                 <Button
                     align=Align::Fill
                     valign=VAlign::Fill
-                    on_click=move |_| log!("5: Clicked")
+                    on_click=move |_| logging::log!("5: Clicked")
                 >
                     "5"
                 </Button>
@@ -33,7 +33,7 @@ pub fn GridExample(cx: Scope) -> impl IntoView {
                     <Button
                         align=Align::Fill
                         valign=VAlign::Fill
-                        on_click=move |_| log!("12: Clicked")
+                        on_click=move |_| logging::log!("12: Clicked")
                     >
                         "12"
                     </Button>
