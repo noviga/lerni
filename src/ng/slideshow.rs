@@ -12,17 +12,16 @@ const PAGINATION_HEIGHT: i32 = 88;
 
 #[component]
 pub fn SlideShow(
-    cx: Scope,
     #[prop(optional)] current: usize,
     #[prop(optional)] teacher_mode: bool,
     #[prop(optional)] pointer: bool,
     children: Children,
 ) -> impl IntoView {
-    let page = create_rw_signal(cx, current);
-    let children = children(cx).nodes;
+    let page = create_rw_signal(current);
+    let children = children().nodes;
     let count = children.len();
 
-    let _ = use_event_listener(cx, document(), keydown, move |e| {
+    let _ = use_event_listener(document(), keydown, move |e| {
         if e.key() == "ArrowLeft" {
             if page.get() > 0 {
                 page.set(page.get() - 1);
@@ -32,9 +31,9 @@ pub fn SlideShow(
         }
     });
 
-    let (width, set_width) = create_signal(cx, crate::ng::calc_width(PAGINATION_HEIGHT));
+    let (width, set_width) = create_signal(crate::ng::calc_width(PAGINATION_HEIGHT));
 
-    let _ = use_event_listener(cx, window(), resize, move |_| {
+    let _ = use_event_listener(window(), resize, move |_| {
         set_width.set(crate::ng::calc_width(PAGINATION_HEIGHT));
     });
 
@@ -49,12 +48,12 @@ pub fn SlideShow(
         .enumerate()
         .map(|(i, child)| {
             metadata.visible = i == page.get();
-            provide_context(cx, metadata);
-            view! { cx, <div hidden=move || i != page.get()>{child}</div> }
+            provide_context(metadata);
+            view! { <div hidden=move || i != page.get()>{child}</div> }
         })
-        .collect_view(cx);
+        .collect_view();
 
-    view! { cx,
+    view! {
         <div
             class="container"
             style:max-width=move || {
@@ -70,16 +69,16 @@ pub fn SlideShow(
 }
 
 #[component]
-fn Pagination(cx: Scope, page: RwSignal<usize>, count: usize) -> impl IntoView {
+fn Pagination(page: RwSignal<usize>, count: usize) -> impl IntoView {
     let mut prev = None;
     let pages = page_list(page.get(), count)
         .into_iter()
         .map(|i| {
-            let view = view! { cx, <PageButton index=i prev=prev current=page/> };
+            let view = view! { <PageButton index=i prev=prev current=page/> };
             prev = Some(i);
             view
         })
-        .collect_view(cx);
+        .collect_view();
 
     let on_prev = move |_| {
         if page.get() > 0 {
@@ -92,7 +91,7 @@ fn Pagination(cx: Scope, page: RwSignal<usize>, count: usize) -> impl IntoView {
         }
     };
 
-    view! { cx,
+    view! {
         <div class="container pl-4 mt-4 pr-4" style="max-width: 100%;">
             <nav class="pagination is-rounded" role="navigation" aria-label="pagination">
                 <ul class="pagination-list">{pages}</ul>
@@ -113,12 +112,11 @@ fn Pagination(cx: Scope, page: RwSignal<usize>, count: usize) -> impl IntoView {
 
 #[component]
 fn PageButton(
-    cx: Scope,
     index: usize,
     prev: Option<usize>,
     current: RwSignal<usize>,
 ) -> impl IntoView {
-    view! { cx,
+    view! {
         <>
             <li hidden=move || !matches!(prev, Some(p) if index != (p + 1))>
                 <span class="pagination-ellipsis">"•"</span>

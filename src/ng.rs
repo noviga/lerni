@@ -65,7 +65,7 @@ pub fn calc_width(margin: i32) -> i32 {
 /// The main entry point.
 pub fn start<F, N>(f: F)
 where
-    F: FnOnce(Scope) -> N + 'static,
+    F: Fn() -> N + 'static,
     N: IntoView,
 {
     leptos::mount_to_body(f);

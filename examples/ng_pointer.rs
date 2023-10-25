@@ -2,11 +2,11 @@ use leptos::*;
 use lerni::ng::*;
 
 #[component]
-pub fn Pointer(cx: Scope) -> impl IntoView {
-    let (pointer, set_pointer) = create_signal(cx, true);
+pub fn Pointer() -> impl IntoView {
+    let (pointer, set_pointer) = create_signal(true);
     let on_click = move |_| set_pointer.set(!pointer.get());
 
-    view! { cx,
+    view! {
         <Slide pointer=pointer.into()>
             <Button on_click=on_click>
                 "Pointer " {move || if pointer.get() { "ON" } else { "OFF" }}

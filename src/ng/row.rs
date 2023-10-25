@@ -5,7 +5,6 @@ use crate::ng::{use_frame, use_frames, Color, Frame};
 /// Row of widgets.
 #[component]
 pub fn Row(
-    cx: Scope,
     #[prop(optional)] cols: Option<usize>,
     #[prop(optional)] border_width: i32,
     #[prop(default = Color::Black)] border_color: Color,
@@ -15,7 +14,7 @@ pub fn Row(
     children: Children,
 ) -> impl IntoView {
     if cols.is_none() && stretch.is_empty() {
-        warn!("Row: either `cols` or `stretch` must be specified");
+        logging::warn!("Row: either `cols` or `stretch` must be specified");
     }
 
     let stretch = if let Some(cols) = cols {
@@ -26,7 +25,7 @@ pub fn Row(
     let denominator: i32 = stretch.iter().sum();
     let cols = stretch.len();
 
-    let f = use_frame(cx);
+    let f = use_frame();
 
     let s = spacing * (cols as i32 - 1);
     let mut x = f.x + border_width / 2;
@@ -48,7 +47,7 @@ pub fn Row(
         .collect();
 
     {
-        let frames = use_frames(cx);
+        let frames = use_frames();
         let mut frames = frames.borrow_mut();
         for i in (0..cols).rev() {
             let Frame {
@@ -67,7 +66,7 @@ pub fn Row(
         }
     }
 
-    children(cx)
+    children()
         .nodes
         .into_iter()
         .take(cols)
@@ -79,7 +78,7 @@ pub fn Row(
                 width,
                 height,
             } = cells[i];
-            view! { cx,
+            view! {
                 <rect
                     x=x
                     y=y
@@ -92,5 +91,5 @@ pub fn Row(
                 {child}
             }
         })
-        .collect_view(cx)
+        .collect_view()
 }

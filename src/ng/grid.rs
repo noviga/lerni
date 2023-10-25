@@ -5,7 +5,6 @@ use crate::ng::{use_frame, use_frames, Color, Frame};
 /// Grid layout widget.
 #[component]
 pub fn Grid(
-    cx: Scope,
     #[prop(default = 1)] rows: usize,
     #[prop(default = 1)] cols: usize,
     #[prop(optional)] border_width: i32,
@@ -14,7 +13,7 @@ pub fn Grid(
     #[prop(optional)] padding: i32,
     children: Children,
 ) -> impl IntoView {
-    let f = use_frame(cx);
+    let f = use_frame();
 
     let max = cols * rows;
 
@@ -26,7 +25,7 @@ pub fn Grid(
     let height = (f.height - border_width - vspacing) / rows;
 
     {
-        let frames = use_frames(cx);
+        let frames = use_frames();
         let mut frames = frames.borrow_mut();
         for i in (0..max).rev() {
             let x = f.x + border_width / 2 + (width + spacing) * (i as i32 % cols);
@@ -41,7 +40,7 @@ pub fn Grid(
         }
     }
 
-    children(cx)
+    children()
         .nodes
         .into_iter()
         .take(max)
@@ -49,7 +48,7 @@ pub fn Grid(
         .map(|(i, child)| {
             let x = f.x + border_width / 2 + (width + spacing) * (i as i32 % cols);
             let y = f.y + border_width / 2 + (height + spacing) * (i as i32 / cols);
-            view! { cx,
+            view! {
                 <rect
                     x=x
                     y=y
@@ -62,5 +61,5 @@ pub fn Grid(
                 {child}
             }
         })
-        .collect_view(cx)
+        .collect_view()
 }
