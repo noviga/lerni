@@ -1,6 +1,6 @@
 use leptos::*;
 
-use crate::ng::{use_frame, Align, VAlign};
+use crate::ng::{use_frame, Align, Frame, VAlign};
 
 /// SVG widget.
 #[component]
@@ -16,7 +16,40 @@ pub fn Svg(
     children: Children,
 ) -> impl IntoView {
     let f = use_frame(cx);
+    let transform = calc_transform(&f, width, height, align, valign, scale, flip_x, flip_y);
 
+    view! { cx, <g transform={transform}>{children(cx)}</g> }
+}
+
+/// SVG-from-file widget.
+#[component]
+pub fn SvgFile(
+    cx: Scope,
+    width: i32,
+    height: i32,
+    #[prop(default = Align::Center)] align: Align,
+    #[prop(default = VAlign::Middle)] valign: VAlign,
+    #[prop(default = 1.0)] scale: f32,
+    #[prop(optional)] flip_x: bool,
+    #[prop(optional)] flip_y: bool,
+    src: &'static str,
+) -> impl IntoView {
+    let f = use_frame(cx);
+    let transform = calc_transform(&f, width, height, align, valign, scale, flip_x, flip_y);
+
+    view! { cx, <g transform={transform} inner_html={src}/> }
+}
+
+fn calc_transform(
+    f: &Frame,
+    width: i32,
+    height: i32,
+    align: Align,
+    valign: VAlign,
+    scale: f32,
+    flip_x: bool,
+    flip_y: bool,
+) -> String {
     let scale = if matches!(align, Align::Fill) || matches!(valign, VAlign::Fill) {
         let sx = f.width as f32 / width as f32;
         let sy = f.height as f32 / height as f32;
@@ -50,6 +83,5 @@ pub fn Svg(
         sy = -sy;
         y += height;
     }
-
-    view! { cx, <g transform=format!("translate({x} {y}) scale({sx} {sy})")>{children(cx)}</g> }
+    format!("translate({x} {y}) scale({sx} {sy})")
 }
