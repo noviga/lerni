@@ -5,7 +5,6 @@ use crate::ng::{use_frame, Align, Frame, VAlign};
 /// SVG widget.
 #[component]
 pub fn Svg(
-    cx: Scope,
     width: i32,
     height: i32,
     #[prop(default = Align::Center)] align: Align,
@@ -15,7 +14,7 @@ pub fn Svg(
     #[prop(optional)] flip_y: bool,
     children: Children,
 ) -> impl IntoView {
-    let f = use_frame(cx);
+    let f = use_frame();
     let transform = calc_transform(&f, width, height, align, valign, scale, flip_x, flip_y);
 
     view! { cx, <g transform={transform}>{children(cx)}</g> }
@@ -83,5 +82,5 @@ fn calc_transform(
         sy = -sy;
         y += height;
     }
-    format!("translate({x} {y}) scale({sx} {sy})")
+    view! { <g transform=format!("translate({x} {y}) scale({sx} {sy})")>{children()}</g> }
 }

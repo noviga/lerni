@@ -14,7 +14,6 @@ const SLIDE_MARGIN: i32 = 32;
 
 #[component]
 pub fn Slide(
-    cx: Scope,
     #[prop(default = WIDTH)] width: i32,
     #[prop(default = HEIGHT)] height: i32,
     #[prop(optional)] background_color: Color,
@@ -24,11 +23,11 @@ pub fn Slide(
     #[prop(default = 15)] blur_radius: i32,
     children: Children,
 ) -> impl IntoView {
-    let metadata = use_context::<Metadata>(cx);
-    let (slide_width, set_slide_width) = create_signal(cx, crate::ng::calc_width(SLIDE_MARGIN));
+    let metadata = use_context::<Metadata>();
+    let (slide_width, set_slide_width) = create_signal(crate::ng::calc_width(SLIDE_MARGIN));
     if metadata.is_none() {
         // Standalone slide usage (not within a slideshow)
-        let _ = use_event_listener(cx, window(), resize, move |_| {
+        let _ = use_event_listener(window(), resize, move |_| {
             set_slide_width.set(crate::ng::calc_width(SLIDE_MARGIN));
         });
     }
@@ -38,12 +37,12 @@ pub fn Slide(
         height,
         ..Default::default()
     };
-    provide_frame(cx, frame);
+    provide_frame(frame);
 
     let view_box = format!("0 0 {width} {height}");
 
-    let svg_ref: NodeRef<Svg> = create_node_ref(cx);
-    let (pointer_position, set_pointer_position) = create_signal(cx, (0, 0));
+    let svg_ref: NodeRef<Svg> = create_node_ref();
+    let (pointer_position, set_pointer_position) = create_signal((0, 0));
     let on_mousemove = move |e: MouseEvent| {
         let mut px = e.offset_x();
         let mut py = e.offset_y();
@@ -53,7 +52,7 @@ pub fn Slide(
         }
         set_pointer_position.set((px, py));
     };
-    let (pointer_in, set_pointer_in) = create_signal(cx, false);
+    let (pointer_in, set_pointer_in) = create_signal(false);
     let pointer_visible = move || pointer.get() && pointer_in.get();
 
     let blur_style = move || {
@@ -77,7 +76,7 @@ pub fn Slide(
         Default::default()
     };
 
-    view! { cx,
+    view! {
         <div
             class="container pl-4 mt-4 pr-4"
             style:max-width=move || {
@@ -107,7 +106,7 @@ pub fn Slide(
                             ry="10"
                             fill=background_color
                         ></rect>
-                        {children(cx)}
+                        {children()}
 
                         <Pointer position=pointer_position visible=pointer_visible/>
                     </svg>
@@ -118,11 +117,11 @@ pub fn Slide(
 }
 
 #[component]
-fn Pointer<F>(cx: Scope, position: ReadSignal<(i32, i32)>, visible: F) -> impl IntoView
+fn Pointer<F>(position: ReadSignal<(i32, i32)>, visible: F) -> impl IntoView
 where
     F: Fn() -> bool + 'static,
 {
-    view! { cx,
+    view! {
         <circle
             cx=move || position.get().0
             cy=move || position.get().1

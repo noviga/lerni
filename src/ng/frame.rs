@@ -2,7 +2,7 @@ extern crate alloc;
 
 use alloc::{collections::VecDeque, rc::Rc};
 use core::cell::RefCell;
-use leptos::{expect_context, provide_context, use_context, Scope};
+use leptos::{expect_context, provide_context, use_context};
 
 /// Frame within which the widget will be rendered.
 #[derive(Clone, Default, Debug)]
@@ -47,24 +47,24 @@ impl Frames {
 }
 
 /// Provides frame to the context.
-pub fn provide_frame(cx: Scope, frame: Frame) {
-    let frames: Option<FramesRef> = use_context(cx);
+pub fn provide_frame(frame: Frame) {
+    let frames: Option<FramesRef> = use_context();
     if let Some(frames) = frames {
         frames.borrow_mut().0.push_back(frame);
     } else {
         let frames = Frames([frame].into());
-        provide_context(cx, Rc::new(RefCell::new(frames)));
+        provide_context(Rc::new(RefCell::new(frames)));
     }
 }
 
 /// Returns the current frame.
-pub fn use_frame(cx: Scope) -> Frame {
-    let frames: FramesRef = expect_context(cx);
+pub fn use_frame() -> Frame {
+    let frames: FramesRef = expect_context();
     let mut frames = frames.borrow_mut();
     frames.pop()
 }
 
 /// Returns frames stack from context.
-pub fn use_frames(cx: Scope) -> FramesRef {
-    expect_context(cx)
+pub fn use_frames() -> FramesRef {
+    expect_context()
 }
