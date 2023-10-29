@@ -2,7 +2,7 @@ use leptos::*;
 use wasm_bindgen::JsValue;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
 
-use crate::ng::{use_frame, Color};
+use crate::ng::{use_frame, Color, Frame};
 
 struct TextProperties<'a> {
     bold: bool,
@@ -50,19 +50,21 @@ pub fn Text(
     };
     let canvas = canvas_context(&props);
     let children = children().nodes;
+    let f = use_frame();
     let Output {
         words,
         rects,
         letter_counters,
-    } = wrap(&children, &canvas, &props);
+    } = wrap(&children, &canvas, &props, &f);
 
-    let total_letters: usize = letter_counters.iter().sum();
+    let _total_letters: usize = letter_counters.iter().sum();
 
     let word = |(i, r): (usize, &Rect)| {
         view! {
             <text
-                x=(r.x + r.width / 2).to_string()
-                y=(r.y + r.height / 2).to_string()
+                x=r.x + r.width / 2
+                y=r.y + r.height / 2
+                class:has-text-weight-bold=bold
                 text-anchor="middle"
                 dominant-baseline="central"
                 font-size=font_size
@@ -77,40 +79,73 @@ pub fn Text(
 
     let erase = |r: &Rect| {
         view! {
-            if erase_top > 0.0 {
-                let h = (erase_top * r.height as f32).round() as i32;
-                view! {
-                    <rect
-                        fill="white"
-                        x=r.x.to_string()
-                        y=r.y.to_string()
-                        width=r.width.to_string()
-                        height=h.to_string()
-                    ></rect>
-                }
-            }
+            {(erase_top > 0.0)
+                .then(|| {
+                    let h = (erase_top * r.height as f32).round() as i32;
+                    view! { <rect fill="white" x=r.x y=r.y width=r.width height=h></rect> }
+                })}
 
-            if p.erase_bottom > 0.0 {
-                let h = (erase_bottom * r.height as f32).round() as i32;
-                view! {
-                    <rect
-                        fill="white"
-                        x=r.x.to_string()
-                        y=(r.y + r.height - h).to_string()
-                        width=r.width.to_string()
-                        height=h.to_string()
-                    ></rect>
-                }
-            }
+            {(erase_bottom > 0.0)
+                .then(|| {
+                    let h = (erase_bottom * r.height as f32).round() as i32;
+                    view! {
+                        <rect fill="white" x=r.x y=r.y + r.height - h width=r.width height=h></rect>
+                    }
+                })}
         }
     };
 
+    let expand = text_width(" ", &canvas) / 2 + 1;
+
     view! {
         {rects.iter().enumerate().map(word).collect_view()}
+        {(erase_top > 0.0 || erase_bottom > 0.0)
+            .then(|| { rects.iter().map(erase).collect_view() })}
 
-        if erase_top > 0.0 || erase_bottom > 0.0 {
-            rects.iter().map(erase).collect_view()
-        }
+        {lattice
+            .then(|| {
+                let width = font_size / 2;
+                let dx = 5 * width;
+                let count = f.width / dx;
+                (0..count)
+                    .map(|i| {
+                        view! {
+                            <rect
+                                x=f.x + dx / 2 + i * dx
+                                y=f.y
+                                width=width
+                                height=f.height
+                                rx=width / 2
+                                stroke=color
+                                stroke-width="6"
+                                fill="white"
+                                pointer-events="none"
+                            ></rect>
+                        }
+                    })
+                    .collect_view()
+            })}
+
+        {rects
+            .iter()
+            .take(words_read)
+            .map(|r| {
+                view! {
+                    <rect
+                        x=r.x - expand
+                        y=r.y - expand
+                        width=r.width + 2 * expand
+                        height=r.height + 2 * expand
+                        rx=expand
+                        ry=expand
+                        fill=marker_color
+                        pointer-events="none"
+                    ></rect>
+                }
+            })
+            .collect_view()}
+
+        {rects.iter().take(words_read).enumerate().map(word).collect_view()}
     }
 }
 
@@ -135,7 +170,7 @@ fn text_width(text: &str, canvas: &CanvasRenderingContext2d) -> i32 {
     canvas.measure_text(text).unwrap().width() as i32
 }
 
-fn wrap(children: &[View], canvas: &CanvasRenderingContext2d, props: &TextProperties) -> Output {
+fn wrap(children: &[View], canvas: &CanvasRenderingContext2d, props: &TextProperties, frame: &Frame) -> Output {
     let children = children.iter().map(|item| {
         if let View::Text(text) = item {
             text.content.clone()
@@ -144,8 +179,7 @@ fn wrap(children: &[View], canvas: &CanvasRenderingContext2d, props: &TextProper
         }
     });
 
-    let f = use_frame();
-    let mut y = f.y;
+    let mut y = frame.y;
     let mut words = Vec::new();
     let mut rects = Vec::new();
     let mut letter_counters = Vec::new();
@@ -157,7 +191,7 @@ fn wrap(children: &[View], canvas: &CanvasRenderingContext2d, props: &TextProper
         let mut indent = (props.indent * props.font_size as f32).round() as i32;
 
         let dy = (props.line_height * props.font_size as f32).round() as i32;
-        let mut x = f.x + indent;
+        let mut x = frame.x + indent;
         let mut lines = Vec::new();
         let mut line = first_word.clone();
         rects.push(Rect {
@@ -171,15 +205,15 @@ fn wrap(children: &[View], canvas: &CanvasRenderingContext2d, props: &TextProper
         for word in sentence_words {
             words.push(word.to_string());
             letter_counters.push(word.chars().filter(|c| c.is_alphabetic()).count());
-            if x + text_width(&format!(" {word}"), canvas) > f.x + f.width {
+            if x + text_width(&format!(" {word}"), canvas) > frame.x + frame.width {
                 lines.push(line.clone());
                 line = word.to_string();
                 indent = 0;
-                x = f.x;
+                x = frame.x;
                 y += dy;
             } else {
                 line.push(' ');
-                x = f.x + indent + text_width(&line, canvas);
+                x = frame.x + indent + text_width(&line, canvas);
                 line.push_str(word);
             }
             rects.push(Rect {
@@ -188,7 +222,7 @@ fn wrap(children: &[View], canvas: &CanvasRenderingContext2d, props: &TextProper
                 width: text_width(word, canvas),
                 height: props.font_size,
             });
-            x = f.x + indent + text_width(&line, canvas);
+            x = frame.x + indent + text_width(&line, canvas);
         }
         if !line.is_empty() {
             lines.push(line);
