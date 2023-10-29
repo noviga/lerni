@@ -60,12 +60,17 @@ pub fn Text(
 
     let word = |(i, r): (usize, &Rect)| {
         view! {
-            <text x={ (r.x + r.width / 2).to_string() }
-                y={ (r.y + r.height / 2).to_string() } text-anchor="middle"
-                dominant-baseline="central" font-size={font_size}
-                style={ format!("font-family: {}", font) } fill={color}
-                pointer-events="none">
-                { &words[i] }
+            <text
+                x=(r.x + r.width / 2).to_string()
+                y=(r.y + r.height / 2).to_string()
+                text-anchor="middle"
+                dominant-baseline="central"
+                font-size=font_size
+                style=format!("font-family: {}", font)
+                fill=color
+                pointer-events="none"
+            >
+                {&words[i]}
             </text>
         }
     };
@@ -74,13 +79,28 @@ pub fn Text(
         view! {
             if erase_top > 0.0 {
                 let h = (erase_top * r.height as f32).round() as i32;
-                view!{<rect fill="white" x={ r.x.to_string() } y={ r.y.to_string() }
-                    width={ r.width .to_string() } height={ h.to_string() }/>}
+                view! {
+                    <rect
+                        fill="white"
+                        x=r.x.to_string()
+                        y=r.y.to_string()
+                        width=r.width.to_string()
+                        height=h.to_string()
+                    ></rect>
+                }
             }
-            let erase_bottom = if p.erase_bottom > 0.0 {
+
+            if p.erase_bottom > 0.0 {
                 let h = (erase_bottom * r.height as f32).round() as i32;
-                view!{<rect fill="white" x={ r.x.to_string() } y={ (r.y + r.height - h).to_string() }
-                    width={ r.width .to_string() } height={ h.to_string() }/>}
+                view! {
+                    <rect
+                        fill="white"
+                        x=r.x.to_string()
+                        y=(r.y + r.height - h).to_string()
+                        width=r.width.to_string()
+                        height=h.to_string()
+                    ></rect>
+                }
             }
         }
     };

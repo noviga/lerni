@@ -17,7 +17,7 @@ pub fn Svg(
     let f = use_frame();
     let transform = calc_transform(&f, width, height, align, valign, scale, flip_x, flip_y);
 
-    view! { <g transform={transform}>{children()}</g> }
+    view! { <g transform=transform>{children()}</g> }
 }
 
 /// SVG-from-file widget.
@@ -35,7 +35,7 @@ pub fn SvgFile(
     let f = use_frame();
     let transform = calc_transform(&f, width, height, align, valign, scale, flip_x, flip_y);
 
-    view! { <g transform={transform} inner_html={src}/> }
+    view! { <g transform=transform inner_html=src></g> }
 }
 
 fn calc_transform(
