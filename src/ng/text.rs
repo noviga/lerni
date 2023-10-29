@@ -170,7 +170,12 @@ fn text_width(text: &str, canvas: &CanvasRenderingContext2d) -> i32 {
     canvas.measure_text(text).unwrap().width() as i32
 }
 
-fn wrap(children: &[View], canvas: &CanvasRenderingContext2d, props: &TextProperties, frame: &Frame) -> Output {
+fn wrap(
+    children: &[View],
+    canvas: &CanvasRenderingContext2d,
+    props: &TextProperties,
+    frame: &Frame,
+) -> Output {
     let children = children.iter().map(|item| {
         if let View::Text(text) = item {
             text.content.clone()
