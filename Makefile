@@ -27,6 +27,7 @@ examples-release:
 fmt:
 	@echo ──────────── Format ───────────────────────────
 	@cargo fmt --all
+	@find src -name "*.rs" -exec leptosfmt {} \;
 
 fmt-check:
 	@echo ──────────── Check format ─────────────────────

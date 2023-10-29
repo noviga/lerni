@@ -17,13 +17,12 @@ pub fn Svg(
     let f = use_frame();
     let transform = calc_transform(&f, width, height, align, valign, scale, flip_x, flip_y);
 
-    view! { cx, <g transform={transform}>{children(cx)}</g> }
+    view! { <g transform={transform}>{children()}</g> }
 }
 
 /// SVG-from-file widget.
 #[component]
 pub fn SvgFile(
-    cx: Scope,
     width: i32,
     height: i32,
     #[prop(default = Align::Center)] align: Align,
@@ -33,10 +32,10 @@ pub fn SvgFile(
     #[prop(optional)] flip_y: bool,
     src: &'static str,
 ) -> impl IntoView {
-    let f = use_frame(cx);
+    let f = use_frame();
     let transform = calc_transform(&f, width, height, align, valign, scale, flip_x, flip_y);
 
-    view! { cx, <g transform={transform} inner_html={src}/> }
+    view! { <g transform={transform} inner_html={src}/> }
 }
 
 fn calc_transform(
@@ -82,5 +81,5 @@ fn calc_transform(
         sy = -sy;
         y += height;
     }
-    view! { <g transform=format!("translate({x} {y}) scale({sx} {sy})")>{children()}</g> }
+    format!("translate({x} {y}) scale({sx} {sy})")
 }
