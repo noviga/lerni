@@ -111,11 +111,7 @@ fn Pagination(page: RwSignal<usize>, count: usize) -> impl IntoView {
 }
 
 #[component]
-fn PageButton(
-    index: usize,
-    prev: Option<usize>,
-    current: RwSignal<usize>,
-) -> impl IntoView {
+fn PageButton(index: usize, prev: Option<usize>, current: RwSignal<usize>) -> impl IntoView {
     view! {
         <>
             <li hidden=move || !matches!(prev, Some(p) if index != (p + 1))>

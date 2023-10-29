@@ -33,7 +33,10 @@ mod slideshow;
 pub use slideshow::SlideShow;
 
 mod svg;
-pub use svg::Svg;
+pub use svg::{Svg, SvgFile};
+
+mod text;
+pub use text::Text;
 
 use leptos::*;
 

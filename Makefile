@@ -1,4 +1,4 @@
-.PHONY: all clean doc doc-open examples examples-release fmt fmt-check linter prepare pre-commit serve test
+.PHONY: all clean doc doc-open examples examples-release fmt fmt-check fmt-leptos linter prepare pre-commit serve test
 
 all:
 	@echo ──────────── Build release ────────────────────
@@ -21,12 +21,16 @@ examples:
 	@./scripts/examples.sh
 
 examples-release:
-	@echo ──────────── Build release examples ───────────────────
+	@echo ──────────── Build release examples ───────────
 	@./scripts/examples.sh release
 
 fmt:
 	@echo ──────────── Format ───────────────────────────
 	@cargo fmt --all
+
+fmt-leptos:
+	@echo ──────────── Format Leptos ────────────────────
+	@find src -name "*.rs" -exec leptosfmt {} \;
 
 fmt-check:
 	@echo ──────────── Check format ─────────────────────
