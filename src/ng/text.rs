@@ -1,8 +1,9 @@
 use leptos::*;
+use std::rc::Rc;
 use wasm_bindgen::JsValue;
-use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
+use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, MouseEvent};
 
-use crate::ng::{use_frame, Color, Frame};
+use crate::ng::{use_frame, Color, Frame, SvgFrame};
 
 struct TextProperties<'a> {
     bold: bool,
@@ -12,6 +13,7 @@ struct TextProperties<'a> {
     indent: f32,
 }
 
+#[derive(Clone)]
 struct Rect {
     pub x: i32,
     pub y: i32,
@@ -21,7 +23,7 @@ struct Rect {
 
 struct Output {
     pub words: Vec<String>,
-    pub rects: Vec<Rect>,
+    pub rects: Rc<Vec<Rect>>,
     pub letter_counters: Vec<usize>,
 }
 
@@ -35,10 +37,12 @@ pub fn Text(
     #[prop(default = 1.2)] line_height: f32,
     #[prop(default = 1.4)] indent: f32,
     #[prop(default = Color::PaleGreen)] marker_color: Color,
-    #[prop(optional)] words_read: usize,
     #[prop(optional)] lattice: bool,
     #[prop(optional)] erase_top: f32,
     #[prop(optional)] erase_bottom: f32,
+    #[prop(optional, into)] words_read: RwSignal<usize>,
+    #[prop(optional, into)] letters_read: RwSignal<usize>,
+    #[prop(optional, into)] letters_total: RwSignal<usize>,
     children: Children,
 ) -> impl IntoView {
     let props = TextProperties {
@@ -57,11 +61,12 @@ pub fn Text(
         letter_counters,
     } = wrap(&children, &canvas, &props, &f);
 
-    let _total_letters: usize = letter_counters.iter().sum();
+    letters_total.set(letter_counters.iter().sum());
 
-    let word = |(i, r): (usize, &Rect)| {
+    let word = |i, r: &Rect, hidden| {
         view! {
             <text
+                visibility=move || {(hidden && i >= words_read.get()).then_some("hidden")}
                 x=r.x + r.width / 2
                 y=r.y + r.height / 2
                 class:has-text-weight-bold=bold
@@ -95,10 +100,26 @@ pub fn Text(
         }
     };
 
+    let r = Rc::clone(&rects);
+    let on_click = move |e: MouseEvent| {
+        let svg: Option<SvgFrame> = use_context();
+        if let Some(svg) = svg {
+            let x = e.offset_x() * svg.width / svg.client_width;
+            let y = e.offset_y() * svg.height / svg.client_height;
+            if x >= f.x && x <= f.x + f.width && y >= f.y && y <= f.y + f.height {
+                if let Some(index) = find_word_index(x, y, &r) {
+                    words_read.set(index + 1);
+                    letters_read.set(letter_counters[0..index + 1].iter().sum());
+                }
+            }
+        }
+    };
+
     let expand = text_width(" ", &canvas) / 2 + 1;
 
     view! {
-        {rects.iter().enumerate().map(word).collect_view()}
+        <rect x=f.x y=f.y width=f.width height=f.height fill="white" on:click=on_click></rect>
+        {rects.iter().enumerate().map(|(i, r)| word(i, r, false)).collect_view()}
         {(erase_top > 0.0 || erase_bottom > 0.0)
             .then(|| { rects.iter().map(erase).collect_view() })}
 
@@ -128,10 +149,11 @@ pub fn Text(
 
         {rects
             .iter()
-            .take(words_read)
-            .map(|r| {
+            .enumerate()
+            .map(|(i, r)| {
                 view! {
                     <rect
+                        visibility=move || {(i >= words_read.get()).then_some("hidden")}
                         x=r.x - expand
                         y=r.y - expand
                         width=r.width + 2 * expand
@@ -145,7 +167,7 @@ pub fn Text(
             })
             .collect_view()}
 
-        {rects.iter().take(words_read).enumerate().map(word).collect_view()}
+        {rects.iter().enumerate().map(|(i, r)| word(i, r, true)).collect_view()}
     }
 }
 
@@ -236,8 +258,14 @@ fn wrap(
         y += dy;
     }
     Output {
-        rects,
+        rects: Rc::new(rects),
         words,
         letter_counters,
     }
+}
+
+fn find_word_index(x: i32, y: i32, rects: &[Rect]) -> Option<usize> {
+    rects
+        .iter()
+        .position(|r| x >= r.x && x <= r.x + r.width && y >= r.y && y <= r.y + r.height)
 }
