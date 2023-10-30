@@ -1,4 +1,5 @@
 use derive_more::Display;
+use leptos::{Attribute, IntoAttribute};
 
 // TODO: Define all colors
 
@@ -307,4 +308,14 @@ pub enum Color {
     Yellow,
     /// Yellow Green color
     YellowGreen,
+}
+
+impl IntoAttribute for Color {
+    fn into_attribute(self) -> Attribute {
+        Attribute::String(self.to_string().into())
+    }
+
+    fn into_attribute_boxed(self: Box<Self>) -> leptos::Attribute {
+        self.into_attribute()
+    }
 }

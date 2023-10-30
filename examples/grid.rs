@@ -1,32 +1,46 @@
-use lerni::{
-    properties::{Align, Color, VAlign},
-    widgets::*,
-};
-use wasm_bindgen::prelude::wasm_bindgen;
-use yew::prelude::*;
+use leptos::*;
+use lerni::*;
 
-#[function_component]
-pub fn GridExample() -> Html {
-    html! {
+#[component]
+pub fn GridExample() -> impl IntoView {
+    view! {
         <Slide>
             <Grid cols=3 rows=3 border_width=4 padding=20>
-                <Label html={ html!(<><tspan>{ "00" }</tspan><tspan font-size="96">{ "1" }</tspan></>) } />
-                <Label text="2" />
-                <Label html={ html!(<><tspan>{ "00" }</tspan><tspan fill="red">{ "3" }</tspan></>) } />
-                <Label text="4" font_size=96 color={ Color::Blue } />
-                <Button text="5" align={ Align::Fill } valign={ VAlign::Fill } />
-                <Label text="6" align={ Align::Right } />
-                <Label text="7" align={ Align::Left } />
-                <Label text="8" />
+                <Label>
+                    <tspan>"00"</tspan>
+                    <tspan font-size=96>"1"</tspan>
+                </Label>
+                <Label>2</Label>
+                <Label>
+                    <tspan>"00"</tspan>
+                    <tspan fill="red">"3"</tspan>
+                </Label>
+                <Label font_size=96 color=Color::Blue>"4"</Label>
+                <Button
+                    align=Align::Fill
+                    valign=VAlign::Fill
+                    on_click=move |_| logging::log!("5: Clicked")
+                >
+                    "5"
+                </Button>
+                <Label align=Align::Right>"6"</Label>
+                <Label align=Align::Left>"7"</Label>
+                <Label>8</Label>
                 <Grid cols=4 rows=2 border_width=4 spacing=20>
-                    <Label text="9" valign={ VAlign::Top } />
-                    <Label text="10" valign={ VAlign::Bottom } />
-                    <Label text="11" />
-                    <Button text="12" align={ Align::Fill } valign={ VAlign::Fill } />
-                    <Label text="13" />
-                    <Label text="14" align={ Align::Left } valign={ VAlign::Top } />
-                    <Label text="15" />
-                    <Label text="16" align={ Align::Right } valign={ VAlign::Bottom } />
+                    <Label valign=VAlign::Top>"9"</Label>
+                    <Label valign=VAlign::Bottom>"10"</Label>
+                    <Label>11</Label>
+                    <Button
+                        align=Align::Fill
+                        valign=VAlign::Fill
+                        on_click=move |_| logging::log!("12: Clicked")
+                    >
+                        "12"
+                    </Button>
+                    <Label>"13"</Label>
+                    <Label align=Align::Left valign=VAlign::Top>"14"</Label>
+                    <Label>"15"</Label>
+                    <Label align=Align::Right valign=VAlign::Bottom>"16"</Label>
                 </Grid>
             </Grid>
         </Slide>
@@ -35,5 +49,5 @@ pub fn GridExample() -> Html {
 
 #[wasm_bindgen(start)]
 pub fn main() {
-    lerni::start::<GridExample>();
+    lerni::start(GridExample);
 }

@@ -1,57 +1,95 @@
-use yew::prelude::*;
+use leptos::*;
 
-use crate::{properties::Color, widgets::Frame};
-
-#[derive(Clone, Default, Properties, PartialEq)]
-pub struct Props {
-    #[prop_or_default]
-    pub children: Children,
-    #[prop_or(0)]
-    pub border_width: i32,
-    #[prop_or(Color::Black)]
-    pub border_color: Color,
-    #[prop_or_default]
-    pub stretch: Vec<i32>,
-    #[prop_or_default]
-    pub spacing: i32,
-    #[prop_or_default]
-    pub padding: i32,
-}
+use crate::{use_frame, use_frames, Color, Frame};
 
 /// Row of widgets.
-#[function_component]
-pub fn Row(props: &Props) -> Html {
-    let f = use_context::<Frame>().unwrap();
-
-    let stretch: Vec<_> = (0..props.children.len())
-        .map(|i| *props.stretch.get(i).unwrap_or(&1))
-        .collect();
-    let denominator: i32 = stretch.iter().sum();
-
-    let spacing = props.spacing * (props.children.len() as i32 - 1);
-    let mut x = f.x + props.border_width / 2;
-    let y = f.y + props.border_width / 2;
-    let height = f.height - props.border_width;
-
-    html! {
-        for props.children.iter().enumerate().map(|(i, item)| {
-            let width = (f.width - props.border_width - spacing) * stretch[i] / denominator;
-            let frame = Frame {
-                x: x + props.padding,
-                y: y + props.padding,
-                width: width - 2 * props.padding,
-                height: height - 2 * props.padding,
-                ..f
-            };
-            let html = html_nested! {
-                <ContextProvider<Frame> context={ frame }>
-                    <rect x={ x.to_string() } y={ y.to_string() } width={ width.to_string() } height={ height.to_string() }
-                        fill="none" stroke={ props.border_color.to_string() } stroke-width={ props.border_width.to_string() } />
-                    { item }
-                </ContextProvider<Frame>>
-            };
-            x += width + props.spacing;
-            html
-        })
+#[component]
+pub fn Row(
+    #[prop(optional)] cols: Option<usize>,
+    #[prop(optional)] border_width: i32,
+    #[prop(default = Color::Black)] border_color: Color,
+    #[prop(optional)] stretch: Vec<i32>,
+    #[prop(optional)] spacing: i32,
+    #[prop(optional)] padding: i32,
+    children: Children,
+) -> impl IntoView {
+    if cols.is_none() && stretch.is_empty() {
+        logging::warn!("Row: either `cols` or `stretch` must be specified");
     }
+
+    let stretch = if let Some(cols) = cols {
+        (0..cols).map(|i| *stretch.get(i).unwrap_or(&1)).collect()
+    } else {
+        stretch
+    };
+    let denominator: i32 = stretch.iter().sum();
+    let cols = stretch.len();
+
+    let f = use_frame();
+
+    let s = spacing * (cols as i32 - 1);
+    let mut x = f.x + border_width / 2;
+    let y = f.y + border_width / 2;
+    let height = f.height - border_width;
+
+    let cells: Vec<_> = (0..cols)
+        .map(|i| {
+            let width = (f.width - border_width - s) * stretch[i] / denominator;
+            let cell = Frame {
+                x,
+                y,
+                width,
+                height,
+            };
+            x += width + spacing;
+            cell
+        })
+        .collect();
+
+    {
+        let frames = use_frames();
+        let mut frames = frames.borrow_mut();
+        for i in (0..cols).rev() {
+            let Frame {
+                x,
+                y,
+                width,
+                height,
+            } = cells[i];
+            let frame = Frame {
+                x: x + padding,
+                y: y + padding,
+                width: width - 2 * padding,
+                height: height - 2 * padding,
+            };
+            frames.push(frame);
+        }
+    }
+
+    children()
+        .nodes
+        .into_iter()
+        .take(cols)
+        .enumerate()
+        .map(|(i, child)| {
+            let Frame {
+                x,
+                y,
+                width,
+                height,
+            } = cells[i];
+            view! {
+                <rect
+                    x=x
+                    y=y
+                    width=width
+                    height=height
+                    fill="none"
+                    stroke=border_color
+                    stroke-width=border_width
+                ></rect>
+                {child}
+            }
+        })
+        .collect_view()
 }

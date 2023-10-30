@@ -1,64 +1,42 @@
-use lerni::widgets::*;
-use wasm_bindgen::prelude::wasm_bindgen;
-use yew::prelude::*;
+use leptos::*;
+use lerni::*;
 
-#[function_component]
-pub fn TextExample() -> Html {
-    let words_read1 = use_state(|| 0);
-    let read1 = use_state(|| "".to_string());
-    let onread1 = {
-        let words_read1 = words_read1.clone();
-        let read1 = read1.clone();
-        Callback::from(move |(words_read, letters, total)| {
-            words_read1.set(words_read);
-            read1.set(format!("{letters} / {total}"));
-        })
-    };
+#[component]
+pub fn TextExample() -> impl IntoView {
+    let words_read1 = create_rw_signal(0);
+    let letters_read1 = create_rw_signal(0);
+    let letters_total1 = create_rw_signal(0);
 
-    let words_read2 = use_state(|| 0);
-    let read2 = use_state(|| "".to_string());
-    let onread2 = {
-        let words_read2 = words_read2.clone();
-        let read2 = read2.clone();
-        Callback::from(move |(words_read, letters, total)| {
-            words_read2.set(words_read);
-            read2.set(format!("{letters} / {total}"));
-        })
-    };
+    let words_read2 = create_rw_signal(0);
+    let letters_read2 = create_rw_signal(0);
+    let letters_total2 = create_rw_signal(0);
 
-    let words_read3 = use_state(|| 0);
-    let read3 = use_state(|| "".to_string());
-    let onread3 = {
-        let words_read3 = words_read3.clone();
-        let read3 = read3.clone();
-        Callback::from(move |(words_read, letters, total)| {
-            words_read3.set(words_read);
-            read3.set(format!("{letters} / {total}"));
-        })
-    };
+    let words_read3 = create_rw_signal(0);
+    let letters_read3 = create_rw_signal(0);
+    let letters_total3 = create_rw_signal(0);
 
-    html! {
+    view! {
         <Slide>
-            <Row padding=30 border_width=4>
-                <Column stretch={ vec![5, 1] }>
-                    <Text lattice=true words_read={ *words_read1 } onread={ onread1 }>
+            <Row cols=2 padding=30 border_width=4>
+                <Column stretch={vec![5, 1]}>
+                    <Text lattice=true words_read=words_read1 letters_read=letters_read1 letters_total=letters_total1>
                         { "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." }
                         { "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat." }
                     </Text>
-                    <Label text={ (*read1).clone() } />
+                    <Label>{words_read1} "w (" {letters_read1} " / " {letters_total1} ")"</Label>
                 </Column>
 
-                <Column stretch={ vec![5, 1, 5, 1] }>
-                    <Text font_size=48 bold=true font="serif" words_read={ *words_read2 } onread={ onread2 }>
+                <Column stretch={vec![5, 1, 5, 1]}>
+                    <Text font_size=48 bold=true font="serif" words_read=words_read2 letters_read=letters_read2 letters_total=letters_total2>
                         { "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur." }
                         { "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." }
                     </Text>
-                    <Label text={ (*read2).clone() } />
-                    <Text font_size=48 erase_top=0.3 words_read={ *words_read3 } onread={ onread3 }>
+                    <Label>{words_read2} "w (" {letters_read2} " / " {letters_total2} ")"</Label>
+                    <Text font_size=48 erase_top=0.3 words_read=words_read3 letters_read=letters_read3 letters_total=letters_total3>
                         { "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur." }
                         { "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." }
                     </Text>
-                    <Label text={ (*read3).clone() } />
+                    <Label>{words_read3} "w (" {letters_read3} " / " {letters_total3} ")"</Label>
                 </Column>
             </Row>
         </Slide>
@@ -67,5 +45,5 @@ pub fn TextExample() -> Html {
 
 #[wasm_bindgen(start)]
 pub fn main() {
-    lerni::start::<TextExample>();
+    lerni::start(TextExample);
 }
