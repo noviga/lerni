@@ -5,7 +5,7 @@ use leptos::{
 };
 use leptos_use::*;
 
-use crate::ng::{provide_frame, Color, Frame, Metadata};
+use crate::ng::{provide_frame, Color, Frame, Metadata, SvgFrame};
 
 const WIDTH: i32 = 1920;
 const HEIGHT: i32 = 1080;
@@ -49,6 +49,12 @@ pub fn Slide(
         if let Some(svg) = svg_ref.get() {
             px = px * WIDTH / svg.client_width();
             py = py * HEIGHT / svg.client_height();
+            provide_context(SvgFrame {
+                width: WIDTH,
+                height: HEIGHT,
+                client_width: svg.client_width(),
+                client_height: svg.client_height(),
+            });
         }
         set_pointer_position.set((px, py));
     };
