@@ -1,28 +1,29 @@
-use lerni::{properties::*, widgets::*};
-use wasm_bindgen::prelude::wasm_bindgen;
-use yew::prelude::*;
+use leptos::*;
+use lerni::*;
 
-#[function_component]
-pub fn Buttons() -> Html {
-    let counter = use_state(|| 0);
-    let onclick = {
-        let counter = counter.clone();
-        Callback::from(move |_| counter.set(*counter + 1))
+#[component]
+pub fn Buttons() -> impl IntoView {
+    let (counter, set_counter) = create_signal(0);
+    let on_click = move |_| {
+        logging::log!("Clicked");
+        set_counter.set(counter.get() + 1);
     };
 
-    html! {
+    view! {
         <Slide>
             <Grid cols=3 rows=3>
-                <Button text="Alice" onclick={ onclick.clone() } />
-                <Button text="Bob" width=300 height=300 radius=150 onclick={ onclick.clone() } />
-                <Button text="Charlie" font_size=72 text_color={ Color::DarkCyan } onclick={ onclick.clone() } />
-                <Button html={ html!(<><tspan font-size="96" fill="red">{ "Da" }</tspan><tspan font-size="80">{ "ve" }</tspan></>) }
-                    onclick={ onclick.clone() } />
-                <Label text={ format!("Clicked: {}", *counter) }/>
-                <Button text="Eve" text_bold=true align={ Align::Right } onclick={ onclick.clone() } />
-                <Button text="Ferdie" align={ Align::Right } valign={ VAlign::Bottom } onclick={ onclick.clone() } />
-                <Button text="George" color={ Color::Honeydew } border_color={ Color::ForestGreen } onclick={ onclick.clone() } />
-                <Button text="Harry" align={ Align::Fill } valign={ VAlign::Fill } { onclick } />
+                <Button on_click=on_click>"Alice"</Button>
+                <Button width=300 height=300 radius=150 on_click=on_click>"Bob"</Button>
+                <Button font_size=72 text_color=Color::DarkCyan on_click=on_click>"Charlie"</Button>
+                <Button on_click=on_click>
+                    <tspan font-size="96" fill="red" alignment-baseline="central">"Da"</tspan>
+                    <tspan font-size="80" alignment-baseline="central">"ve"</tspan>
+                </Button>
+                <Label>{counter}</Label>
+                <Button text_bold=true align=Align::Right on_click=on_click>"Eve"</Button>
+                <Button align=Align::Right valign=VAlign::Bottom on_click=on_click>"Ferdie"</Button>
+                <Button color=Color::Honeydew border_color=Color::ForestGreen on_click=on_click>"George"</Button>
+                <Button align=Align::Fill valign=VAlign::Fill on_click=on_click>"Harry"</Button>
             </Grid>
         </Slide>
     }
@@ -30,5 +31,5 @@ pub fn Buttons() -> Html {
 
 #[wasm_bindgen(start)]
 pub fn main() {
-    lerni::start::<Buttons>();
+    lerni::start(Buttons);
 }

@@ -1,202 +1,141 @@
-use web_sys::SvgElement;
-use yew::{prelude::*, ContextProvider};
+use leptos::{
+    ev::{resize, MouseEvent},
+    svg::Svg,
+    *,
+};
+use leptos_use::*;
 
-use crate::{properties::Color, utils, widgets::Frame};
+use crate::{provide_frame, Color, Frame, Metadata, SvgFrame};
 
 const WIDTH: i32 = 1920;
 const HEIGHT: i32 = 1080;
 const POINTER_SIZE: i32 = 72;
+const SLIDE_MARGIN: i32 = 32;
 
-/// Slide widget.
-#[derive(Clone, Default)]
-pub struct Slide {
-    svg_ref: NodeRef,
-    pointer_x: i32,
-    pointer_y: i32,
-    width: i32,
-}
-
-#[derive(Clone, Default, Properties, PartialEq)]
-pub struct Props {
-    #[prop_or_default]
-    pub children: Children,
-    #[prop_or(WIDTH)]
-    pub width: i32,
-    #[prop_or(HEIGHT)]
-    pub height: i32,
-    #[prop_or_default]
-    pub defs: Html,
-    #[prop_or_default]
-    pub background_color: Color,
-    #[prop_or_default]
-    pub background_image: String,
-    #[prop_or_default]
-    pub pointer: bool,
-    #[prop_or_default]
-    pub blur: bool,
-    #[prop_or(15)]
-    pub blur_radius: i32,
-    #[prop_or_default]
-    pub onclick: Callback<(i32, i32)>,
-}
-
-#[derive(Clone, Copy)]
-pub enum Msg {
-    MovePointer { x: i32, y: i32 },
-    HidePointer,
-    Clicked { x: i32, y: i32 },
-    Resize,
-}
-
-impl Component for Slide {
-    type Message = Msg;
-    type Properties = Props;
-
-    fn create(ctx: &Context<Self>) -> Self {
-        utils::add_resize_handler(ctx.link(), Msg::Resize);
-        Self {
-            width: Self::calc_width(),
-            ..Default::default()
-        }
+#[component]
+pub fn Slide(
+    #[prop(default = WIDTH)] width: i32,
+    #[prop(default = HEIGHT)] height: i32,
+    #[prop(optional)] background_color: Color,
+    #[prop(optional)] background_image: String,
+    #[prop(optional)] pointer: MaybeSignal<bool>,
+    #[prop(optional)] blur: MaybeSignal<bool>,
+    #[prop(default = 15)] blur_radius: i32,
+    children: Children,
+) -> impl IntoView {
+    let metadata = use_context::<Metadata>();
+    let (slide_width, set_slide_width) = create_signal(crate::calc_width(SLIDE_MARGIN));
+    if metadata.is_none() {
+        // Standalone slide usage (not within a slideshow)
+        let _ = use_event_listener(window(), resize, move |_| {
+            set_slide_width.set(crate::calc_width(SLIDE_MARGIN));
+        });
     }
 
-    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
-        let p = ctx.props();
-        match msg {
-            Msg::MovePointer { x, y } => {
-                if let Some(svg) = self.svg_ref.cast::<SvgElement>() {
-                    self.pointer_x = x * WIDTH / svg.client_width();
-                    self.pointer_y = y * HEIGHT / svg.client_height();
-                }
-                true
-            }
-            Msg::HidePointer => {
-                self.pointer_x = 0;
-                self.pointer_y = 0;
-                true
-            }
-            Msg::Clicked { x, y } => {
-                if let Some(svg) = self.svg_ref.cast::<SvgElement>() {
-                    let x = x * WIDTH / svg.client_width();
-                    let y = y * HEIGHT / svg.client_height();
-                    p.onclick.emit((x, y));
-                }
-                false
-            }
-            Msg::Resize => {
-                self.width = Self::calc_width();
-                true
-            }
+    let frame = Frame {
+        width,
+        height,
+        ..Default::default()
+    };
+    provide_frame(frame);
+
+    let view_box = format!("0 0 {width} {height}");
+
+    let svg_ref: NodeRef<Svg> = create_node_ref();
+    let (pointer_position, set_pointer_position) = create_signal((0, 0));
+    let on_mousemove = move |e: MouseEvent| {
+        let mut px = e.offset_x();
+        let mut py = e.offset_y();
+        if let Some(svg) = svg_ref.get() {
+            px = px * WIDTH / svg.client_width();
+            py = py * HEIGHT / svg.client_height();
+            provide_context(SvgFrame {
+                width: WIDTH,
+                height: HEIGHT,
+                client_width: svg.client_width(),
+                client_height: svg.client_height(),
+            });
         }
-    }
+        set_pointer_position.set((px, py));
+    };
+    let (pointer_in, set_pointer_in) = create_signal(false);
+    let pointer_visible = move || pointer.get() && pointer_in.get();
 
-    fn view(&self, ctx: &Context<Self>) -> Html {
-        let p = ctx.props();
-        let view_box = format!("0 0 {} {}", p.width, p.height);
-
-        let onmousemove = ctx.link().callback(|e: MouseEvent| Msg::MovePointer {
-            x: e.offset_x(),
-            y: e.offset_y(),
-        });
-
-        let onmouseleave = ctx.link().callback(|_| Msg::HidePointer);
-
-        let onclick = ctx.link().callback(|e: MouseEvent| Msg::Clicked {
-            x: e.offset_x(),
-            y: e.offset_y(),
-        });
-
-        let mut fx = 0.0;
-        let mut fy = 0.0;
-
-        if let Some(svg) = self.svg_ref.cast::<SvgElement>() {
-            fx = WIDTH as f32 / svg.client_width() as f32;
-            fy = HEIGHT as f32 / svg.client_height() as f32;
-        }
-
-        let frame = Frame {
-            x: 0,
-            y: 0,
-            width: p.width,
-            height: p.height,
-            fx,
-            fy,
-        };
-
-        let style = if self.width > 0 {
-            format!("max-width: {}px;", self.width)
-        } else {
-            ("max-width: 100%").to_string()
-        };
-
-        let radius = if p.blur { p.blur_radius } else { 0 };
-        let blur = format!(
+    let blur_style = move || {
+        let radius = if blur.get() { blur_radius } else { 0 };
+        format!(
             r#"-webkit-filter: blur({radius}px);
-                -moz-filter: blur({radius}px);
-                -ms-filter: blur({radius}px);
-                filter: blur({radius}px); transition: all .3s;"#,
-        );
+            -moz-filter: blur({radius}px);
+            -ms-filter: blur({radius}px);
+            filter: blur({radius}px); transition: all .3s;"#
+        )
+    };
 
-        let svg_style = if !p.background_image.is_empty() {
-            format!(
-                r#"background-image: url({});
-                background-size: cover;
-                background-position: center;
-                background-repeat: no-repeat;"#,
-                &p.background_image
-            )
-        } else {
-            Default::default()
-        };
+    let bg_style = if !background_image.is_empty() {
+        format!(
+            r#"background-image: url({background_image});
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;"#
+        )
+    } else {
+        Default::default()
+    };
 
-        html! {
-            <div { style } class="container pl-4 mt-4 pr-4">
-                <div class="box">
-                    <figure class="image is-16by9" style={ blur }>
-                        <svg viewBox={ view_box } class="has-ratio" ref={ &self.svg_ref }
-                            { onmousemove } { onmouseleave } { onclick } style={ svg_style }>
-                            { p.defs.clone() }
-                            <rect width="100%" height="100%" rx="10" ry="10" fill={ p.background_color.to_string() } />
-                            {
-                                for p.children.iter().map(|item|{
-                                    html_nested! {
-                                        <ContextProvider<Frame> context={ frame.clone() }>
-                                            { item }
-                                        </ContextProvider<Frame>>
-                                    }
-                                })
-                            }
-                            { self.pointer_view(p.pointer) }
-                        </svg>
-                    </figure>
-                </div>
+    view! {
+        <div
+            class="container pl-4 mt-4 pr-4"
+            style:max-width=move || {
+                if metadata.is_none() {
+                    format!("{}px", slide_width.get())
+                } else {
+                    "100%".to_string()
+                }
+            }
+        >
+
+            <div class="box">
+                <figure class="image is-16by9" style=blur_style>
+                    <svg
+                        on:mousemove=on_mousemove
+                        on:mouseenter=move |_| set_pointer_in.set(true)
+                        on:mouseleave=move |_| set_pointer_in.set(false)
+                        node_ref=svg_ref
+                        viewBox=view_box
+                        class="has-ratio"
+                        style=bg_style
+                    >
+                        <rect
+                            width="100%"
+                            height="100%"
+                            rx="10"
+                            ry="10"
+                            fill=background_color
+                        ></rect>
+                        {children()}
+
+                        <Pointer position=pointer_position visible=pointer_visible/>
+                    </svg>
+                </figure>
             </div>
-        }
+        </div>
     }
 }
 
-impl Slide {
-    fn pointer_view(&self, pointer: bool) -> Html {
-        if pointer && self.pointer_x > 0 && self.pointer_y > 0 {
-            html_nested! {
-                <circle cx={ self.pointer_x.to_string() } cy={ self.pointer_y.to_string() } style="filter: blur(2px);"
-                    r={ (POINTER_SIZE / 2).to_string() } fill="orange" opacity="0.75" pointer-events="none" />
-            }
-        } else {
-            html_nested!()
-        }
-    }
-
-    fn calc_width() -> i32 {
-        let elem = web_sys::window()
-            .and_then(|win| win.document())
-            .and_then(|doc| doc.document_element());
-        if let Some(elem) = elem {
-            let width = elem.client_width();
-            let height = elem.client_height();
-            width.min((height - 88) * 16 / 9)
-        } else {
-            0
-        }
+#[component]
+fn Pointer<F>(position: ReadSignal<(i32, i32)>, visible: F) -> impl IntoView
+where
+    F: Fn() -> bool + 'static,
+{
+    view! {
+        <circle
+            cx=move || position.get().0
+            cy=move || position.get().1
+            style="filter: blur(2px); transition: opacity .3s;"
+            r=POINTER_SIZE / 2
+            fill="orange"
+            opacity=move || if visible() { 0.75 } else { 0.0 }
+            pointer-events="none"
+        ></circle>
     }
 }

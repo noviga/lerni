@@ -1,23 +1,21 @@
-use lerni::widgets::*;
-use wasm_bindgen::prelude::wasm_bindgen;
-use yew::prelude::*;
+use leptos::*;
+use lerni::*;
 
-#[function_component]
-pub fn Pointer() -> Html {
-    let pointer = use_state(|| true);
-    let onclick = {
-        let pointer = pointer.clone();
-        Callback::from(move |_| pointer.set(!*pointer))
-    };
+#[component]
+pub fn Pointer() -> impl IntoView {
+    let (pointer, set_pointer) = create_signal(true);
+    let on_click = move |_| set_pointer.set(!pointer.get());
 
-    html! {
-        <Slide pointer={ *pointer }>
-            <Button text="Pointer ON/OFF" { onclick } />
+    view! {
+        <Slide pointer=pointer.into()>
+            <Button on_click=on_click>
+                "Pointer " {move || if pointer.get() { "ON" } else { "OFF" }}
+            </Button>
         </Slide>
     }
 }
 
 #[wasm_bindgen(start)]
 pub fn main() {
-    lerni::start::<Pointer>();
+    lerni::start(Pointer);
 }

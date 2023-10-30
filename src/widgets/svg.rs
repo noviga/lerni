@@ -1,34 +1,72 @@
-use yew::prelude::*;
+use leptos::*;
 
-use crate::{
-    properties::{Align, VAlign},
-    widgets::Frame,
-};
+use crate::{use_frame, Align, Frame, VAlign};
 
-/// SVG properties.
-#[derive(Default, Clone, Properties, PartialEq)]
-pub struct Props {
-    #[prop_or_default]
-    pub children: Children,
-    pub width: i32,
-    pub height: i32,
-    #[prop_or(Align::Center)]
-    pub align: Align,
-    #[prop_or(VAlign::Middle)]
-    pub valign: VAlign,
-    #[prop_or(1.0)]
-    pub scale: f32,
-    #[prop_or_default]
-    pub flip_x: bool,
-    #[prop_or_default]
-    pub flip_y: bool,
+struct SvgProperties {
+    width: i32,
+    height: i32,
+    align: Align,
+    valign: VAlign,
+    scale: f32,
+    flip_x: bool,
+    flip_y: bool,
 }
 
 /// SVG widget.
-#[function_component]
-pub fn Svg(props: &Props) -> Html {
-    let f = use_context::<Frame>().unwrap();
+#[component]
+pub fn Svg(
+    width: i32,
+    height: i32,
+    #[prop(default = Align::Center)] align: Align,
+    #[prop(default = VAlign::Middle)] valign: VAlign,
+    #[prop(default = 1.0)] scale: f32,
+    #[prop(optional)] flip_x: bool,
+    #[prop(optional)] flip_y: bool,
+    children: Children,
+) -> impl IntoView {
+    let f = use_frame();
+    let props = SvgProperties {
+        width,
+        height,
+        align,
+        valign,
+        scale,
+        flip_x,
+        flip_y,
+    };
+    let transform = calc_transform(&f, &props);
 
+    view! { <g transform=transform>{children()}</g> }
+}
+
+/// SVG-from-file widget.
+#[component]
+pub fn SvgFile(
+    width: i32,
+    height: i32,
+    #[prop(default = Align::Center)] align: Align,
+    #[prop(default = VAlign::Middle)] valign: VAlign,
+    #[prop(default = 1.0)] scale: f32,
+    #[prop(optional)] flip_x: bool,
+    #[prop(optional)] flip_y: bool,
+    src: &'static str,
+) -> impl IntoView {
+    let f = use_frame();
+    let props = SvgProperties {
+        width,
+        height,
+        align,
+        valign,
+        scale,
+        flip_x,
+        flip_y,
+    };
+    let transform = calc_transform(&f, &props);
+
+    view! { <g transform=transform inner_html=src></g> }
+}
+
+fn calc_transform(f: &Frame, props: &SvgProperties) -> String {
     let scale = if matches!(props.align, Align::Fill) || matches!(props.valign, VAlign::Fill) {
         let sx = f.width as f32 / props.width as f32;
         let sy = f.height as f32 / props.height as f32;
@@ -62,10 +100,5 @@ pub fn Svg(props: &Props) -> Html {
         sy = -sy;
         y += height;
     }
-
-    html! {
-        <g transform={ format!("translate({x} {y}) scale({sx} {sy})") }>
-        { for props.children.iter() }
-        </g>
-    }
+    format!("translate({x} {y}) scale({sx} {sy})")
 }
