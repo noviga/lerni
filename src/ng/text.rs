@@ -66,7 +66,7 @@ pub fn Text(
     let word = |i, r: &Rect, hidden| {
         view! {
             <text
-                visibility=move || {(hidden && i >= words_read.get()).then_some("hidden")}
+                visibility=move || { (hidden && i >= words_read.get()).then_some("hidden") }
                 x=r.x + r.width / 2
                 y=r.y + r.height / 2
                 class:has-text-weight-bold=bold
@@ -153,7 +153,7 @@ pub fn Text(
             .map(|(i, r)| {
                 view! {
                     <rect
-                        visibility=move || {(i >= words_read.get()).then_some("hidden")}
+                        visibility=move || { (i >= words_read.get()).then_some("hidden") }
                         x=r.x - expand
                         y=r.y - expand
                         width=r.width + 2 * expand
