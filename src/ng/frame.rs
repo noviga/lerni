@@ -17,6 +17,19 @@ pub struct Frame {
     pub height: i32,
 }
 
+/// SVG frame area.
+#[derive(Clone, Default, Debug)]
+pub struct SvgFrame {
+    /// SVG frame width (in viewbox pixels).
+    pub width: i32,
+    /// SVG frame height (in viewbox pixels).
+    pub height: i32,
+    /// Client area width (in screen pixels).
+    pub client_width: i32,
+    /// Client area height (in screen pixels).
+    pub client_height: i32,
+}
+
 /// Frames stack.
 #[derive(Clone, Default, Debug)]
 pub struct Frames(VecDeque<Frame>);
