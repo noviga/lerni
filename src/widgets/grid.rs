@@ -1,56 +1,65 @@
-use yew::prelude::*;
+use leptos::*;
 
-use crate::{properties::Color, widgets::Frame};
-
-#[derive(Clone, Default, Properties, PartialEq)]
-pub struct Props {
-    #[prop_or_default]
-    pub children: Children,
-    #[prop_or(1)]
-    pub rows: usize,
-    #[prop_or(1)]
-    pub cols: usize,
-    #[prop_or(0)]
-    pub border_width: i32,
-    #[prop_or(Color::Black)]
-    pub border_color: Color,
-    #[prop_or_default]
-    pub spacing: i32,
-    #[prop_or_default]
-    pub padding: i32,
-}
+use crate::{use_frame, use_frames, Color, Frame};
 
 /// Grid layout widget.
-#[function_component]
-pub fn Grid(props: &Props) -> Html {
-    let f = use_context::<Frame>().unwrap();
+#[component]
+pub fn Grid(
+    #[prop(default = 1)] rows: usize,
+    #[prop(default = 1)] cols: usize,
+    #[prop(optional)] border_width: i32,
+    #[prop(default = Color::Black)] border_color: Color,
+    #[prop(optional)] spacing: i32,
+    #[prop(optional)] padding: i32,
+    children: Children,
+) -> impl IntoView {
+    let f = use_frame();
 
-    let cols = props.cols as i32;
-    let rows = props.rows as i32;
-    let hspacing = props.spacing * (cols - 1);
-    let vspacing = props.spacing * (rows - 1);
-    let width = (f.width - props.border_width - hspacing) / cols;
-    let height = (f.height - props.border_width - vspacing) / rows;
+    let max = cols * rows;
 
-    let max = props.cols * props.rows;
-    html! {
-        for props.children.iter().take(max).enumerate().map(|(i, item)| {
-            let x = f.x + props.border_width / 2 + (width + props.spacing)  * (i as i32 % cols);
-            let y = f.y + props.border_width / 2 + (height + props.spacing) * (i as i32 / cols);
+    let cols = cols as i32;
+    let rows = rows as i32;
+    let hspacing = spacing * (cols - 1);
+    let vspacing = spacing * (rows - 1);
+    let width = (f.width - border_width - hspacing) / cols;
+    let height = (f.height - border_width - vspacing) / rows;
+
+    {
+        let frames = use_frames();
+        let mut frames = frames.borrow_mut();
+        for i in (0..max).rev() {
+            let x = f.x + border_width / 2 + (width + spacing) * (i as i32 % cols);
+            let y = f.y + border_width / 2 + (height + spacing) * (i as i32 / cols);
             let frame = Frame {
-                x: x + props.padding,
-                y: y + props.padding,
-                width: width - 2 * props.padding,
-                height: height - 2 * props.padding,
-                ..f
+                x: x + padding,
+                y: y + padding,
+                width: width - 2 * padding,
+                height: height - 2 * padding,
             };
-            html_nested! {
-                <ContextProvider<Frame> context={ frame }>
-                    <rect x={ x.to_string() } y={ y.to_string() } width={ width.to_string() } height={ height.to_string() }
-                        fill="none" stroke={ props.border_color.to_string() } stroke-width={ props.border_width.to_string() } />
-                    { item }
-                </ContextProvider<Frame>>
+            frames.push(frame);
+        }
+    }
+
+    children()
+        .nodes
+        .into_iter()
+        .take(max)
+        .enumerate()
+        .map(|(i, child)| {
+            let x = f.x + border_width / 2 + (width + spacing) * (i as i32 % cols);
+            let y = f.y + border_width / 2 + (height + spacing) * (i as i32 / cols);
+            view! {
+                <rect
+                    x=x
+                    y=y
+                    width=width
+                    height=height
+                    fill="none"
+                    stroke=border_color
+                    stroke-width=border_width
+                ></rect>
+                {child}
             }
         })
-    }
+        .collect_view()
 }

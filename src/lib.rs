@@ -2,50 +2,44 @@
 
 #![warn(missing_docs)]
 
-pub mod ng;
-pub mod properties;
-pub mod utils;
-pub mod widgets;
+mod frame;
+mod properties;
+mod widgets;
 
-use yew::{BaseComponent, Renderer};
+pub use frame::*;
+pub use properties::*;
+pub use widgets::*;
+
+pub use wasm_bindgen::prelude::wasm_bindgen;
+
+use leptos::*;
 
 /// Start function.
 ///
 /// # Example
 ///
 /// ```no_run
-/// use yew::prelude::*;
-/// use wasm_bindgen::prelude::wasm_bindgen;
+/// use leptos::*;
+/// use lerni::*;
 ///
-/// #[function_component]
-/// pub fn HelloWorld() -> Html {
-///     html!("Hello, world!")
+/// #[component]
+/// pub fn HelloWorld() -> impl IntoView {
+///     view! {
+///         "Hello, world!"
+///     }
 /// }
 ///
 /// #[wasm_bindgen(start)]
 /// pub fn main() {
-///     lerni::start::<HelloWorld>();
+///     lerni::start(HelloWorld);
 /// }
 /// ```
-pub fn start<T: BaseComponent>()
+pub fn start<F, N>(f: F)
 where
-    <T as BaseComponent>::Properties: Default,
+    F: Fn() -> N + 'static,
+    N: IntoView,
 {
-    Renderer::<T>::new().render();
-}
-
-/// Debug macro.
-#[macro_export]
-macro_rules! debug {
-    ($arg:literal) => {
-        web_sys::console::log_1(&format!("{}", $arg).into())
-    };
-    ($arg:expr) => {
-        web_sys::console::log_1(&format!("{:?}", $arg).into())
-    };
-    ($fmt:literal $(, $args:expr)+) => {
-        web_sys::console::log_1(&format!($fmt $(, $args)+).into())
-    };
+    leptos::mount_to_body(f);
 }
 
 /// Keyboard key codes.

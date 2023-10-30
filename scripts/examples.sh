@@ -13,14 +13,6 @@ blur \
 buttons \
 grid \
 hello_world \
-ng_blur \
-ng_buttons \
-ng_grid \
-ng_hello_world \
-ng_pointer \
-ng_rows_cols \
-ng_svg \
-ng_text \
 pointer \
 rows_cols \
 svg \

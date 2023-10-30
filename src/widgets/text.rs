@@ -1,21 +1,21 @@
+extern crate alloc;
+
+use alloc::rc::Rc;
+use leptos::*;
 use wasm_bindgen::JsValue;
-use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement};
-use yew::{prelude::*, virtual_dom::VNode};
+use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, MouseEvent};
 
-use crate::{properties::Color, widgets::Frame};
+use crate::{use_frame, Color, Frame, SvgFrame};
 
-/// Text widget.
-pub struct Text {
-    frame: Frame,
-    canvas: CanvasRenderingContext2d,
-    words: Vec<String>,
-    letter_counters: Vec<usize>,
-    total_letters: usize,
-    rects: Vec<Rect>,
-    expand: i32,
-    _context_listener: ContextHandle<Frame>,
+struct TextProperties<'a> {
+    bold: bool,
+    font_size: i32,
+    font: &'a str,
+    line_height: f32,
+    indent: f32,
 }
 
+#[derive(Clone)]
 struct Rect {
     pub x: i32,
     pub y: i32,
@@ -23,289 +23,251 @@ struct Rect {
     pub height: i32,
 }
 
-/// Text properties.
-#[derive(Clone, Default, Properties, PartialEq)]
-pub struct Props {
-    #[prop_or_default]
-    pub children: Children,
-    #[prop_or_default]
-    pub bold: bool,
-    #[prop_or(48)]
-    pub font_size: i32,
-    #[prop_or(Color::Black)]
-    pub color: Color,
-    #[prop_or_else(|| "sans-serif".to_string())]
-    pub font: String,
-    #[prop_or(1.2)]
-    pub line_height: f32,
-    #[prop_or(1.4)]
-    pub indent: f32,
-    #[prop_or(Color::PaleGreen)]
-    pub marker_color: Color,
-    #[prop_or_default]
-    pub words_read: usize,
-    #[prop_or_default]
-    pub lattice: bool,
-    #[prop_or_default]
-    pub erase_top: f32,
-    #[prop_or_default]
-    pub erase_bottom: f32,
-    #[prop_or_default]
-    pub onread: Callback<(usize, usize, usize)>,
+struct Output {
+    pub words: Vec<String>,
+    pub rects: Rc<Vec<Rect>>,
+    pub letter_counters: Vec<usize>,
 }
 
-pub enum Msg {
-    ContextUpdated(Frame),
-    Clicked(i32, i32),
-}
+/// Text widget.
+#[component]
+pub fn Text(
+    #[prop(optional)] bold: bool,
+    #[prop(default = 48)] font_size: i32,
+    #[prop(default = Color::Black)] color: Color,
+    #[prop(default = "sans-serif".to_string(), into)] font: String,
+    #[prop(default = 1.2)] line_height: f32,
+    #[prop(default = 1.4)] indent: f32,
+    #[prop(default = Color::PaleGreen)] marker_color: Color,
+    #[prop(optional)] lattice: bool,
+    #[prop(optional)] erase_top: f32,
+    #[prop(optional)] erase_bottom: f32,
+    #[prop(optional, into)] words_read: RwSignal<usize>,
+    #[prop(optional, into)] letters_read: RwSignal<usize>,
+    #[prop(optional, into)] letters_total: RwSignal<usize>,
+    children: Children,
+) -> impl IntoView {
+    let props = TextProperties {
+        bold,
+        font_size,
+        font: &font,
+        line_height,
+        indent,
+    };
+    let canvas = canvas_context(&props);
+    let children = children().nodes;
+    let f = use_frame();
+    let Output {
+        words,
+        rects,
+        letter_counters,
+    } = wrap(&children, &canvas, &props, &f);
 
-impl Component for Text {
-    type Message = Msg;
-    type Properties = Props;
+    letters_total.set(letter_counters.iter().sum());
 
-    fn create(ctx: &Context<Self>) -> Self {
-        let p = ctx.props();
-        let (frame, _context_listener) = ctx
-            .link()
-            .context(ctx.link().callback(Msg::ContextUpdated))
-            .expect("No context provided");
+    let word = |i, r: &Rect, hidden| {
+        view! {
+            <text
+                visibility=move || { (hidden && i >= words_read.get()).then_some("hidden") }
+                x=r.x + r.width / 2
+                y=r.y + r.height / 2
+                class:has-text-weight-bold=bold
+                text-anchor="middle"
+                dominant-baseline="central"
+                font-size=font_size
+                style=format!("font-family: {}", font)
+                fill=color
+                pointer-events="none"
+            >
+                {&words[i]}
+            </text>
+        }
+    };
 
-        let canvas = Self::canvas_context(p);
+    let erase = |r: &Rect| {
+        view! {
+            {(erase_top > 0.0)
+                .then(|| {
+                    let h = (erase_top * r.height as f32).round() as i32;
+                    view! { <rect fill="white" x=r.x y=r.y width=r.width height=h></rect> }
+                })}
 
-        let expand = Self::text_width(" ", &canvas) / 2 + 1;
+            {(erase_bottom > 0.0)
+                .then(|| {
+                    let h = (erase_bottom * r.height as f32).round() as i32;
+                    view! {
+                        <rect fill="white" x=r.x y=r.y + r.height - h width=r.width height=h></rect>
+                    }
+                })}
+        }
+    };
 
-        let mut text = Self {
-            frame,
-            canvas,
-            words: Default::default(),
-            letter_counters: Default::default(),
-            total_letters: Default::default(),
-            rects: Default::default(),
-            expand,
-            _context_listener,
-        };
-        text.wrap(p);
-        let letters = text.letter_counters.iter().take(p.words_read).sum();
-        p.onread.emit((p.words_read, letters, text.total_letters));
-        text
-    }
-
-    fn update(&mut self, ctx: &Context<Self>, msg: Self::Message) -> bool {
-        let p = ctx.props();
-        match msg {
-            Msg::ContextUpdated(frame) => {
-                self.frame = frame;
-                true
-            }
-            Msg::Clicked(x, y) => {
-                if let Some(index) = self.find_word_index(x, y) {
-                    let words_read = index + 1;
-                    let letters = self.letter_counters.iter().take(words_read).sum();
-                    p.onread.emit((words_read, letters, self.total_letters));
-                    true
-                } else {
-                    false
+    let r = Rc::clone(&rects);
+    let on_click = move |e: MouseEvent| {
+        let svg: Option<SvgFrame> = use_context();
+        if let Some(svg) = svg {
+            let x = e.offset_x() * svg.width / svg.client_width;
+            let y = e.offset_y() * svg.height / svg.client_height;
+            if x >= f.x && x <= f.x + f.width && y >= f.y && y <= f.y + f.height {
+                if let Some(index) = find_word_index(x, y, &r) {
+                    words_read.set(index + 1);
+                    letters_read.set(letter_counters[0..index + 1].iter().sum());
                 }
             }
         }
-    }
+    };
 
-    fn view(&self, ctx: &Context<Self>) -> Html {
-        let p = ctx.props();
-        let f = &self.frame;
+    let expand = text_width(" ", &canvas) / 2 + 1;
 
-        let onclick = {
-            let fx = f.fx;
-            let fy = f.fy;
-            ctx.link().callback(move |e: MouseEvent| {
-                let x = (e.offset_x() as f32 * fx).round() as i32;
-                let y = (e.offset_y() as f32 * fy).round() as i32;
-                Msg::Clicked(x, y)
-            })
-        };
+    view! {
+        <rect x=f.x y=f.y width=f.width height=f.height fill="white" on:click=on_click></rect>
+        {rects.iter().enumerate().map(|(i, r)| word(i, r, false)).collect_view()}
+        {(erase_top > 0.0 || erase_bottom > 0.0)
+            .then(|| { rects.iter().map(erase).collect_view() })}
 
-        let class = if p.bold { "has-text-weight-bold" } else { "" };
-
-        let lattice = if p.lattice {
-            let width = p.font_size / 2;
-            let dx = 5 * width;
-            let count = f.width / dx;
-            html! {
-                for (0..count).map(|i| html_nested!(<rect x={ (f.x + dx / 2 + i * dx).to_string() } y={ f.y.to_string() }
-                    width={ width.to_string() } height={ f.height.to_string() }
-                    rx={ (width / 2).to_string() }
-                    stroke={ p.color.to_string() } stroke-width="6"
-                    fill="white" pointer-events="none" />))
-            }
-        } else {
-            Default::default()
-        };
-
-        let word = |(i, r): (usize, &Rect)| {
-            html_nested! {
-                <text x={ (r.x + r.width / 2).to_string() }
-                    y={ (r.y + r.height / 2).to_string() } { class } text-anchor="middle"
-                    dominant-baseline="central" font-size={ p.font_size.to_string() }
-                    style={ format!("font-family: {}", p.font) } fill={ p.color.to_string() }
-                    pointer-events="none">
-                    { self.words[i].clone() }
-                </text>
-            }
-        };
-
-        let erase = |r: &Rect| {
-            let erase_top = if p.erase_top > 0.0 {
-                let h = (p.erase_top * r.height as f32).round() as i32;
-                html_nested!(<rect fill="white" x={ r.x.to_string() } y={ r.y.to_string() }
-                    width={ r.width .to_string() } height={ h.to_string() }/>)
-            } else {
-                Default::default()
-            };
-            let erase_bottom = if p.erase_bottom > 0.0 {
-                let h = (p.erase_bottom * r.height as f32).round() as i32;
-                html_nested!(<rect fill="white" x={ r.x.to_string() } y={ (r.y + r.height - h).to_string() }
-                    width={ r.width .to_string() } height={ h.to_string() }/>)
-            } else {
-                Default::default()
-            };
-            html_nested! {
-                <>
-                    { erase_top }
-                    { erase_bottom }
-                </>
-            }
-        };
-
-        html! {
-            <>
-                <rect x={ f.x.to_string() } y={ f.y.to_string() } width={ f.width.to_string() }
-                    height={ f.height.to_string() } fill="white" { onclick } />
-                { for self.rects.iter().enumerate().map(word) }
-                {
-                    if p.erase_top > 0.0 || p.erase_bottom > 0.0 {
-                        self.rects.iter().map(erase).collect::<Html>()
-                    } else {
-                        Default::default()
-                    }
-                }
-                { lattice }
-                {
-                    for self.rects.iter().take(p.words_read).map(|r| {
-                        html! {
-                            <rect x={ (r.x - self.expand).to_string() }
-                                y={ (r.y - self.expand).to_string() }
-                                width={ (r.width + 2 * self.expand).to_string() }
-                                height={ (r.height + 2 * self.expand).to_string() }
-                                rx={ self.expand.to_string() } ry={ self.expand.to_string() }
-                                fill={ p.marker_color.to_string() } pointer-events="none" />
+        {lattice
+            .then(|| {
+                let width = font_size / 2;
+                let dx = 5 * width;
+                let count = f.width / dx;
+                (0..count)
+                    .map(|i| {
+                        view! {
+                            <rect
+                                x=f.x + dx / 2 + i * dx
+                                y=f.y
+                                width=width
+                                height=f.height
+                                rx=width / 2
+                                stroke=color
+                                stroke-width="6"
+                                fill="white"
+                                pointer-events="none"
+                            ></rect>
                         }
                     })
+                    .collect_view()
+            })}
+
+        {rects
+            .iter()
+            .enumerate()
+            .map(|(i, r)| {
+                view! {
+                    <rect
+                        visibility=move || { (i >= words_read.get()).then_some("hidden") }
+                        x=r.x - expand
+                        y=r.y - expand
+                        width=r.width + 2 * expand
+                        height=r.height + 2 * expand
+                        rx=expand
+                        ry=expand
+                        fill=marker_color
+                        pointer-events="none"
+                    ></rect>
                 }
-                { for self.rects.iter().take(p.words_read).enumerate().map(word) }
-            </>
-        }
+            })
+            .collect_view()}
+
+        {rects.iter().enumerate().map(|(i, r)| word(i, r, true)).collect_view()}
     }
 }
 
-impl Text {
-    fn canvas_context(props: &Props) -> CanvasRenderingContext2d {
-        let doc = web_sys::window()
-            .and_then(|win| win.document())
-            .expect("Unable to get document");
+fn canvas_context(props: &TextProperties) -> CanvasRenderingContext2d {
+    let doc = web_sys::window()
+        .and_then(|win| win.document())
+        .expect("Unable to get document");
 
-        let canvas = HtmlCanvasElement::from(JsValue::from(doc.create_element("canvas").unwrap()));
-        let context = CanvasRenderingContext2d::from(JsValue::from(
-            canvas.get_context("2d").unwrap().unwrap(),
-        ));
+    let canvas = HtmlCanvasElement::from(JsValue::from(doc.create_element("canvas").unwrap()));
+    let context =
+        CanvasRenderingContext2d::from(JsValue::from(canvas.get_context("2d").unwrap().unwrap()));
 
-        let font_weight = if props.bold { 700 } else { 400 };
-        context.set_font(&format!(
-            "{font_weight} {}px {}",
-            props.font_size, props.font
-        ));
-        context
-    }
+    let font_weight = if props.bold { 700 } else { 400 };
+    context.set_font(&format!(
+        "{font_weight} {}px {}",
+        props.font_size, props.font
+    ));
+    context
+}
 
-    fn text_width(text: &str, canvas: &CanvasRenderingContext2d) -> i32 {
-        canvas.measure_text(text).unwrap().width() as i32
-    }
+fn text_width(text: &str, canvas: &CanvasRenderingContext2d) -> i32 {
+    canvas.measure_text(text).unwrap().width() as i32
+}
 
-    fn wrap(&mut self, props: &Props) {
-        let children = props.children.iter().map(|item| {
-            if let VNode::VText(node) = item {
-                node.text
-            } else {
-                Default::default()
-            }
+fn wrap(
+    children: &[View],
+    canvas: &CanvasRenderingContext2d,
+    props: &TextProperties,
+    frame: &Frame,
+) -> Output {
+    let children = children.iter().map(|item| {
+        if let View::Text(text) = item {
+            text.content.clone()
+        } else {
+            Default::default()
+        }
+    });
+
+    let mut y = frame.y;
+    let mut words = Vec::new();
+    let mut rects = Vec::new();
+    let mut letter_counters = Vec::new();
+    for child in children {
+        let mut sentence_words = child.split(' ');
+        let first_word = sentence_words.next().unwrap().to_string();
+        letter_counters.push(first_word.chars().filter(|c| c.is_alphabetic()).count());
+
+        let mut indent = (props.indent * props.font_size as f32).round() as i32;
+
+        let dy = (props.line_height * props.font_size as f32).round() as i32;
+        let mut x = frame.x + indent;
+        let mut lines = Vec::new();
+        let mut line = first_word.clone();
+        rects.push(Rect {
+            x,
+            y,
+            width: text_width(&first_word, canvas),
+            height: props.font_size,
         });
-
-        let mut y = self.frame.y;
-        for child in children {
-            let mut words = child.split(' ');
-            let first_word = words.next().unwrap().to_string();
-            self.letter_counters
-                .push(first_word.chars().filter(|c| c.is_alphabetic()).count());
-
-            let mut indent = (props.indent * props.font_size as f32).round() as i32;
-
-            let dy = (props.line_height * props.font_size as f32).round() as i32;
-            let mut x = self.frame.x + indent;
-            let mut lines = Vec::new();
-            let mut line = first_word.clone();
-            self.rects.push(Rect {
+        x += text_width(&first_word, canvas);
+        words.push(first_word);
+        for word in sentence_words {
+            words.push(word.to_string());
+            letter_counters.push(word.chars().filter(|c| c.is_alphabetic()).count());
+            if x + text_width(&format!(" {word}"), canvas) > frame.x + frame.width {
+                lines.push(line.clone());
+                line = word.to_string();
+                indent = 0;
+                x = frame.x;
+                y += dy;
+            } else {
+                line.push(' ');
+                x = frame.x + indent + text_width(&line, canvas);
+                line.push_str(word);
+            }
+            rects.push(Rect {
                 x,
                 y,
-                width: Self::text_width(&first_word, &self.canvas),
+                width: text_width(word, canvas),
                 height: props.font_size,
             });
-            x += Self::text_width(&first_word, &self.canvas);
-            self.words.push(first_word);
-            for word in words {
-                self.words.push(word.to_string());
-                self.letter_counters
-                    .push(word.chars().filter(|c| c.is_alphabetic()).count());
-                if x + Self::text_width(&format!(" {word}"), &self.canvas)
-                    > self.frame.x + self.frame.width
-                {
-                    lines.push(line.clone());
-                    line = word.to_string();
-                    indent = 0;
-                    x = self.frame.x;
-                    y += dy;
-                } else {
-                    line.push(' ');
-                    x = self.frame.x + indent + Self::text_width(&line, &self.canvas);
-                    line.push_str(word);
-                }
-                self.rects.push(Rect {
-                    x,
-                    y,
-                    width: Self::text_width(word, &self.canvas),
-                    height: props.font_size,
-                });
-                x = self.frame.x + indent + Self::text_width(&line, &self.canvas);
-            }
-            if !line.is_empty() {
-                lines.push(line);
-            }
-
-            y += dy;
+            x = frame.x + indent + text_width(&line, canvas);
         }
-        self.total_letters = self.letter_counters.iter().sum();
-    }
-
-    fn find_word_index(&self, x: i32, y: i32) -> Option<usize> {
-        if x < self.frame.x
-            || x > self.frame.x + self.frame.width
-            || y < self.frame.y
-            || y > self.frame.y + self.frame.height
-        {
-            return None;
+        if !line.is_empty() {
+            lines.push(line);
         }
-        self.rects
-            .iter()
-            .enumerate()
-            .find(|(_, r)| x >= r.x && x <= r.x + r.width && y >= r.y && y <= r.y + r.height)
-            .map(|(i, _)| i)
+
+        y += dy;
     }
+    Output {
+        rects: Rc::new(rects),
+        words,
+        letter_counters,
+    }
+}
+
+fn find_word_index(x: i32, y: i32, rects: &[Rect]) -> Option<usize> {
+    rects
+        .iter()
+        .position(|r| x >= r.x && x <= r.x + r.width && y >= r.y && y <= r.y + r.height)
 }

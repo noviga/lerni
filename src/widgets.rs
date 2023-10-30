@@ -17,7 +17,7 @@ pub use label::Label;
 pub use row::Row;
 pub use slide::Slide;
 pub use slideshow::SlideShow;
-pub use svg::Svg;
+pub use svg::{Svg, SvgFile};
 pub use text::Text;
 
 /// Additional information provided to all slides.
@@ -31,19 +31,16 @@ pub struct Metadata {
     pub pointer: bool,
 }
 
-/// Frame within which the widget will be rendered.
-#[derive(Clone, Default, Debug, PartialEq)]
-pub struct Frame {
-    /// X-coordinate (in pixels) of the to left corner.
-    pub x: i32,
-    /// Y-coordinate (in pixels) of the to left corner.
-    pub y: i32,
-    /// Width (in pixels).
-    pub width: i32,
-    /// Height (in pixels).
-    pub height: i32,
-    /// Screen X to SVG X transform factor.
-    pub fx: f32,
-    /// Screen Y to SVG Y transform factor.
-    pub fy: f32,
+/// Calculates the width of the slide.
+pub fn calc_width(margin: i32) -> i32 {
+    let elem = web_sys::window()
+        .and_then(|win| win.document())
+        .and_then(|doc| doc.document_element());
+    if let Some(elem) = elem {
+        let width = elem.client_width();
+        let height = elem.client_height();
+        width.min((height - margin) * 16 / 9)
+    } else {
+        0
+    }
 }

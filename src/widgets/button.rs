@@ -1,101 +1,49 @@
-use yew::prelude::*;
+use leptos::*;
+use web_sys::MouseEvent;
 
-use crate::{
-    properties::{Align, Color, VAlign},
-    widgets::{Frame, Label},
-};
+use crate::{provide_frame, use_frame, Align, Color, Frame, Label, VAlign};
 
 const WIDTH: i32 = 400;
 const HEIGHT: i32 = 150;
 
-/// Button properties.
-#[derive(Default, Clone, Properties, PartialEq)]
-pub struct Props {
-    #[prop_or_default]
-    pub text: String,
-    #[prop_or_default]
-    pub text_bold: bool,
-    #[prop_or_default]
-    pub html: Html,
-    #[prop_or(WIDTH)]
-    pub width: i32,
-    #[prop_or(HEIGHT)]
-    pub height: i32,
-    #[prop_or(24)]
-    pub radius: i32,
-    #[prop_or_default]
-    pub font: String,
-    #[prop_or(48)]
-    pub font_size: i32,
-    #[prop_or(Color::AliceBlue)]
-    pub color: Color,
-    #[prop_or(Color::Black)]
-    pub text_color: Color,
-    #[prop_or(12)]
-    pub border_width: i32,
-    #[prop_or(Color::RoyalBlue)]
-    pub border_color: Color,
-    #[prop_or(Align::Center)]
-    pub align: Align,
-    #[prop_or(VAlign::Middle)]
-    pub valign: VAlign,
-    #[prop_or_default]
-    pub onclick: Callback<Props>,
-}
+#[component]
+pub fn Button<CB>(
+    on_click: CB,
+    #[prop(optional)] text_bold: bool,
+    #[prop(default = WIDTH)] width: i32,
+    #[prop(default = HEIGHT)] height: i32,
+    #[prop(default = 24)] radius: i32,
+    #[prop(optional)] font: String,
+    #[prop(default = 48)] font_size: i32,
+    #[prop(default = Color::AliceBlue)] color: Color,
+    #[prop(default = Color::Black)] text_color: Color,
+    #[prop(default = 12)] border_width: i32,
+    #[prop(default = Color::RoyalBlue)] border_color: Color,
+    #[prop(default = Align::Center)] align: Align,
+    #[prop(default = VAlign::Middle)] valign: VAlign,
+    children: Children,
+) -> impl IntoView
+where
+    CB: FnMut(MouseEvent) + 'static,
+{
+    let f = use_frame();
 
-/// Button widget.
-#[function_component]
-pub fn Button(props: &Props) -> Html {
-    let f = use_context::<Frame>().unwrap();
-
-    let width = if props.align == Align::Fill {
-        f.width
-    } else {
-        props.width
-    };
-    let height = if props.valign == VAlign::Fill {
+    let width = if align == Align::Fill { f.width } else { width };
+    let height = if valign == VAlign::Fill {
         f.height
     } else {
-        props.height
+        height
     };
 
-    let x = match props.align {
+    let x = match align {
         Align::Left | Align::Fill => f.x,
         Align::Center => f.x + (f.width - width) / 2,
         Align::Right => f.x + f.width - width,
     };
-    let y = match props.valign {
+    let y = match valign {
         VAlign::Top | VAlign::Fill => f.y,
         VAlign::Middle => f.y + (f.height - height) / 2,
         VAlign::Bottom => f.y + f.height - height,
-    };
-
-    let mouse_down = use_state(|| false);
-    let onmousedown = {
-        let mouse_down = mouse_down.clone();
-        Callback::from(move |_| mouse_down.set(true))
-    };
-    let onmouseup = {
-        let mouse_down = mouse_down.clone();
-        let props = props.clone();
-        Callback::from(move |_| {
-            if *mouse_down {
-                mouse_down.set(false);
-                props.onclick.emit(props.clone());
-            }
-        })
-    };
-    let onmouseleave = {
-        let mouse_down = mouse_down.clone();
-        Callback::from(move |_| {
-            mouse_down.set(false);
-        })
-    };
-
-    let border_width = if *mouse_down {
-        props.border_width + 6
-    } else {
-        props.border_width
     };
 
     let frame = Frame {
@@ -103,22 +51,37 @@ pub fn Button(props: &Props) -> Html {
         y,
         width,
         height,
-        ..f
     };
-    let x = (x + border_width / 2).to_string();
-    let y = (y + border_width / 2).to_string();
-    let width = (width - border_width).to_string();
-    let height = (height - border_width).to_string();
-    html! {
-        <a { onmousedown } { onmouseup } { onmouseleave }>
-            <rect { x } { y } { width } { height }
-                rx={ props.radius.to_string() } ry={ props.radius.to_string() }
-                fill={ props.color.to_string() } stroke={ props.border_color.to_string() }
-                stroke-width={ border_width.to_string() } />
-            <ContextProvider<Frame> context={ frame }>
-                <Label text={ props.text.clone() } html={ props.html.clone() } bold={ props.text_bold }
-                    color={ props.text_color } font={ props.font.clone() } font_size={ props.font_size }/>
-            </ContextProvider<Frame>>
-        </a>
+    provide_frame(frame);
+
+    let x = x + border_width / 2;
+    let y = y + border_width / 2;
+    let width = width - border_width;
+    let height = height - border_width;
+
+    let (border, set_border) = create_signal(border_width);
+    let on_mousedown = move |_| set_border.set(border_width + 6);
+    let on_mouseup = move |_| set_border.set(border_width);
+
+    view! {
+        <rect
+            on:click=on_click
+            on:mousedown=on_mousedown
+            on:mouseup=on_mouseup
+            on:mouseleave=on_mouseup
+            x=x
+            y=y
+            width=width
+            height=height
+            rx=radius
+            ry=radius
+            fill=color
+            stroke=border_color
+            stroke-width=move || border.get()
+            style="cursor: pointer;"
+        ></rect>
+        <Label bold=text_bold color=text_color font=font font_size=font_size>
+            {children()}
+        </Label>
     }
 }
