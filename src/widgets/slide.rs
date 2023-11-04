@@ -17,7 +17,7 @@ pub fn Slide(
     #[prop(default = WIDTH)] width: i32,
     #[prop(default = HEIGHT)] height: i32,
     #[prop(optional)] background_color: Color,
-    #[prop(optional)] background_image: String,
+    #[prop(optional, into)] background_image: String,
     #[prop(optional)] pointer: MaybeSignal<bool>,
     #[prop(optional)] blur: MaybeSignal<bool>,
     #[prop(default = 15)] blur_radius: i32,
