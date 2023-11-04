@@ -15,6 +15,7 @@ grid \
 hello_world \
 pointer \
 rows_cols \
+stack \
 svg \
 text \
 "
