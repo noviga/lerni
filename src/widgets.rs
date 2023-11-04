@@ -7,6 +7,7 @@ mod label;
 mod row;
 mod slide;
 mod slideshow;
+mod stack;
 mod svg;
 mod text;
 
@@ -17,6 +18,7 @@ pub use label::Label;
 pub use row::Row;
 pub use slide::Slide;
 pub use slideshow::SlideShow;
+pub use stack::Stack;
 pub use svg::{Svg, SvgFile};
 pub use text::Text;
 

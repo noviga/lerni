@@ -4,7 +4,7 @@ use lerni::*;
 #[component]
 pub fn SvgExample() -> impl IntoView {
     view! {
-        <Slide background_image="/img/lerni-bg.svg".into()>
+        <Slide background_image="/img/lerni-bg.svg">
             <Grid cols=3 rows=3 border_width=4 padding=20>
                 <SvgFile width=128 height=64 src=include_str!("logo.svg") />
                 <Svg width=128 height=64 scale=3.0>{include!("logo.svg-rs")}</Svg>
