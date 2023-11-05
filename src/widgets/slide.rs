@@ -18,8 +18,8 @@ pub fn Slide(
     #[prop(default = HEIGHT)] height: i32,
     #[prop(optional)] background_color: Color,
     #[prop(optional, into)] background_image: String,
-    #[prop(optional)] pointer: MaybeSignal<bool>,
-    #[prop(optional)] blur: MaybeSignal<bool>,
+    #[prop(optional, into)] pointer: MaybeSignal<bool>,
+    #[prop(optional, into)] blur: MaybeSignal<bool>,
     #[prop(default = 15)] blur_radius: i32,
     children: Children,
 ) -> impl IntoView {
