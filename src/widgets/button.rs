@@ -14,11 +14,11 @@ pub fn Button<CB>(
     #[prop(default = HEIGHT)] height: i32,
     #[prop(default = 24)] radius: i32,
     #[prop(optional)] font: String,
-    #[prop(default = 48)] font_size: i32,
-    #[prop(default = Color::AliceBlue)] color: Color,
-    #[prop(default = Color::Black)] text_color: Color,
-    #[prop(default = 12)] border_width: i32,
-    #[prop(default = Color::RoyalBlue)] border_color: Color,
+    #[prop(default = 48.into(), into)] font_size: MaybeSignal<i32>,
+    #[prop(default = Color::AliceBlue.into(), into)] color: MaybeSignal<Color>,
+    #[prop(default = Color::Black.into(), into)] text_color: MaybeSignal<Color>,
+    #[prop(default = 12.into())] border_width: MaybeSignal<i32>,
+    #[prop(default = Color::RoyalBlue.into(), into)] border_color: MaybeSignal<Color>,
     #[prop(default = Align::Center)] align: Align,
     #[prop(default = VAlign::Middle)] valign: VAlign,
     children: Children,
@@ -54,14 +54,14 @@ where
     };
     provide_frame(frame);
 
-    let x = x + border_width / 2;
-    let y = y + border_width / 2;
-    let width = width - border_width;
-    let height = height - border_width;
+    let x = x + border_width.get() / 2;
+    let y = y + border_width.get() / 2;
+    let width = width - border_width.get();
+    let height = height - border_width.get();
 
-    let (border, set_border) = create_signal(border_width);
-    let on_mousedown = move |_| set_border.set(border_width + 6);
-    let on_mouseup = move |_| set_border.set(border_width);
+    let (border, set_border) = create_signal(border_width.get());
+    let on_mousedown = move |_| set_border.set(border_width.get() + 6);
+    let on_mouseup = move |_| set_border.set(border_width.get());
 
     view! {
         <rect

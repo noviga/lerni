@@ -8,12 +8,19 @@ pub fn Buttons() -> impl IntoView {
         logging::log!("Clicked");
         set_counter.set(counter.get() + 1);
     };
+    let bob_color = create_memo(move |_| {
+        if counter.get() % 2 == 0 {
+            Color::LightCoral
+        } else {
+            Color::LightSkyBlue
+        }
+    });
 
     view! {
         <Slide>
             <Grid cols=3 rows=3>
                 <Button on_click=on_click>"Alice"</Button>
-                <Button width=300 height=300 radius=150 on_click=on_click>"Bob"</Button>
+                <Button width=300 height=300 radius=150 color=bob_color on_click=on_click>"Bob"</Button>
                 <Button font_size=72 text_color=Color::DarkCyan on_click=on_click>"Charlie"</Button>
                 <Button on_click=on_click>
                     <tspan font-size="96" fill="red" alignment-baseline="central">"Da"</tspan>

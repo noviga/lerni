@@ -7,7 +7,7 @@ pub fn Pointer() -> impl IntoView {
     let on_click = move |_| set_pointer.set(!pointer.get());
 
     view! {
-        <Slide pointer=pointer.into()>
+        <Slide pointer=pointer>
             <Button on_click=on_click>
                 "Pointer " {move || if pointer.get() { "ON" } else { "OFF" }}
             </Button>

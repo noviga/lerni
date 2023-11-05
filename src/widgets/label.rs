@@ -6,10 +6,10 @@ use crate::{use_frame, Align, Color, VAlign};
 pub fn Label(
     #[prop(optional)] bold: bool,
     #[prop(optional)] font: String,
-    #[prop(default = 48)] font_size: i32,
+    #[prop(default = 48.into(), into)] font_size: MaybeSignal<i32>,
     #[prop(default = Align::Center)] align: Align,
     #[prop(default = VAlign::Middle)] valign: VAlign,
-    #[prop(default = Color::Black)] color: Color,
+    #[prop(default = Color::Black.into(), into)] color: MaybeSignal<Color>,
     children: Children,
 ) -> impl IntoView {
     let f = use_frame();
