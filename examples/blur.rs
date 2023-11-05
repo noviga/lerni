@@ -7,7 +7,7 @@ pub fn Blur() -> impl IntoView {
     let on_click = move |_| set_blur.set(!blur.get());
 
     view! {
-        <Slide blur=blur.into() background_color=Color::MistyRose>
+        <Slide blur=blur background_color=Color::MistyRose>
             <Button on_click=on_click>
                 "Blur " {move || if blur.get() { "ON" } else { "OFF" }}
             </Button>
