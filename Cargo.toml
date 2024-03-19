@@ -15,6 +15,7 @@ gloo-utils = "0.2"
 leptos = { version = "0.6", features = ["csr"] }
 leptos-use = "0.10"
 rand = { version = "0.8", default-features = false, features = ["getrandom"] }
+yew = { version = "0.21", features = ["csr"], optional = true }
 wasm-bindgen = "0.2.92"
 
 [dependencies.web-sys]
@@ -61,3 +62,8 @@ crate-type = ["cdylib"]
 [[example]]
 name = "text"
 crate-type = ["cdylib"]
+
+[features]
+legacy = [
+    "yew",
+]

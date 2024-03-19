@@ -1,8 +1,8 @@
-.PHONY: all clean doc doc-open examples examples-release fmt fmt-check fmt-leptos linter prepare pre-commit serve test
+.PHONY: all clean doc doc-open examples examples-release fmt fmt-check fmt-leptos legacy linter prepare pre-commit serve test
 
 all:
 	@echo ──────────── Build release ────────────────────
-	@cargo build --release
+	@cargo b -r
 
 clean:
 	@echo ──────────── Clean ────────────────────────────
@@ -36,6 +36,10 @@ fmt-check:
 	@echo ──────────── Check format ─────────────────────
 	@cargo fmt --all -- --check
 
+legacy:
+	@echo ──────────── Build legacy release ─────────────
+	@cargo b -rF legacy
+
 linter:
 	@echo ──────────── Run linter ───────────────────────
 	@cargo clippy --all-targets -- --no-deps -D warnings -A clippy::derive_partial_eq_without_eq
@@ -52,4 +56,4 @@ serve: examples
 
 test: all
 	@echo ──────────── Run tests ────────────────────────
-	@cargo test --release
+	@cargo t -r
