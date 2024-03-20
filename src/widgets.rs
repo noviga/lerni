@@ -34,14 +34,14 @@ pub struct Metadata {
 }
 
 /// Calculates the width of the slide.
-pub fn calc_width(margin: i32) -> i32 {
+pub fn calc_width(x_margin: i32, y_margin: i32) -> i32 {
     let elem = web_sys::window()
         .and_then(|win| win.document())
         .and_then(|doc| doc.document_element());
     if let Some(elem) = elem {
-        let width = elem.client_width();
+        let width = elem.client_width() - x_margin;
         let height = elem.client_height();
-        width.min((height - margin) * 16 / 9)
+        width.min((height - y_margin) * 16 / 9)
     } else {
         0
     }
