@@ -24,11 +24,11 @@ pub fn Slide(
     children: Children,
 ) -> impl IntoView {
     let metadata = use_context::<Metadata>();
-    let (slide_width, set_slide_width) = create_signal(crate::calc_width(SLIDE_MARGIN));
+    let (slide_width, set_slide_width) = create_signal(crate::calc_width(0, SLIDE_MARGIN));
     if metadata.is_none() {
         // Standalone slide usage (not within a slideshow)
-        let _ = use_event_listener(window(), resize, move |_| {
-            set_slide_width.set(crate::calc_width(SLIDE_MARGIN));
+        _ = use_event_listener(window(), resize, move |_| {
+            set_slide_width.set(crate::calc_width(0, SLIDE_MARGIN));
         });
     }
 

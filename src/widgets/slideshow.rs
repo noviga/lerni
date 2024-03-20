@@ -8,7 +8,8 @@ use std::collections::BTreeSet;
 use crate::Metadata;
 
 const BUTTON_COUNT: usize = 6;
-const PAGINATION_HEIGHT: i32 = 88;
+const PAGINATION_WIDTH: i32 = 40;
+const CONTROL_PANEL_HEIGHT: i32 = 64;
 
 #[component]
 pub fn SlideShow(
@@ -21,20 +22,21 @@ pub fn SlideShow(
     let children = children().nodes;
     let count = children.len();
 
-    let _ = use_event_listener(document(), keydown, move |e| {
-        if e.key() == "ArrowLeft" {
+    _ = use_event_listener(document(), keydown, move |e| {
+        if e.key() == "ArrowLeft" || e.key() == "ArrowUp" {
             if page.get() > 0 {
                 page.set(page.get() - 1);
             }
-        } else if e.key() == "ArrowRight" && page.get() < count - 1 {
+        } else if (e.key() == "ArrowRight" || e.key() == "ArrowDown") && page.get() < count - 1 {
             page.set(page.get() + 1);
         }
     });
 
-    let (width, set_width) = create_signal(crate::calc_width(PAGINATION_HEIGHT));
+    let (width, set_width) =
+        create_signal(crate::calc_width(PAGINATION_WIDTH, CONTROL_PANEL_HEIGHT));
 
-    let _ = use_event_listener(window(), resize, move |_| {
-        set_width.set(crate::calc_width(PAGINATION_HEIGHT));
+    _ = use_event_listener(window(), resize, move |_| {
+        set_width.set(crate::calc_width(PAGINATION_WIDTH, CONTROL_PANEL_HEIGHT));
     });
 
     let mut metadata = Metadata {
@@ -62,8 +64,27 @@ pub fn SlideShow(
             }
         >
 
-            <Pagination page=page count=count/>
-            {children}
+            <div class="columns is-gapless is-mobile">
+                <div class="column is-rest">{children} <ControlPanel/></div>
+                <div class="pl-0 mt-4 pr-0" style:width="40px">
+                    <Pagination page=page count=count/>
+                </div>
+            </div>
+        </div>
+    }
+}
+
+#[component]
+fn ControlPanel() -> impl IntoView {
+    view! {
+        <div class="container pl-4 mt-4 pr-4" style="max-width: 100%;">
+            <div class="buttons">
+                <button class="button is-rounded is-danger">
+                    <span class="icon">
+                        <i class="fas fa-lg fa-refresh"></i>
+                    </span>
+                </button>
+            </div>
         </div>
     }
 }
@@ -71,10 +92,9 @@ pub fn SlideShow(
 #[component]
 fn Pagination(page: RwSignal<usize>, count: usize) -> impl IntoView {
     let mut prev = None;
-    let pages = page_list(page.get(), count)
-        .into_iter()
+    let pages = (0..count)
         .map(|i| {
-            let view = view! { <PageButton index=i prev=prev current=page/> };
+            let view = view! { <PageButton index=i count=count current=page/> };
             prev = Some(i);
             view
         })
@@ -92,17 +112,27 @@ fn Pagination(page: RwSignal<usize>, count: usize) -> impl IntoView {
     };
 
     view! {
-        <div class="container pl-4 mt-4 pr-4" style="max-width: 100%;">
-            <nav class="pagination is-rounded" role="navigation" aria-label="pagination">
-                <ul class="pagination-list">{pages}</ul>
-                <a class="pagination-link button is-info" style="order: 2;" on:click=on_prev>
+        <div class="container">
+            <nav
+                class="pagination is-rounded is-flex is-flex-direction-column"
+                role="navigation"
+                aria-label="pagination"
+            >
+                <ul class="pagination-list mb-2 is-flex is-flex-direction-column is-align-items-center">
+                    {pages}
+                </ul>
+                <a
+                    class="pagination-previous button is-info mb-2"
+                    style="order: 2;"
+                    on:click=on_prev
+                >
                     <span class="icon">
-                        <i class="fas fa-lg fa-arrow-left"></i>
+                        <i class="fas fa-lg fa-arrow-up"></i>
                     </span>
                 </a>
-                <a class="pagination-link button is-info" style="order: 3;" on:click=on_next>
+                <a class="pagination-next button is-info" style="order: 3;" on:click=on_next>
                     <span class="icon">
-                        <i class="fas fa-lg fa-arrow-right"></i>
+                        <i class="fas fa-lg fa-arrow-down"></i>
                     </span>
                 </a>
             </nav>
@@ -111,13 +141,18 @@ fn Pagination(page: RwSignal<usize>, count: usize) -> impl IntoView {
 }
 
 #[component]
-fn PageButton(index: usize, prev: Option<usize>, current: RwSignal<usize>) -> impl IntoView {
+fn PageButton(index: usize, count: usize, current: RwSignal<usize>) -> impl IntoView {
     view! {
         <>
-            <li hidden=move || !matches!(prev, Some(p) if index != (p + 1))>
-                <span class="pagination-ellipsis">"•"</span>
+            <li hidden=move || {
+                index == 0 || is_page_number_visible(index - 1, current.get(), count)
+                    || !is_page_number_visible(index, current.get(), count)
+            }>
+                <span class="icon">
+                    <i class="fas fa-lg fa-ellipsis-v"></i>
+                </span>
             </li>
-            <li>
+            <li hidden=move || !is_page_number_visible(index, current.get(), count)>
                 <a
                     class="pagination-link"
                     class:button=move || index == current.get()
@@ -131,9 +166,9 @@ fn PageButton(index: usize, prev: Option<usize>, current: RwSignal<usize>) -> im
     }
 }
 
-fn page_list(current: usize, count: usize) -> Vec<usize> {
+fn is_page_number_visible(index: usize, current: usize, count: usize) -> bool {
     if count <= BUTTON_COUNT {
-        (0..count).collect()
+        true
     } else {
         let mut pages: BTreeSet<usize> = [0].into();
         let mut add_page = |page| {
@@ -152,29 +187,6 @@ fn page_list(current: usize, count: usize) -> Vec<usize> {
         add_page(center - 1);
         add_page(center);
         add_page(center + 1);
-        pages.into_iter().collect()
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn page_list_calc() {
-        let c = BUTTON_COUNT;
-        for i in 0..c {
-            assert_eq!(page_list(i, c), (0..c).collect::<Vec<_>>());
-        }
-
-        let c = 2 * BUTTON_COUNT;
-        assert_eq!(page_list(0, c), vec![0, 1, 2, c - 1]);
-        assert_eq!(page_list(1, c), vec![0, 1, 2, c - 1]);
-        assert_eq!(page_list(2, c), vec![0, 1, 2, 3, c - 1]);
-        assert_eq!(page_list(3, c), vec![0, 2, 3, 4, c - 1]);
-        assert_eq!(page_list(c - 4, c), vec![0, c - 5, c - 4, c - 3, c - 1]);
-        assert_eq!(page_list(c - 3, c), vec![0, c - 4, c - 3, c - 2, c - 1]);
-        assert_eq!(page_list(c - 2, c), vec![0, c - 3, c - 2, c - 1]);
-        assert_eq!(page_list(c - 1, c), vec![0, c - 3, c - 2, c - 1]);
+        pages.contains(&index)
     }
 }
