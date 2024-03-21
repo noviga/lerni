@@ -25,8 +25,6 @@ pub use text::Text;
 /// Additional information provided to all slides.
 #[derive(Clone, Copy, Default, Debug, PartialEq)]
 pub struct Metadata {
-    /// Visibility flag.
-    pub visible: bool,
     /// Teacher mode flag.
     pub teacher_mode: bool,
     /// Pointer on/off flag.

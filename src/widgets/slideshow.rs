@@ -4,6 +4,7 @@ use leptos::{
 };
 use leptos_use::*;
 use std::collections::BTreeSet;
+use web_sys::MouseEvent;
 
 use crate::Metadata;
 
@@ -39,21 +40,31 @@ pub fn SlideShow(
         set_width.set(crate::calc_width(PAGINATION_WIDTH, CONTROL_PANEL_HEIGHT));
     });
 
-    let mut metadata = Metadata {
+    let metadata = Metadata {
         teacher_mode,
         pointer,
-        ..Default::default()
     };
+    provide_context(metadata);
 
+    let mut panel_items = Vec::with_capacity(count);
+    let mut panel_item_refs = Vec::with_capacity(count);
     let children = children
         .into_iter()
         .enumerate()
         .map(|(i, child)| {
-            metadata.visible = i == page.get();
-            provide_context(metadata);
-            view! { <div hidden=move || i != page.get()>{child}</div> }
+            let panel_item_ref = create_node_ref();
+            panel_item_refs.push(panel_item_ref);
+            panel_items
+                .push(view! { <div node_ref=panel_item_ref hidden=move || i != page.get()></div> });
+            view! {
+                <div number=i hidden=move || i != page.get()>
+                    {child}
+                </div>
+            }
         })
         .collect_view();
+
+    provide_context(panel_item_refs);
 
     view! {
         <div
@@ -65,7 +76,9 @@ pub fn SlideShow(
         >
 
             <div class="columns is-gapless is-mobile">
-                <div class="column is-rest">{children} <ControlPanel/></div>
+                <div class="column is-rest">
+                    {children} <ControlPanel>{panel_items}</ControlPanel>
+                </div>
                 <div class="pl-0 mt-4 pr-0" style:width="40px">
                     <Pagination page=page count=count/>
                 </div>
@@ -75,15 +88,25 @@ pub fn SlideShow(
 }
 
 #[component]
-fn ControlPanel() -> impl IntoView {
+fn ControlPanel(children: Children) -> impl IntoView {
     view! {
         <div class="container pl-4 mt-4 pr-4" style="max-width: 100%;">
-            <div class="buttons">
-                <button class="button is-rounded is-danger">
-                    <span class="icon">
-                        <i class="fas fa-lg fa-refresh"></i>
-                    </span>
-                </button>
+            <div class="field is-grouped">
+                <p class="control">
+                    <button class="button is-rounded is-link" on:click=history_back>
+                        <span class="icon">
+                            <i class="fas fa-lg fa-arrow-left"></i>
+                        </span>
+                    </button>
+                </p>
+                <p class="control">
+                    <button class="button is-rounded is-danger">
+                        <span class="icon">
+                            <i class="fas fa-lg fa-refresh"></i>
+                        </span>
+                    </button>
+                </p>
+                {children()}
             </div>
         </div>
     }
@@ -188,5 +211,13 @@ fn is_page_number_visible(index: usize, current: usize, count: usize) -> bool {
         add_page(center);
         add_page(center + 1);
         pages.contains(&index)
+    }
+}
+
+fn history_back(_event: MouseEvent) {
+    if let Some(window) = web_sys::window() {
+        if let Ok(history) = window.history() {
+            history.back().unwrap_or_default();
+        }
     }
 }
