@@ -1,5 +1,6 @@
 use leptos::{
     ev::{resize, MouseEvent},
+    html::Div,
     svg::Svg,
     *,
 };
@@ -21,6 +22,7 @@ pub fn Slide(
     #[prop(optional, into)] pointer: MaybeSignal<bool>,
     #[prop(optional, into)] blur: MaybeSignal<bool>,
     #[prop(default = 15)] blur_radius: i32,
+    #[prop(optional)] node_ref: Option<NodeRef<Div>>,
     children: Children,
 ) -> impl IntoView {
     let metadata = use_context::<Metadata>();
@@ -82,8 +84,11 @@ pub fn Slide(
         Default::default()
     };
 
+    let node_ref = node_ref.unwrap_or_else(create_node_ref);
+
     view! {
         <div
+            node_ref=node_ref
             class="container pl-4 mt-4 pr-4"
             style:max-width=move || {
                 if metadata.is_none() {
