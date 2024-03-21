@@ -70,8 +70,8 @@ pub mod keys {
     pub const DIGIT_9: u32 = 57;
 }
 
-/// Check whether a slide is visible.
-pub fn is_slide_visible(node_ref: &NodeRef<Div>) -> bool {
+/// Check whether a slide is active.
+pub fn is_active_slide(node_ref: NodeRef<Div>) -> bool {
     if let Some(node) = node_ref.get() {
         if let Some(parent) = node.parent_element() {
             return parent.get_attribute("hidden").is_none();
@@ -82,12 +82,26 @@ pub fn is_slide_visible(node_ref: &NodeRef<Div>) -> bool {
 }
 
 /// Check whether a slide is visible.
-pub fn slide_number(node_ref: &NodeRef<Div>) -> Option<usize> {
-    if let Some(node) = node_ref.get() {
+pub fn slide_number(node_ref: NodeRef<Div>) -> Option<usize> {
+    if let Some(node) = node_ref.get_untracked() {
         if let Some(parent) = node.parent_element() {
             return parent.get_attribute("number").and_then(|n| n.parse().ok());
         }
     }
 
     None
+}
+
+/// Mount a child view on a panel.
+pub fn mount_on_panel(node_ref: NodeRef<Div>, item: impl IntoView) {
+    let panel_item_refs: Option<Vec<NodeRef<Div>>> = use_context();
+    if let Some(panel_item_refs) = panel_item_refs {
+        if let Some(n) = slide_number(node_ref) {
+            if let Some(panel_item_ref) = panel_item_refs.get(n) {
+                if let Some(el) = panel_item_ref.get_untracked() {
+                    _ = el.child(item);
+                }
+            }
+        }
+    }
 }
