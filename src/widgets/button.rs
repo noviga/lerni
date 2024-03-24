@@ -7,8 +7,8 @@ const WIDTH: i32 = 400;
 const HEIGHT: i32 = 150;
 
 #[component]
-pub fn Button<CB>(
-    on_click: CB,
+pub fn Button(
+    #[prop(optional, into)] on_click: Option<Callback<MouseEvent>>,
     #[prop(optional)] text_bold: bool,
     #[prop(default = WIDTH)] width: i32,
     #[prop(default = HEIGHT)] height: i32,
@@ -17,15 +17,12 @@ pub fn Button<CB>(
     #[prop(default = 48.into(), into)] font_size: MaybeSignal<i32>,
     #[prop(default = Color::AliceBlue.into(), into)] color: MaybeSignal<Color>,
     #[prop(default = Color::Black.into(), into)] text_color: MaybeSignal<Color>,
-    #[prop(default = 12.into())] border_width: MaybeSignal<i32>,
+    #[prop(default = 12.into(), into)] border_width: MaybeSignal<i32>,
     #[prop(default = Color::RoyalBlue.into(), into)] border_color: MaybeSignal<Color>,
     #[prop(default = Align::Center)] align: Align,
     #[prop(default = VAlign::Middle)] valign: VAlign,
     children: Children,
-) -> impl IntoView
-where
-    CB: FnMut(MouseEvent) + 'static,
-{
+) -> impl IntoView {
     let f = use_frame();
 
     let width = if align == Align::Fill { f.width } else { width };
@@ -65,7 +62,12 @@ where
 
     view! {
         <rect
-            on:click=on_click
+            on:click=move |e| {
+                if let Some(cb) = on_click {
+                    cb.call(e);
+                }
+            }
+
             on:mousedown=on_mousedown
             on:mouseup=on_mouseup
             on:mouseleave=on_mouseup

@@ -20,17 +20,33 @@ pub fn Buttons() -> impl IntoView {
         <Slide>
             <Grid cols=3 rows=3>
                 <Button on_click=on_click>"Alice"</Button>
-                <Button width=300 height=300 radius=150 color=bob_color on_click=on_click>"Bob"</Button>
-                <Button font_size=72 text_color=Color::DarkCyan on_click=on_click>"Charlie"</Button>
+                <Button width=300 height=300 radius=150 color=bob_color on_click=on_click>
+                    "Bob"
+                </Button>
+                <Button font_size=72 text_color=Color::DarkCyan on_click=on_click>
+                    "Charlie"
+                </Button>
                 <Button on_click=on_click>
-                    <tspan font-size="96" fill="red" alignment-baseline="central">"Da"</tspan>
-                    <tspan font-size="80" alignment-baseline="central">"ve"</tspan>
+                    <tspan font-size="96" fill="red" alignment-baseline="central">
+                        "Da"
+                    </tspan>
+                    <tspan font-size="80" alignment-baseline="central">
+                        "ve"
+                    </tspan>
                 </Button>
                 <Label>{counter}</Label>
-                <Button text_bold=true align=Align::Right on_click=on_click>"Eve"</Button>
-                <Button align=Align::Right valign=VAlign::Bottom on_click=on_click>"Ferdie"</Button>
-                <Button color=Color::Honeydew border_color=Color::ForestGreen on_click=on_click>"George"</Button>
-                <Button align=Align::Fill valign=VAlign::Fill on_click=on_click>"Harry"</Button>
+                <Button text_bold=true align=Align::Right on_click=on_click>
+                    "Eve"
+                </Button>
+                <Button align=Align::Right valign=VAlign::Bottom on_click=on_click>
+                    "Ferdie"
+                </Button>
+                <Button color=Color::Honeydew border_color=Color::ForestGreen on_click=on_click>
+                    "George"
+                </Button>
+                <Button align=Align::Fill valign=VAlign::Fill on_click=on_click>
+                    "Harry"
+                </Button>
             </Grid>
         </Slide>
     }

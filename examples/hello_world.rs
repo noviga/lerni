@@ -40,8 +40,10 @@ pub fn Counter() -> impl IntoView {
         }
     });
 
+    let on_click = move |(x, y)| logging::log!("({}, {})", x, y);
+
     view! {
-        <Slide node_ref=node_ref>
+        <Slide node_ref=node_ref on_click=on_click>
             <Label>
                 "Counter (press 'Enter' and 'Escape' to change): " {move || counter.get()}
             </Label>

@@ -31,6 +31,7 @@ fmt:
 fmt-leptos:
 	@echo ──────────── Format Leptos ────────────────────
 	@find src -name "*.rs" -exec leptosfmt {} \;
+	@find examples -name "*.rs" -exec leptosfmt {} \;
 
 fmt-check:
 	@echo ──────────── Check format ─────────────────────

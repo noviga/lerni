@@ -15,7 +15,9 @@ pub fn GridExample() -> impl IntoView {
                     <tspan>"00"</tspan>
                     <tspan fill="red">"3"</tspan>
                 </Label>
-                <Label font_size=96 color=Color::Blue>"4"</Label>
+                <Label font_size=96 color=Color::Blue>
+                    "4"
+                </Label>
                 <Button
                     align=Align::Fill
                     valign=VAlign::Fill
@@ -38,9 +40,13 @@ pub fn GridExample() -> impl IntoView {
                         "12"
                     </Button>
                     <Label>"13"</Label>
-                    <Label align=Align::Left valign=VAlign::Top>"14"</Label>
+                    <Label align=Align::Left valign=VAlign::Top>
+                        "14"
+                    </Label>
                     <Label>"15"</Label>
-                    <Label align=Align::Right valign=VAlign::Bottom>"16"</Label>
+                    <Label align=Align::Right valign=VAlign::Bottom>
+                        "16"
+                    </Label>
                 </Grid>
             </Grid>
         </Slide>
