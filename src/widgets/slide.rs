@@ -23,6 +23,7 @@ pub fn Slide(
     #[prop(optional, into)] blur: MaybeSignal<bool>,
     #[prop(default = 15)] blur_radius: i32,
     #[prop(optional)] node_ref: Option<NodeRef<Div>>,
+    #[prop(optional, into)] on_click: Option<Callback<(i32, i32)>>,
     children: Children,
 ) -> impl IntoView {
     let metadata = use_context::<Metadata>();
@@ -59,6 +60,15 @@ pub fn Slide(
             });
         }
         set_pointer_position.set((px, py));
+    };
+    let on_mouse_click = move |e: MouseEvent| {
+        if let Some(cb) = on_click {
+            if let Some(svg) = svg_ref.get() {
+                let x = e.offset_x() * WIDTH / svg.client_width();
+                let y = e.offset_y() * HEIGHT / svg.client_height();
+                cb.call((x, y));
+            }
+        }
     };
     let (pointer_in, set_pointer_in) = create_signal(false);
     let pointer_visible = move || pointer.get() && pointer_in.get();
@@ -105,6 +115,7 @@ pub fn Slide(
                         on:mousemove=on_mousemove
                         on:mouseenter=move |_| set_pointer_in.set(true)
                         on:mouseleave=move |_| set_pointer_in.set(false)
+                        on:click=on_mouse_click
                         node_ref=svg_ref
                         viewBox=view_box
                         class="has-ratio"

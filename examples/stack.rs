@@ -6,8 +6,10 @@ pub fn StackExample() -> impl IntoView {
     view! {
         <Slide pointer=true>
             <Stack count=2>
-                <SvgFile width=128 height=64 scale=2.0 src=include_str!("logo.svg") />
-                <Label font_size=96 valign=VAlign::Top>"Hello,"</Label>
+                <SvgFile width=128 height=64 scale=2.0 src=include_str!("logo.svg")/>
+                <Label font_size=96 valign=VAlign::Top>
+                    "Hello,"
+                </Label>
             </Stack>
         </Slide>
     }
