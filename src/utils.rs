@@ -105,3 +105,16 @@ pub fn mount_on_panel(node_ref: NodeRef<Div>, item: impl IntoView) {
         }
     }
 }
+
+/// Get the strings from a view.
+pub fn view_to_strings(view: View) -> Vec<String> {
+    match view {
+        View::Text(text) => vec![text.content.into_owned()],
+        View::Component(component) => component
+            .children
+            .into_iter()
+            .flat_map(view_to_strings)
+            .collect(),
+        _ => Default::default(),
+    }
+}
