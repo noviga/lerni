@@ -7,7 +7,7 @@ pub fn HelloWorld() -> impl IntoView {
     view! {
         <SlideShow>
             <Slide background_color=Color::MistyRose>
-                <Label on_click=move |_| logging::log!("clicked")>"Hello →"</Label>
+                <Label>"Hello →"</Label>
             </Slide>
             <Slide background_color=Color::PaleGreen>
                 <Label>"← World!"</Label>
