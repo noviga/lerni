@@ -5,7 +5,7 @@ use leptos::*;
 use wasm_bindgen::JsValue;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, MouseEvent};
 
-use crate::{use_frame, Color, Frame, SvgFrame};
+use crate::{use_frame, utils, Color, Frame, SvgFrame};
 
 struct TextProperties<'a> {
     bold: bool,
@@ -55,13 +55,13 @@ pub fn Text(
         indent,
     };
     let canvas = canvas_context(&props);
-    let children = children().nodes;
+    let children = children().nodes.collect_view();
     let f = use_frame();
     let Output {
         words,
         rects,
         letter_counters,
-    } = wrap(&children, &canvas, &props, &f);
+    } = wrap(children, &canvas, &props, &f);
 
     letters_total.set(letter_counters.iter().sum());
 
@@ -195,18 +195,12 @@ fn text_width(text: &str, canvas: &CanvasRenderingContext2d) -> i32 {
 }
 
 fn wrap(
-    children: &[View],
+    children: View,
     canvas: &CanvasRenderingContext2d,
     props: &TextProperties,
     frame: &Frame,
 ) -> Output {
-    let children = children.iter().map(|item| {
-        if let View::Text(text) = item {
-            text.content.clone()
-        } else {
-            Default::default()
-        }
-    });
+    let children = utils::view_to_strings(children);
 
     let mut y = frame.y;
     let mut words = Vec::new();

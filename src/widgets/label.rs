@@ -1,4 +1,5 @@
 use leptos::*;
+use web_sys::MouseEvent;
 
 use crate::{use_frame, Align, Color, Size, VAlign};
 
@@ -10,6 +11,7 @@ pub fn Label(
     #[prop(default = Align::Center)] align: Align,
     #[prop(default = VAlign::Middle)] valign: VAlign,
     #[prop(default = Color::Black.into(), into)] color: MaybeSignal<Color>,
+    #[prop(optional, into)] on_click: Option<Callback<MouseEvent>>,
     children: Children,
 ) -> impl IntoView {
     let f = use_frame();
@@ -26,6 +28,20 @@ pub fn Label(
     };
 
     view! {
+        <rect
+            x=f.x
+            y=f.y
+            width=f.width
+            height=f.height
+            fill="transparent"
+            stroke="none"
+            on:click=move |e| {
+                if let Some(cb) = on_click {
+                    cb.call(e);
+                }
+            }
+        >
+        </rect>
         <text
             class:has-text-weight-bold=bold
             style:font-family=font
@@ -38,6 +54,7 @@ pub fn Label(
             pointer-events="none"
             style="user-select: none; -webkit-user-select: none;"
         >
+
             {children()}
         </text>
     }
