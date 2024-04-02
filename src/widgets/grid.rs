@@ -40,12 +40,8 @@ pub fn Grid(
         }
     }
 
-    children()
-        .nodes
-        .into_iter()
-        .take(max)
-        .enumerate()
-        .map(|(i, child)| {
+    let border = (0..max)
+        .map(|i| {
             let x = f.x + border_width / 2 + (width + spacing) * (i as i32 % cols);
             let y = f.y + border_width / 2 + (height + spacing) * (i as i32 / cols);
             view! {
@@ -58,8 +54,12 @@ pub fn Grid(
                     stroke=border_color
                     stroke-width=border_width
                 ></rect>
-                {child}
             }
         })
-        .collect_view()
+        .collect_view();
+
+    view! {
+        {border}
+        {children()}
+    }
 }

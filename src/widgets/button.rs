@@ -1,7 +1,7 @@
 use leptos::*;
 use web_sys::MouseEvent;
 
-use crate::{provide_frame, use_frame, Align, Color, Frame, Label, VAlign};
+use crate::{provide_frame, use_frame, Align, Color, Frame, Label, Size, VAlign};
 
 const WIDTH: i32 = 400;
 const HEIGHT: i32 = 150;
@@ -10,11 +10,12 @@ const HEIGHT: i32 = 150;
 pub fn Button(
     #[prop(optional, into)] on_click: Option<Callback<MouseEvent>>,
     #[prop(optional)] text_bold: bool,
-    #[prop(default = WIDTH)] width: i32,
-    #[prop(default = HEIGHT)] height: i32,
-    #[prop(default = 24)] radius: i32,
+    #[prop(optional, into)] width: Option<Size>,
+    #[prop(optional, into)] height: Option<Size>,
+    #[prop(optional, into)] radius: Option<i32>,
+    #[prop(default = false)] rounded: bool,
     #[prop(optional)] font: String,
-    #[prop(default = 48.into(), into)] font_size: MaybeSignal<i32>,
+    #[prop(default = 48.into(), into)] font_size: Size,
     #[prop(default = Color::AliceBlue.into(), into)] color: MaybeSignal<Color>,
     #[prop(default = Color::Black.into(), into)] text_color: MaybeSignal<Color>,
     #[prop(default = 12.into(), into)] border_width: MaybeSignal<i32>,
@@ -25,11 +26,30 @@ pub fn Button(
 ) -> impl IntoView {
     let f = use_frame();
 
-    let width = if align == Align::Fill { f.width } else { width };
-    let height = if valign == VAlign::Fill {
-        f.height
+    let width = width.map(|s| s.into_pixels(f.width));
+    let height = height.map(|s| s.into_pixels(f.height));
+
+    let size = if rounded {
+        width.or(height).or(radius.map(|r| r * 2))
     } else {
-        height
+        None
+    };
+
+    let (width, height, radius) = if rounded {
+        let size = size.unwrap_or(WIDTH);
+        (size, size, size / 2)
+    } else {
+        let width = if align == Align::Fill {
+            f.width
+        } else {
+            width.unwrap_or(WIDTH)
+        };
+        let height = if valign == VAlign::Fill {
+            f.height
+        } else {
+            height.unwrap_or(HEIGHT)
+        };
+        (width, height, radius.unwrap_or(24))
     };
 
     let x = match align {

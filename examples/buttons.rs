@@ -20,7 +20,7 @@ pub fn Buttons() -> impl IntoView {
         <Slide>
             <Grid cols=3 rows=3>
                 <Button on_click=on_click>"Alice"</Button>
-                <Button width=300 height=300 radius=150 color=bob_color on_click=on_click>
+                <Button width=300 rounded=true color=bob_color on_click=on_click>
                     "Bob"
                 </Button>
                 <Button font_size=72 text_color=Color::DarkCyan on_click=on_click>
@@ -34,11 +34,16 @@ pub fn Buttons() -> impl IntoView {
                         "ve"
                     </tspan>
                 </Button>
-                <Label>{counter}</Label>
+                <Label font_size=Size::Percent(50)>{counter}</Label>
                 <Button text_bold=true align=Align::Right on_click=on_click>
                     "Eve"
                 </Button>
-                <Button align=Align::Right valign=VAlign::Bottom on_click=on_click>
+                <Button
+                    width=Size::Percent(50)
+                    align=Align::Right
+                    valign=VAlign::Bottom
+                    on_click=on_click
+                >
                     "Ferdie"
                 </Button>
                 <Button color=Color::Honeydew border_color=Color::ForestGreen on_click=on_click>
