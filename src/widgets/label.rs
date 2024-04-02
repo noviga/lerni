@@ -1,12 +1,12 @@
 use leptos::*;
 
-use crate::{use_frame, Align, Color, VAlign};
+use crate::{use_frame, Align, Color, Size, VAlign};
 
 #[component]
 pub fn Label(
     #[prop(optional)] bold: bool,
     #[prop(optional)] font: String,
-    #[prop(default = 48.into(), into)] font_size: MaybeSignal<i32>,
+    #[prop(default = 48.into(), into)] font_size: Size,
     #[prop(default = Align::Center)] align: Align,
     #[prop(default = VAlign::Middle)] valign: VAlign,
     #[prop(default = Color::Black.into(), into)] color: MaybeSignal<Color>,
@@ -31,7 +31,7 @@ pub fn Label(
             style:font-family=font
             x=x
             y=y
-            font-size=font_size
+            font-size=move || font_size.into_pixels(f.height)
             text-anchor=anchor
             fill=color
             dominant-baseline=baseline

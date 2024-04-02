@@ -33,6 +33,31 @@ pub struct Metadata {
     pub pointer: bool,
 }
 
+/// Size in pixels or percent.
+#[derive(Clone, Copy, Debug)]
+pub enum Size {
+    /// Size in pixels.
+    Pixels(i32),
+    /// Size in percent.
+    Percent(i32),
+}
+
+impl From<i32> for Size {
+    fn from(value: i32) -> Self {
+        Size::Pixels(value)
+    }
+}
+
+impl Size {
+    /// Converts the size to pixels.
+    pub fn into_pixels(self, total: i32) -> i32 {
+        match self {
+            Size::Pixels(value) => value,
+            Size::Percent(value) => total * value / 100,
+        }
+    }
+}
+
 /// Calculates the width of the slide.
 pub fn calc_width(x_margin: i32, y_margin: i32) -> i32 {
     let elem = web_sys::window()
