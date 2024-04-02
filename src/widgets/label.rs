@@ -54,7 +54,6 @@ pub fn Label(
             pointer-events="none"
             style="user-select: none; -webkit-user-select: none;"
         >
-
             {children()}
         </text>
     }
