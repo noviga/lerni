@@ -5,7 +5,7 @@ use crate::{use_frame, Align, Color, Size, VAlign};
 #[component]
 pub fn Label(
     #[prop(optional)] bold: bool,
-    #[prop(optional)] font: String,
+    #[prop(default = "sans-serif".to_string(), into)] font: String,
     #[prop(default = 48.into(), into)] font_size: Size,
     #[prop(default = Align::Center)] align: Align,
     #[prop(default = VAlign::Middle)] valign: VAlign,

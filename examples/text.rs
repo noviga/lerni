@@ -36,6 +36,7 @@ pub fn TextExample() -> impl IntoView {
                         font_size=48
                         bold=true
                         font="serif"
+                        valign=VAlign::Middle
                         words_read=words_read2
                         letters_read=letters_read2
                         letters_total=letters_total2
@@ -47,6 +48,7 @@ pub fn TextExample() -> impl IntoView {
                     <Text
                         font_size=48
                         erase_top=0.3
+                        valign=VAlign::Bottom
                         words_read=words_read3
                         letters_read=letters_read3
                         letters_total=letters_total3
