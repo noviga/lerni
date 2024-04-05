@@ -66,12 +66,8 @@ pub fn Column(
         }
     }
 
-    children()
-        .nodes
-        .into_iter()
-        .take(rows)
-        .enumerate()
-        .map(|(i, child)| {
+    let border = (0..rows)
+        .map(|i| {
             let Frame {
                 x,
                 y,
@@ -88,8 +84,12 @@ pub fn Column(
                     stroke=border_color
                     stroke-width=border_width
                 ></rect>
-                {child}
             }
         })
-        .collect_view()
+        .collect_view();
+
+    view! {
+        {border}
+        {children()}
+    }
 }

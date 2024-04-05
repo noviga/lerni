@@ -5,7 +5,7 @@ use leptos::*;
 use wasm_bindgen::JsValue;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, MouseEvent};
 
-use crate::{use_frame, utils, Color, Frame, SvgFrame};
+use crate::{use_frame, utils, Color, Frame, SvgFrame, VAlign};
 
 struct TextProperties<'a> {
     bold: bool,
@@ -38,6 +38,7 @@ pub fn Text(
     #[prop(default = "sans-serif".to_string(), into)] font: String,
     #[prop(default = 1.2)] line_height: f32,
     #[prop(default = 1.4)] indent: f32,
+    #[prop(default = VAlign::Top)] valign: VAlign,
     #[prop(default = Color::PaleGreen)] marker_color: Color,
     #[prop(optional)] lattice: bool,
     #[prop(optional)] erase_top: f32,
@@ -61,7 +62,7 @@ pub fn Text(
         words,
         rects,
         letter_counters,
-    } = wrap(children, &canvas, &props, &f);
+    } = wrap(children, &canvas, &props, &f, &valign);
 
     letters_total.set(letter_counters.iter().sum());
 
@@ -199,6 +200,7 @@ fn wrap(
     canvas: &CanvasRenderingContext2d,
     props: &TextProperties,
     frame: &Frame,
+    valign: &VAlign,
 ) -> Output {
     let children = utils::view_to_strings(children);
 
@@ -252,6 +254,28 @@ fn wrap(
         }
 
         y += dy;
+    }
+    let dy = match valign {
+        VAlign::Middle => {
+            if let Some(last_rect) = rects.last() {
+                let total_height = last_rect.y + last_rect.height - frame.y;
+                (frame.height - total_height) / 2
+            } else {
+                0
+            }
+        }
+        VAlign::Bottom => {
+            if let Some(last_rect) = rects.last() {
+                let total_height = last_rect.y + last_rect.height - frame.y;
+                frame.height - total_height
+            } else {
+                0
+            }
+        }
+        _ => 0,
+    };
+    for r in &mut rects {
+        r.y += dy;
     }
     Output {
         rects: Rc::new(rects),
