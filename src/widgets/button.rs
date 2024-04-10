@@ -9,6 +9,8 @@ const HEIGHT: i32 = 150;
 #[component]
 pub fn Button(
     #[prop(optional, into)] on_click: Option<Callback<MouseEvent>>,
+    #[prop(optional, into)] on_mousedown: Option<Callback<MouseEvent>>,
+    #[prop(optional, into)] on_mouseup: Option<Callback<MouseEvent>>,
     #[prop(optional)] text_bold: bool,
     #[prop(optional, into)] width: Option<Size>,
     #[prop(optional, into)] height: Option<Size>,
@@ -77,8 +79,18 @@ pub fn Button(
     let height = height - border_width.get();
 
     let (border, set_border) = create_signal(border_width.get());
-    let on_mousedown = move |_| set_border.set(border_width.get() + 6);
-    let on_mouseup = move |_| set_border.set(border_width.get());
+    let on_mousedown = move |e| {
+        set_border.set(border_width.get() + 6);
+        if let Some(cb) = on_mousedown {
+            cb.call(e);
+        }
+    };
+    let on_mouseup = move |e| {
+        set_border.set(border_width.get());
+        if let Some(cb) = on_mouseup {
+            cb.call(e);
+        }
+    };
 
     view! {
         <rect

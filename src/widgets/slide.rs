@@ -6,7 +6,7 @@ use leptos::{
 };
 use leptos_use::*;
 
-use crate::{provide_frame, Color, Frame, Metadata, SvgFrame};
+use crate::{is_active_slide, provide_frame, Color, Frame, PointerSignal, RefreshSignal, SvgFrame};
 
 const WIDTH: i32 = 1920;
 const HEIGHT: i32 = 1080;
@@ -19,17 +19,21 @@ pub fn Slide(
     #[prop(default = HEIGHT)] height: i32,
     #[prop(optional)] background_color: Color,
     #[prop(optional, into)] background_image: String,
-    #[prop(optional, into)] pointer: MaybeSignal<bool>,
     #[prop(optional, into)] blur: MaybeSignal<bool>,
     #[prop(default = 15)] blur_radius: i32,
     #[prop(optional)] node_ref: Option<NodeRef<Div>>,
     #[prop(optional, into)] on_click: Option<Callback<(i32, i32)>>,
+    #[prop(optional, into)] on_refresh: Option<Callback<()>>,
     children: Children,
 ) -> impl IntoView {
-    let metadata = use_context::<Metadata>();
+    let refresh_signal = use_context::<RefreshSignal>();
+    let pointer_signal = use_context::<PointerSignal>();
     let (slide_width, set_slide_width) = create_signal(crate::calc_width(0, SLIDE_MARGIN));
-    if metadata.is_none() {
-        // Standalone slide usage (not within a slideshow)
+
+    // Standalone slide usage (not within a slideshow)
+    let is_standalone = pointer_signal.is_none();
+
+    if is_standalone {
         _ = use_event_listener(window(), resize, move |_| {
             set_slide_width.set(crate::calc_width(0, SLIDE_MARGIN));
         });
@@ -71,7 +75,8 @@ pub fn Slide(
         }
     };
     let (pointer_in, set_pointer_in) = create_signal(false);
-    let pointer_visible = move || pointer.get() && pointer_in.get();
+    let pointer_visible =
+        move || pointer_signal.map(|s| s.0.get()).unwrap_or_default() && pointer_in.get();
 
     let blur_style = move || {
         let radius = if blur.get() { blur_radius } else { 0 };
@@ -96,16 +101,23 @@ pub fn Slide(
 
     let node_ref = node_ref.unwrap_or_else(create_node_ref);
 
+    create_effect(move |_| {
+        if let Some(refresh) = refresh_signal {
+            refresh.0.get();
+        }
+        if is_active_slide(node_ref) {
+            if let Some(cb) = on_refresh {
+                cb.call(())
+            }
+        }
+    });
+
     view! {
         <div
             node_ref=node_ref
             class="container pl-4 mt-4 pr-4"
             style:max-width=move || {
-                if metadata.is_none() {
-                    format!("{}px", slide_width.get())
-                } else {
-                    "100%".to_string()
-                }
+                if is_standalone { format!("{}px", slide_width.get()) } else { "100%".to_string() }
             }
         >
 

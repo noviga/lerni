@@ -24,14 +24,7 @@ pub use stack::Stack;
 pub use svg::{Svg, SvgFile};
 pub use text::Text;
 
-/// Additional information provided to all slides.
-#[derive(Clone, Copy, Default, Debug, PartialEq)]
-pub struct Metadata {
-    /// Teacher mode flag.
-    pub teacher_mode: bool,
-    /// Pointer on/off flag.
-    pub pointer: bool,
-}
+use leptos::ReadSignal;
 
 /// Size in pixels or percent.
 #[derive(Clone, Copy, Debug)]
@@ -55,6 +48,24 @@ impl Size {
             Size::Pixels(value) => value,
             Size::Percent(value) => total * value / 100,
         }
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub(crate) struct PointerSignal(ReadSignal<bool>);
+
+impl PointerSignal {
+    pub fn new(signal: ReadSignal<bool>) -> Self {
+        PointerSignal(signal)
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub(crate) struct RefreshSignal(ReadSignal<()>);
+
+impl RefreshSignal {
+    pub fn new(signal: ReadSignal<()>) -> Self {
+        RefreshSignal(signal)
     }
 }
 

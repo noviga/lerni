@@ -1,6 +1,6 @@
 [package]
 name = "lerni"
-version = "0.0.3"
+version = "0.0.4"
 edition = "2021"
 license = "MIT"
 description = "Lerni content framework"
@@ -41,10 +41,6 @@ crate-type = ["cdylib"]
 
 [[example]]
 name = "hello_world"
-crate-type = ["cdylib"]
-
-[[example]]
-name = "pointer"
 crate-type = ["cdylib"]
 
 [[example]]
