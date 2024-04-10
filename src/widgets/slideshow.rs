@@ -6,19 +6,19 @@ use leptos_use::*;
 use std::collections::BTreeSet;
 use web_sys::MouseEvent;
 
-use crate::Metadata;
+use crate::{PointerSignal, RefreshSignal};
 
 const BUTTON_COUNT: usize = 6;
 const PAGINATION_WIDTH: i32 = 40;
 const CONTROL_PANEL_HEIGHT: i32 = 64;
 
 #[component]
-pub fn SlideShow(
-    #[prop(optional)] current: usize,
-    #[prop(optional)] teacher_mode: bool,
-    #[prop(optional)] pointer: bool,
-    children: Children,
-) -> impl IntoView {
+pub fn SlideShow(#[prop(optional)] current: usize, children: Children) -> impl IntoView {
+    let refresh = create_rw_signal(());
+    provide_context(RefreshSignal::new(refresh.read_only()));
+    let pointer = create_rw_signal(true);
+    provide_context(PointerSignal::new(pointer.read_only()));
+
     let page = create_rw_signal(current);
     let children = children().nodes;
     let count = children.len();
@@ -39,12 +39,6 @@ pub fn SlideShow(
     _ = use_event_listener(window(), resize, move |_| {
         set_width.set(crate::calc_width(PAGINATION_WIDTH, CONTROL_PANEL_HEIGHT));
     });
-
-    let metadata = Metadata {
-        teacher_mode,
-        pointer,
-    };
-    provide_context(metadata);
 
     let mut panel_items = Vec::with_capacity(count);
     let mut panel_item_refs = Vec::with_capacity(count);
@@ -77,7 +71,9 @@ pub fn SlideShow(
 
             <div class="columns is-gapless is-mobile">
                 <div class="column is-rest">
-                    {children} <ControlPanel>{panel_items}</ControlPanel>
+                    {children} <ControlPanel refresh=refresh pointer=pointer>
+                        {panel_items}
+                    </ControlPanel>
                 </div>
                 <div class="pl-0 mt-4 pr-0" style:width="40px">
                     <Pagination page=page count=count/>
@@ -88,7 +84,11 @@ pub fn SlideShow(
 }
 
 #[component]
-fn ControlPanel(children: Children) -> impl IntoView {
+fn ControlPanel(
+    refresh: RwSignal<()>,
+    pointer: RwSignal<bool>,
+    children: Children,
+) -> impl IntoView {
     view! {
         <div class="container pl-4 mt-4 pr-4" style="max-width: 100%;">
             <div class="field is-grouped">
@@ -100,9 +100,25 @@ fn ControlPanel(children: Children) -> impl IntoView {
                     </button>
                 </p>
                 <p class="control">
-                    <button class="button is-rounded is-danger">
+                    <button
+                        class="button is-rounded is-danger"
+                        on:mousedown=move |e| e.prevent_default()
+                        on:click=move |_| refresh.set(())
+                    >
                         <span class="icon">
                             <i class="fas fa-lg fa-refresh"></i>
+                        </span>
+                    </button>
+                </p>
+                <p class="control">
+                    <button
+                        class="button is-rounded is-warning"
+                        class:is-inverted=move || pointer.get()
+                        on:mousedown=move |e| e.prevent_default()
+                        on:click=move |_| pointer.update(|pointer| *pointer = !*pointer)
+                    >
+                        <span class="icon">
+                            <i class="far fa-lg fa-dot-circle"></i>
                         </span>
                     </button>
                 </p>

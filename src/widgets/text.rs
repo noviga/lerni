@@ -44,8 +44,10 @@ pub fn Text(
     #[prop(optional)] erase_top: f32,
     #[prop(optional)] erase_bottom: f32,
     #[prop(optional, into)] words_read: RwSignal<usize>,
+    #[prop(optional, into)] word_count: RwSignal<usize>,
     #[prop(optional, into)] letters_read: RwSignal<usize>,
     #[prop(optional, into)] letters_total: RwSignal<usize>,
+    #[prop(optional, into)] on_click: Option<Callback<MouseEvent>>,
     children: Children,
 ) -> impl IntoView {
     let props = TextProperties {
@@ -65,6 +67,7 @@ pub fn Text(
     } = wrap(children, &canvas, &props, &f, &valign);
 
     letters_total.set(letter_counters.iter().sum());
+    word_count.set(words.len());
 
     let word = |i, r: &Rect, hidden| {
         view! {
@@ -112,11 +115,15 @@ pub fn Text(
             if x >= f.x && x <= f.x + f.width && y >= f.y && y <= f.y + f.height {
                 if let Some(index) = find_word_index(x, y, &r) {
                     words_read.set(index + 1);
-                    letters_read.set(letter_counters[0..index + 1].iter().sum());
                 }
             }
         }
+        if let Some(cb) = on_click {
+            cb.call(e);
+        }
     };
+
+    create_effect(move |_| letters_read.set(letter_counters[0..words_read.get()].iter().sum()));
 
     let expand = text_width(" ", &canvas) / 2 + 1;
 
