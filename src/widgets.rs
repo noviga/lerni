@@ -3,6 +3,7 @@
 mod button;
 mod column;
 mod grid;
+mod image;
 mod label;
 mod row;
 mod slide;
@@ -15,6 +16,7 @@ mod text;
 pub use button::Button;
 pub use column::Column;
 pub use grid::Grid;
+pub use image::Image;
 pub use label::Label;
 pub use row::Row;
 pub use slide::Slide;

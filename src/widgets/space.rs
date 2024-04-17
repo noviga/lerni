@@ -1,19 +1,11 @@
-use leptos::{component, view, IntoView};
+use leptos::{component, IntoView, View};
 
 use crate::use_frame;
 
 #[component]
-pub fn Space(#[prop(optional, into)] image: String) -> impl IntoView {
-    let f = use_frame();
+pub fn Space() -> impl IntoView {
+    // We need to pop the frame to avoid overlapping with the next widget.
+    _ = use_frame();
 
-    view! {
-        <image
-            href=image
-            x=f.x
-            y=f.y
-            width=f.width
-            height=f.height
-            preserveAspectRatio="meet xMaxYMax"
-        ></image>
-    }
+    View::default()
 }

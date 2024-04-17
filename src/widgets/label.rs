@@ -10,6 +10,8 @@ pub fn Label(
     #[prop(default = Align::Center)] align: Align,
     #[prop(default = VAlign::Middle)] valign: VAlign,
     #[prop(default = Color::Black.into(), into)] color: MaybeSignal<Color>,
+    #[prop(default = true.into(), into)] visible: MaybeSignal<bool>,
+    #[prop(default = "all .3s".to_string(), into)] transition: String,
     children: Children,
 ) -> impl IntoView {
     let f = use_frame();
@@ -26,19 +28,25 @@ pub fn Label(
     };
 
     view! {
-        <text
-            class:has-text-weight-bold=bold
-            style:font-family=font
-            x=x
-            y=y
-            font-size=move || font_size.into_pixels(f.height)
-            text-anchor=anchor
-            fill=color
-            dominant-baseline=baseline
-            pointer-events="none"
-            style="user-select: none; -webkit-user-select: none;"
+        <g
+            style:opacity=move || if visible.get() { 1 } else { 0 }
+            style:visibility=move || { if visible.get() { "visible" } else { "hidden" } }
+            style:transition=transition
         >
-            {children()}
-        </text>
+            <text
+                class:has-text-weight-bold=bold
+                style:font-family=font
+                x=x
+                y=y
+                font-size=move || font_size.into_pixels(f.height)
+                text-anchor=anchor
+                fill=color
+                dominant-baseline=baseline
+                pointer-events="none"
+                style="user-select: none; -webkit-user-select: none;"
+            >
+                {children()}
+            </text>
+        </g>
     }
 }

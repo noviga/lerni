@@ -24,6 +24,10 @@ pub fn Button(
     #[prop(default = Color::RoyalBlue.into(), into)] border_color: MaybeSignal<Color>,
     #[prop(default = Align::Center)] align: Align,
     #[prop(default = VAlign::Middle)] valign: VAlign,
+    #[prop(optional)] margin: i32,
+    #[prop(optional, into)] image: MaybeSignal<String>,
+    #[prop(default = true.into(), into)] visible: MaybeSignal<bool>,
+    #[prop(default = "all .3s".to_string(), into)] transition: String,
     children: Children,
 ) -> impl IntoView {
     let f = use_frame();
@@ -66,10 +70,10 @@ pub fn Button(
     };
 
     let frame = Frame {
-        x,
-        y,
-        width,
-        height,
+        x: x + margin,
+        y: y + margin,
+        width: width - 2 * margin,
+        height: height - 2 * margin,
     };
     provide_frame(frame);
 
@@ -93,29 +97,47 @@ pub fn Button(
     };
 
     view! {
-        <rect
-            on:click=move |e| {
-                if let Some(cb) = on_click {
-                    cb.call(e);
+        <g
+            style:opacity=move || if visible.get() { 1 } else { 0 }
+            style:visibility=move || { if visible.get() { "visible" } else { "hidden" } }
+            style:transition=transition
+        >
+            <rect
+                on:click=move |e| {
+                    if let Some(cb) = on_click {
+                        cb.call(e);
+                    }
                 }
-            }
 
-            on:mousedown=on_mousedown
-            on:mouseup=on_mouseup
-            on:mouseleave=on_mouseup
-            x=x
-            y=y
-            width=width
-            height=height
-            rx=radius
-            ry=radius
-            fill=color
-            stroke=border_color
-            stroke-width=move || border.get()
-            style="cursor: pointer;"
-        ></rect>
-        <Label bold=text_bold color=text_color font=font font_size=font_size>
-            {children()}
-        </Label>
+                on:mousedown=on_mousedown
+                on:mouseup=on_mouseup
+                on:mouseleave=on_mouseup
+                x=x
+                y=y
+                width=width
+                height=height
+                rx=radius
+                ry=radius
+                fill=color
+                stroke=border_color
+                stroke-width=move || border.get()
+                style="cursor: pointer;"
+            ></rect>
+            <image
+                stroke=border_color
+                stroke-width=4
+                href=image
+                x=x + margin
+                y=y + margin
+                width=width - 2 * margin
+                height=height - 2 * margin
+                preserveAspectRatio="xMidYMid meet"
+                pointer-events="none"
+                style="user-select: none; -webkit-user-select: none;"
+            ></image>
+            <Label bold=text_bold color=text_color font=font font_size=font_size>
+                {children()}
+            </Label>
+        </g>
     }
 }

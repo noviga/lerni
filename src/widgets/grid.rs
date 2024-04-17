@@ -11,6 +11,8 @@ pub fn Grid(
     #[prop(default = Color::Black)] border_color: Color,
     #[prop(optional)] spacing: i32,
     #[prop(optional)] padding: i32,
+    #[prop(default = true.into(), into)] visible: MaybeSignal<bool>,
+    #[prop(default = "all .3s".to_string(), into)] transition: String,
     children: Children,
 ) -> impl IntoView {
     let f = use_frame();
@@ -59,7 +61,13 @@ pub fn Grid(
         .collect_view();
 
     view! {
-        {border}
-        {children()}
+        <g
+            style:opacity=move || if visible.get() { 1 } else { 0 }
+            style:visibility=move || { if visible.get() { "visible" } else { "hidden" } }
+            style:transition=transition
+        >
+            {border}
+            {children()}
+        </g>
     }
 }

@@ -8,7 +8,7 @@ pub fn Buttons() -> impl IntoView {
         logging::log!("Clicked");
         set_counter.set(counter.get() + 1);
     };
-    let bob_color = create_memo(move |_| {
+    let bob_color = Signal::derive(move || {
         if counter.get() % 2 == 0 {
             Color::LightCoral
         } else {
@@ -19,7 +19,9 @@ pub fn Buttons() -> impl IntoView {
     view! {
         <Slide>
             <Grid cols=3 rows=3>
-                <Button on_click=on_click>"Alice"</Button>
+                <Button on_click=on_click visible=Signal::derive(move || counter.get() % 2 == 0)>
+                    "Alice"
+                </Button>
                 <Button width=300 rounded=true color=bob_color on_click=on_click>
                     "Bob"
                 </Button>
@@ -49,7 +51,13 @@ pub fn Buttons() -> impl IntoView {
                 <Button color=Color::Honeydew border_color=Color::ForestGreen on_click=on_click>
                     "George"
                 </Button>
-                <Button align=Align::Fill valign=VAlign::Fill on_click=on_click>
+                <Button
+                    align=Align::Fill
+                    valign=VAlign::Fill
+                    on_click=on_click
+                    image="/img/lerni-bg.svg"
+                    margin=20
+                >
                     "Harry"
                 </Button>
             </Grid>

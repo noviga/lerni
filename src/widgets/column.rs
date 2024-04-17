@@ -11,6 +11,8 @@ pub fn Column(
     #[prop(optional)] stretch: Vec<i32>,
     #[prop(optional)] spacing: i32,
     #[prop(optional)] padding: i32,
+    #[prop(default = true.into(), into)] visible: MaybeSignal<bool>,
+    #[prop(default = "all .3s".to_string(), into)] transition: String,
     children: Children,
 ) -> impl IntoView {
     if rows.is_none() && stretch.is_empty() {
@@ -89,7 +91,13 @@ pub fn Column(
         .collect_view();
 
     view! {
-        {border}
-        {children()}
+        <g
+            style:opacity=move || if visible.get() { 1 } else { 0 }
+            style:visibility=move || { if visible.get() { "visible" } else { "hidden" } }
+            style:transition=transition
+        >
+            {border}
+            {children()}
+        </g>
     }
 }
