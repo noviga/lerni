@@ -48,6 +48,8 @@ pub fn Text(
     #[prop(optional, into)] letters_read: RwSignal<usize>,
     #[prop(optional, into)] letters_total: RwSignal<usize>,
     #[prop(optional, into)] on_click: Option<Callback<MouseEvent>>,
+    #[prop(default = true.into(), into)] visible: MaybeSignal<bool>,
+    #[prop(default = "all .3s".to_string(), into)] transition: String,
     children: Children,
 ) -> impl IntoView {
     let props = TextProperties {
@@ -128,56 +130,62 @@ pub fn Text(
     let expand = text_width(" ", &canvas) / 2 + 1;
 
     view! {
-        <rect x=f.x y=f.y width=f.width height=f.height fill="white" on:click=on_click></rect>
-        {rects.iter().enumerate().map(|(i, r)| word(i, r, false)).collect_view()}
-        {(erase_top > 0.0 || erase_bottom > 0.0)
-            .then(|| { rects.iter().map(erase).collect_view() })}
+        <g
+            style:opacity=move || if visible.get() { 1 } else { 0 }
+            style:visibility=move || { if visible.get() { "visible" } else { "hidden" } }
+            style:transition=transition
+        >
+            <rect x=f.x y=f.y width=f.width height=f.height fill="white" on:click=on_click></rect>
+            {rects.iter().enumerate().map(|(i, r)| word(i, r, false)).collect_view()}
+            {(erase_top > 0.0 || erase_bottom > 0.0)
+                .then(|| { rects.iter().map(erase).collect_view() })}
 
-        {lattice
-            .then(|| {
-                let width = font_size / 2;
-                let dx = 5 * width;
-                let count = f.width / dx;
-                (0..count)
-                    .map(|i| {
-                        view! {
-                            <rect
-                                x=f.x + dx / 2 + i * dx
-                                y=f.y
-                                width=width
-                                height=f.height
-                                rx=width / 2
-                                stroke=color
-                                stroke-width="6"
-                                fill="white"
-                                pointer-events="none"
-                            ></rect>
-                        }
-                    })
-                    .collect_view()
-            })}
+            {lattice
+                .then(|| {
+                    let width = font_size / 2;
+                    let dx = 5 * width;
+                    let count = f.width / dx;
+                    (0..count)
+                        .map(|i| {
+                            view! {
+                                <rect
+                                    x=f.x + dx / 2 + i * dx
+                                    y=f.y
+                                    width=width
+                                    height=f.height
+                                    rx=width / 2
+                                    stroke=color
+                                    stroke-width="6"
+                                    fill="white"
+                                    pointer-events="none"
+                                ></rect>
+                            }
+                        })
+                        .collect_view()
+                })}
 
-        {rects
-            .iter()
-            .enumerate()
-            .map(|(i, r)| {
-                view! {
-                    <rect
-                        visibility=move || { (i >= words_read.get()).then_some("hidden") }
-                        x=r.x - expand
-                        y=r.y - expand
-                        width=r.width + 2 * expand
-                        height=r.height + 2 * expand
-                        rx=expand
-                        ry=expand
-                        fill=marker_color
-                        pointer-events="none"
-                    ></rect>
-                }
-            })
-            .collect_view()}
+            {rects
+                .iter()
+                .enumerate()
+                .map(|(i, r)| {
+                    view! {
+                        <rect
+                            visibility=move || { (i >= words_read.get()).then_some("hidden") }
+                            x=r.x - expand
+                            y=r.y - expand
+                            width=r.width + 2 * expand
+                            height=r.height + 2 * expand
+                            rx=expand
+                            ry=expand
+                            fill=marker_color
+                            pointer-events="none"
+                        ></rect>
+                    }
+                })
+                .collect_view()}
 
-        {rects.iter().enumerate().map(|(i, r)| word(i, r, true)).collect_view()}
+            {rects.iter().enumerate().map(|(i, r)| word(i, r, true)).collect_view()}
+        </g>
     }
 }
 

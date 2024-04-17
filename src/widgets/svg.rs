@@ -22,6 +22,8 @@ pub fn Svg(
     #[prop(default = 1.0)] scale: f32,
     #[prop(optional)] flip_x: bool,
     #[prop(optional)] flip_y: bool,
+    #[prop(default = true.into(), into)] visible: MaybeSignal<bool>,
+    #[prop(default = "all .3s".to_string(), into)] transition: String,
     children: Children,
 ) -> impl IntoView {
     let f = use_frame();
@@ -36,7 +38,16 @@ pub fn Svg(
     };
     let transform = calc_transform(&f, &props);
 
-    view! { <g transform=transform>{children()}</g> }
+    view! {
+        <g
+            transform=transform
+            style:opacity=move || if visible.get() { 1 } else { 0 }
+            style:visibility=move || { if visible.get() { "visible" } else { "hidden" } }
+            style:transition=transition
+        >
+            {children()}
+        </g>
+    }
 }
 
 /// SVG-from-file widget.
@@ -49,6 +60,8 @@ pub fn SvgFile(
     #[prop(default = 1.0)] scale: f32,
     #[prop(optional)] flip_x: bool,
     #[prop(optional)] flip_y: bool,
+    #[prop(default = true.into(), into)] visible: MaybeSignal<bool>,
+    #[prop(default = "all .3s".to_string(), into)] transition: String,
     src: &'static str,
 ) -> impl IntoView {
     let f = use_frame();
@@ -63,7 +76,15 @@ pub fn SvgFile(
     };
     let transform = calc_transform(&f, &props);
 
-    view! { <g transform=transform inner_html=src></g> }
+    view! {
+        <g
+            transform=transform
+            inner_html=src
+            style:opacity=move || if visible.get() { 1 } else { 0 }
+            style:visibility=move || { if visible.get() { "visible" } else { "hidden" } }
+            style:transition=transition
+        ></g>
+    }
 }
 
 fn calc_transform(f: &Frame, props: &SvgProperties) -> String {
