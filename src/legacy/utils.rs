@@ -1,7 +1,6 @@
 //! Utility functions and various helpers.
 
 use gloo_events::EventListener;
-use rand::rngs::OsRng;
 use std::collections::HashMap;
 use wasm_bindgen::JsCast;
 use yew::{html::Scope, prelude::*};
@@ -87,11 +86,6 @@ pub mod keys {
     pub const DIGIT_8: u32 = 56;
     /// Digit 9 key.
     pub const DIGIT_9: u32 = 57;
-}
-
-/// Creates Random Number Generator (RNG).
-pub fn rng() -> OsRng {
-    Default::default()
 }
 
 /// Add keyboard handler.

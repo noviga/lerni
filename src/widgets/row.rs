@@ -8,7 +8,7 @@ pub fn Row(
     #[prop(optional)] cols: Option<usize>,
     #[prop(optional)] border_width: i32,
     #[prop(default = Color::Black)] border_color: Color,
-    #[prop(optional)] stretch: Vec<i32>,
+    #[prop(optional, into)] stretch: Vec<i32>,
     #[prop(optional)] spacing: i32,
     #[prop(optional)] padding: i32,
     #[prop(default = true.into(), into)] visible: MaybeSignal<bool>,
