@@ -2,6 +2,7 @@ extern crate alloc;
 
 use alloc::rc::Rc;
 use leptos::*;
+use rand::{prelude::SliceRandom, rngs::OsRng};
 use wasm_bindgen::JsValue;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, MouseEvent};
 
@@ -41,6 +42,8 @@ pub fn Text(
     #[prop(default = VAlign::Top)] valign: VAlign,
     #[prop(default = Color::PaleGreen)] marker_color: Color,
     #[prop(optional)] lattice: bool,
+    #[prop(optional)] reverse_words: bool,
+    #[prop(optional)] shuffle_letters: bool,
     #[prop(optional)] erase_top: f32,
     #[prop(optional)] erase_bottom: f32,
     #[prop(optional, into)] words_read: RwSignal<usize>,
@@ -71,6 +74,18 @@ pub fn Text(
     letters_total.set(letter_counters.iter().sum());
     word_count.set(words.len());
 
+    let mut orig_words = words.clone();
+    if reverse_words {
+        orig_words.iter_mut().for_each(|word| {
+            *word = reverse_word(word);
+        });
+    }
+    if shuffle_letters {
+        orig_words.iter_mut().for_each(|word| {
+            *word = shuffle_word(word);
+        });
+    }
+
     let word = |i, r: &Rect, hidden| {
         view! {
             <text
@@ -85,7 +100,7 @@ pub fn Text(
                 fill=color
                 pointer-events="none"
             >
-                {&words[i]}
+                {if hidden { &words[i] } else { &orig_words[i] }}
             </text>
         }
     };
@@ -187,6 +202,34 @@ pub fn Text(
             {rects.iter().enumerate().map(|(i, r)| word(i, r, true)).collect_view()}
         </g>
     }
+}
+
+fn reverse_word(word: &str) -> String {
+    let mut result = String::new();
+    let mut last = 0;
+    // Reverse only alphabetic chars
+    for (i, matched) in word.match_indices(|c: char| !(c.is_alphanumeric())) {
+        if last != i {
+            result.push_str(&word[last..i].chars().rev().collect::<String>());
+        }
+        result.push_str(matched);
+        last = i + matched.len();
+    }
+    if last < word.len() {
+        result.push_str(&word[last..].chars().rev().collect::<String>());
+    }
+    result
+}
+
+fn shuffle_word(word: &str) -> String {
+    let mut rng = OsRng;
+    let mut chars: Vec<char> = word.chars().collect();
+    // Shuffle only internal chars except first and last
+    let len = chars.len();
+    if len > 2 {
+        chars[1..len - 1].shuffle(&mut rng);
+    }
+    chars.into_iter().collect()
 }
 
 fn canvas_context(props: &TextProperties) -> CanvasRenderingContext2d {
