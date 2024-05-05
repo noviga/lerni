@@ -33,7 +33,7 @@ pub fn TextExample() -> impl IntoView {
     view! {
         <Slide node_ref=node_ref>
             <Row cols=2 padding=30 border_width=4>
-                <Column stretch=[5, 1]>
+                <Column stretch=[5, 1, 5]>
                     <Text
                         lattice=true
                         word_count=word_count1
@@ -45,6 +45,10 @@ pub fn TextExample() -> impl IntoView {
                         {"Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}
                     </Text>
                     <Label>{words_read1} "w (" {letters_read1} " / " {letters_total1} ")"</Label>
+                    <Text valign=VAlign::Bottom reverse_words=true>
+                        {"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."}
+                        {"Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."}
+                    </Text>
                 </Column>
 
                 <Column stretch=[5, 1, 5, 1]>
@@ -53,7 +57,7 @@ pub fn TextExample() -> impl IntoView {
                         bold=true
                         font="serif"
                         valign=VAlign::Middle
-                        reverse_words=true
+                        shuffle_letters=true
                         words_read=words_read2
                         letters_read=letters_read2
                         letters_total=letters_total2
