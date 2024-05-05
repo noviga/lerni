@@ -2,7 +2,7 @@ extern crate alloc;
 
 use alloc::rc::Rc;
 use leptos::*;
-use rand::{prelude::SliceRandom, rngs::OsRng};
+use rand::{prelude::SliceRandom, rngs::OsRng, Rng};
 use wasm_bindgen::JsValue;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, MouseEvent};
 
@@ -208,7 +208,9 @@ fn reverse_word(word: &str) -> String {
     let mut result = String::new();
     let mut last = 0;
     // Reverse only alphabetic chars
-    for (i, matched) in word.match_indices(|c: char| !(c.is_alphanumeric())) {
+    for (i, matched) in
+        word.match_indices(&[',', '.', '!', '?', ':', ';', '…', '(', ')', '«', '»', '"'])
+    {
         if last != i {
             result.push_str(&word[last..i].chars().rev().collect::<String>());
         }
@@ -222,14 +224,32 @@ fn reverse_word(word: &str) -> String {
 }
 
 fn shuffle_word(word: &str) -> String {
-    let mut rng = OsRng;
-    let mut chars: Vec<char> = word.chars().collect();
-    // Shuffle only internal chars except first and last
-    let len = chars.len();
-    if len > 2 {
-        chars[1..len - 1].shuffle(&mut rng);
+    let mut result = String::new();
+    let mut last = 0;
+
+    let shuffle = |word: &str| -> String {
+        let mut rng = OsRng;
+        let mut word: Vec<_> = word.chars().collect();
+        let len = word.len();
+        if len > 3 {
+            let start = rng.gen_range(1..len / 2);
+            let end = rng.gen_range((len + 1) / 2..len);
+            word[start..end].shuffle(&mut rng);
+        }
+        word.into_iter().collect()
+    };
+    // Shuffle only alphabetic chars except the first and last
+    for (i, matched) in word.match_indices(|c: char| !(c.is_alphanumeric())) {
+        if last != i {
+            result.push_str(shuffle(&word[last..i]).as_str());
+        }
+        result.push_str(matched);
+        last = i + matched.len();
     }
-    chars.into_iter().collect()
+    if last < word.len() {
+        result.push_str(shuffle(&word[last..]).as_str());
+    }
+    result
 }
 
 fn canvas_context(props: &TextProperties) -> CanvasRenderingContext2d {
