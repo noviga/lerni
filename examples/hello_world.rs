@@ -2,6 +2,7 @@ use leptos::{ev::keydown, *};
 use leptos_use::use_event_listener;
 use lerni::*;
 
+/// Hello world example.
 #[component]
 pub fn HelloWorld() -> impl IntoView {
     view! {
@@ -17,6 +18,7 @@ pub fn HelloWorld() -> impl IntoView {
     }
 }
 
+/// Counter component.
 #[component]
 pub fn Counter() -> impl IntoView {
     let (counter, set_counter) = create_signal(0);

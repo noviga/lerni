@@ -16,7 +16,7 @@ pub fn Button(
     #[prop(optional, into)] height: Option<Size>,
     #[prop(optional, into)] radius: Option<i32>,
     #[prop(default = false)] rounded: bool,
-    #[prop(optional)] font: String,
+    #[prop(optional, into)] font: String,
     #[prop(default = 48.into(), into)] font_size: Size,
     #[prop(default = Color::AliceBlue.into(), into)] color: MaybeSignal<Color>,
     #[prop(default = Color::Black.into(), into)] text_color: MaybeSignal<Color>,

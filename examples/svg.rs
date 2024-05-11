@@ -1,6 +1,7 @@
 use leptos::*;
 use lerni::*;
 
+/// SVG example.
 #[component]
 pub fn SvgExample() -> impl IntoView {
     view! {

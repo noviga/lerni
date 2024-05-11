@@ -1,6 +1,7 @@
 use leptos::*;
 use lerni::*;
 
+/// Blur example.
 #[component]
 pub fn Blur() -> impl IntoView {
     let (blur, set_blur) = create_signal(false);

@@ -1,6 +1,7 @@
 use leptos::*;
 use lerni::*;
 
+/// Stack example.
 #[component]
 pub fn StackExample() -> impl IntoView {
     view! {

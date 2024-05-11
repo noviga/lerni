@@ -1,6 +1,7 @@
 use leptos::*;
 use lerni::*;
 
+/// Grid layout example.
 #[component]
 pub fn GridExample() -> impl IntoView {
     view! {
@@ -31,7 +32,9 @@ pub fn GridExample() -> impl IntoView {
                 <Grid cols=4 rows=2 border_width=4 spacing=20>
                     <Label valign=VAlign::Top>"9"</Label>
                     <Label valign=VAlign::Bottom>"10"</Label>
-                    <Label>11</Label>
+                    <Label color=Color::White background_color=Color::Red>
+                        "11"
+                    </Label>
                     <Button
                         align=Align::Fill
                         valign=VAlign::Fill

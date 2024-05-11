@@ -10,6 +10,7 @@ pub fn Label(
     #[prop(default = Align::Center)] align: Align,
     #[prop(default = VAlign::Middle)] valign: VAlign,
     #[prop(default = Color::Black.into(), into)] color: MaybeSignal<Color>,
+    #[prop(default = Color::Transparent.into(), into)] background_color: MaybeSignal<Color>,
     #[prop(default = true.into(), into)] visible: MaybeSignal<bool>,
     #[prop(default = "all .3s".to_string(), into)] transition: String,
     children: Children,
@@ -33,6 +34,15 @@ pub fn Label(
             style:visibility=move || { if visible.get() { "visible" } else { "hidden" } }
             style:transition=transition
         >
+            <rect
+                x=f.x
+                y=f.y
+                width=f.width
+                height=f.height
+                fill=background_color
+                pointer-events="none"
+                style="user-select: none; -webkit-user-select: none;"
+            ></rect>
             <text
                 class:has-text-weight-bold=bold
                 style:font-family=font
