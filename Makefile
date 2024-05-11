@@ -50,7 +50,7 @@ prepare:
 	@rustup target add wasm32-unknown-unknown
 	@cargo install wasm-bindgen-cli
 
-pre-commit: fmt linter test
+pre-commit: fmt fmt-leptos linter test
 
 serve: examples
 	@cd dist && python3 -m http.server 8000

@@ -9,6 +9,7 @@ pub fn Grid(
     #[prop(default = 1)] cols: usize,
     #[prop(optional)] border_width: i32,
     #[prop(default = Color::Black)] border_color: Color,
+    #[prop(default = Color::Transparent)] background_color: Color,
     #[prop(optional)] spacing: i32,
     #[prop(optional)] padding: i32,
     #[prop(default = true.into(), into)] visible: MaybeSignal<bool>,
@@ -66,6 +67,15 @@ pub fn Grid(
             style:visibility=move || { if visible.get() { "visible" } else { "hidden" } }
             style:transition=transition
         >
+            <rect
+                x=f.x
+                y=f.y
+                width=f.width
+                height=f.height
+                fill=background_color
+                pointer-events="none"
+                style="user-select: none; -webkit-user-select: none;"
+            ></rect>
             {border}
             {children()}
         </g>

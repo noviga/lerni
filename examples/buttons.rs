@@ -1,6 +1,7 @@
 use leptos::*;
 use lerni::*;
 
+/// Buttons example.
 #[component]
 pub fn Buttons() -> impl IntoView {
     let (counter, set_counter) = create_signal(0);

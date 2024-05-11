@@ -2,6 +2,7 @@ use leptos::{ev::keydown, *};
 use leptos_use::use_event_listener;
 use lerni::*;
 
+/// Text example.
 #[component]
 pub fn TextExample() -> impl IntoView {
     let word_count1 = create_rw_signal(0);
