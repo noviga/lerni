@@ -8,6 +8,7 @@ use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, MouseEvent};
 
 use crate::{use_frame, utils, Color, Frame, SvgFrame, VAlign};
 
+#[derive(Debug, Clone)]
 struct TextProperties<'a> {
     bold: bool,
     font_size: i32,
@@ -28,13 +29,15 @@ struct Output {
     pub words: Vec<String>,
     pub rects: Rc<Vec<Rect>>,
     pub letter_counters: Vec<usize>,
+    pub font_size: i32,
+    pub canvas: CanvasRenderingContext2d,
 }
 
 /// Text widget.
 #[component]
 pub fn Text(
     #[prop(optional)] bold: bool,
-    #[prop(default = 48)] font_size: i32,
+    #[prop(optional)] font_size: i32,
     #[prop(default = Color::Black)] color: Color,
     #[prop(default = "sans-serif".to_string(), into)] font: String,
     #[prop(default = 1.2)] line_height: f32,
@@ -62,14 +65,15 @@ pub fn Text(
         line_height,
         indent,
     };
-    let canvas = canvas_context(&props);
     let children = children().nodes.collect_view();
     let f = use_frame();
     let Output {
         words,
         rects,
         letter_counters,
-    } = wrap(children, &canvas, &props, &f, &valign);
+        font_size,
+        canvas,
+    } = wrap(children, &props, &f, &valign);
 
     letters_total.set(letter_counters.iter().sum());
     word_count.set(words.len());
@@ -273,21 +277,60 @@ fn text_width(text: &str, canvas: &CanvasRenderingContext2d) -> i32 {
     canvas.measure_text(text).unwrap().width() as i32
 }
 
-fn wrap(
-    children: View,
-    canvas: &CanvasRenderingContext2d,
-    props: &TextProperties,
-    frame: &Frame,
-    valign: &VAlign,
-) -> Output {
-    let children = utils::view_to_strings(children);
+fn text_height(sentences: &[String], props: &TextProperties, width: i32) -> i32 {
+    let mut y = 0;
+    let canvas = canvas_context(props);
+    for sentence in sentences {
+        let mut sentence_words = sentence.split(' ');
+        let first_word = sentence_words.next().unwrap();
+        let mut indent = (props.indent * props.font_size as f32).round() as i32;
+        let dy = (props.line_height * props.font_size as f32).round() as i32;
+        let mut x = indent;
+        let mut lines = Vec::new();
+        let mut line = first_word.to_string();
+        x += text_width(first_word, &canvas);
+        for word in sentence_words {
+            if x + text_width(&format!(" {word}"), &canvas) > width {
+                lines.push(line.clone());
+                line = word.to_string();
+                indent = 0;
+                y += dy;
+            } else {
+                line.push(' ');
+                line.push_str(word);
+            }
+            x = indent + text_width(&line, &canvas);
+        }
+        if !line.is_empty() {
+            lines.push(line);
+        }
 
+        y += dy;
+    }
+    y
+}
+
+fn wrap(children: View, props: &TextProperties, frame: &Frame, valign: &VAlign) -> Output {
+    let sentences = utils::view_to_strings(children);
+
+    let mut props = props.clone();
+    if props.font_size == 0 {
+        loop {
+            props.font_size += 1;
+            if text_height(&sentences, &props, frame.width) > frame.height {
+                break;
+            }
+        }
+        props.font_size -= 1;
+    }
+
+    let canvas = canvas_context(&props);
     let mut y = frame.y;
     let mut words = Vec::new();
     let mut rects = Vec::new();
     let mut letter_counters = Vec::new();
-    for child in children {
-        let mut sentence_words = child.split(' ');
+    for sentence in sentences {
+        let mut sentence_words = sentence.split(' ');
         let first_word = sentence_words.next().unwrap().to_string();
         letter_counters.push(first_word.chars().filter(|c| c.is_alphabetic()).count());
 
@@ -300,15 +343,15 @@ fn wrap(
         rects.push(Rect {
             x,
             y,
-            width: text_width(&first_word, canvas),
+            width: text_width(&first_word, &canvas),
             height: props.font_size,
         });
-        x += text_width(&first_word, canvas);
+        x += text_width(&first_word, &canvas);
         words.push(first_word);
         for word in sentence_words {
             words.push(word.to_string());
             letter_counters.push(word.chars().filter(|c| c.is_alphabetic()).count());
-            if x + text_width(&format!(" {word}"), canvas) > frame.x + frame.width {
+            if x + text_width(&format!(" {word}"), &canvas) > frame.x + frame.width {
                 lines.push(line.clone());
                 line = word.to_string();
                 indent = 0;
@@ -316,16 +359,16 @@ fn wrap(
                 y += dy;
             } else {
                 line.push(' ');
-                x = frame.x + indent + text_width(&line, canvas);
+                x = frame.x + indent + text_width(&line, &canvas);
                 line.push_str(word);
             }
             rects.push(Rect {
                 x,
                 y,
-                width: text_width(word, canvas),
+                width: text_width(word, &canvas),
                 height: props.font_size,
             });
-            x = frame.x + indent + text_width(&line, canvas);
+            x = frame.x + indent + text_width(&line, &canvas);
         }
         if !line.is_empty() {
             lines.push(line);
@@ -359,6 +402,8 @@ fn wrap(
         rects: Rc::new(rects),
         words,
         letter_counters,
+        font_size: props.font_size,
+        canvas,
     }
 }
 
