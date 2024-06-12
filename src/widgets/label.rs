@@ -1,6 +1,6 @@
 use leptos::*;
 
-use crate::{use_frame, Align, Color, Size, VAlign};
+use crate::{use_frame, Align, Color, Flip, Size, VAlign};
 
 #[component]
 pub fn Label(
@@ -13,6 +13,8 @@ pub fn Label(
     #[prop(default = Color::Transparent.into(), into)] background_color: MaybeSignal<Color>,
     #[prop(default = true.into(), into)] visible: MaybeSignal<bool>,
     #[prop(default = "all .3s".to_string(), into)] transition: String,
+    #[prop(optional)] angle: i32,
+    #[prop(optional)] flip: Flip,
     children: Children,
 ) -> impl IntoView {
     let f = use_frame();
@@ -27,6 +29,13 @@ pub fn Label(
         VAlign::Middle | VAlign::Fill => ((f.y + f.height / 2), "central"),
         VAlign::Bottom => (f.y + f.height, "text-top"),
     };
+
+    let mut transform = format!("rotate({angle} {x} {y})");
+    if flip == Flip::Horizontal {
+        transform.push_str(" scale(-1 1)");
+    } else if flip == Flip::Vertical {
+        transform.push_str(" scale(1 -1)");
+    }
 
     view! {
         <g
@@ -46,8 +55,9 @@ pub fn Label(
             <text
                 class:has-text-weight-bold=bold
                 style:font-family=font
-                x=x
-                y=y
+                x=if flip == Flip::Horizontal { -x } else { x }
+                y=if flip == Flip::Vertical { -y } else { y }
+                transform=transform
                 font-size=move || font_size.into_pixels(f.height)
                 text-anchor=anchor
                 fill=color
