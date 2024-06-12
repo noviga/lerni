@@ -8,10 +8,10 @@ pub fn HelloWorld() -> impl IntoView {
     view! {
         <SlideShow>
             <Slide background_color=Color::MistyRose>
-                <Label>"Hello →"</Label>
+                <Label angle=10>"Hello →"</Label>
             </Slide>
             <Slide background_color=Color::PaleGreen>
-                <Label>"← World!"</Label>
+                <Label angle=-10>"← World!"</Label>
             </Slide>
             <Counter/>
         </SlideShow>
