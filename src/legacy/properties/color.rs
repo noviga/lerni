@@ -9,7 +9,7 @@ pub enum Color {
     #[default]
     None,
     /// Arbitrary color with the string value.
-    #[display(fmt = "{_0}")]
+    #[display("{_0}")]
     Value(&'static str),
 
     /// Alice Blue color.
