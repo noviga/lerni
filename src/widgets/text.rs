@@ -44,11 +44,11 @@ pub fn Text(
     #[prop(default = 1.4)] indent: f32,
     #[prop(default = VAlign::Top)] valign: VAlign,
     #[prop(default = Color::PaleGreen)] marker_color: Color,
-    #[prop(optional)] lattice: bool,
-    #[prop(optional)] reverse_words: bool,
-    #[prop(optional)] shuffle_letters: bool,
-    #[prop(optional)] erase_top: f32,
-    #[prop(optional)] erase_bottom: f32,
+    #[prop(optional, into)] lattice: MaybeSignal<bool>,
+    #[prop(optional, into)] reverse_words: MaybeSignal<bool>,
+    #[prop(optional, into)] shuffle_letters: MaybeSignal<bool>,
+    #[prop(optional, into)] erase_top: MaybeSignal<f32>,
+    #[prop(optional, into)] erase_bottom: MaybeSignal<f32>,
     #[prop(optional, into)] words_read: RwSignal<usize>,
     #[prop(optional, into)] word_count: RwSignal<usize>,
     #[prop(optional, into)] letters_read: RwSignal<usize>,
@@ -78,52 +78,77 @@ pub fn Text(
     letters_total.set(letter_counters.iter().sum());
     word_count.set(words.len());
 
-    let mut orig_words = words.clone();
-    if reverse_words {
-        orig_words.iter_mut().for_each(|word| {
-            *word = reverse_word(word);
-        });
-    }
-    if shuffle_letters {
-        orig_words.iter_mut().for_each(|word| {
-            *word = shuffle_word(word);
-        });
-    }
+    let get_word = move |i: usize, hidden: bool| {
+        let word: &String = words.get(i).unwrap();
+        if !hidden && reverse_words.get() {
+            reverse_word(word)
+        } else if !hidden && shuffle_letters.get() {
+            shuffle_word(word)
+        } else {
+            word.clone()
+        }
+    };
 
-    let word = |i, r: &Rect, hidden| {
-        view! {
-            <text
-                visibility=move || { (hidden && i >= words_read.get()).then_some("hidden") }
-                x=r.x + r.width / 2
-                y=r.y + r.height / 2
-                class:has-text-weight-bold=bold
-                text-anchor="middle"
-                dominant-baseline="central"
-                font-size=font_size
-                style=format!("font-family: {}", font)
-                fill=color
-                pointer-events="none"
-            >
-                {if hidden { &words[i] } else { &orig_words[i] }}
-            </text>
+    let word = {
+        |i, r: &Rect, hidden: bool| {
+            view! {
+                <text
+                    visibility=move || { (hidden && i >= words_read.get()).then_some("hidden") }
+                    x=r.x + r.width / 2
+                    y=r.y + r.height / 2
+                    class:has-text-weight-bold=bold
+                    text-anchor="middle"
+                    dominant-baseline="central"
+                    font-size=font_size
+                    style=format!("font-family: {}", font)
+                    fill=color
+                    pointer-events="none"
+                >
+                    {move || get_word(i, hidden)}
+                </text>
+            }
         }
     };
 
     let erase = |r: &Rect| {
+        let rx = r.x;
+        let ry = r.y;
+        let rh = r.height;
+        let rw = r.width;
         view! {
-            {(erase_top > 0.0)
-                .then(|| {
-                    let h = (erase_top * r.height as f32).round() as i32;
-                    view! { <rect fill="white" x=r.x y=r.y width=r.width height=h></rect> }
-                })}
+            {move || {
+                (erase_top.get() > 0.0)
+                    .then(|| {
+                        let h = (erase_top.get() * rh as f32).round() as i32;
+                        view! {
+                            <rect
+                                fill="white"
+                                pointer-events="none"
+                                x=rx
+                                y=ry
+                                width=rw
+                                height=h
+                            ></rect>
+                        }
+                    })
+            }}
 
-            {(erase_bottom > 0.0)
-                .then(|| {
-                    let h = (erase_bottom * r.height as f32).round() as i32;
-                    view! {
-                        <rect fill="white" x=r.x y=r.y + r.height - h width=r.width height=h></rect>
-                    }
-                })}
+            {move || {
+                (erase_bottom.get() > 0.0)
+                    .then(|| {
+                        let h = (erase_bottom.get() * rh as f32).round() as i32;
+                        view! {
+                            <rect
+                                fill="white"
+                                pointer-events="none"
+                                x=rx
+                                y=ry + rh - h
+                                width=rw
+                                height=h
+                            ></rect>
+                        }
+                    })
+            }}
         }
     };
 
@@ -151,37 +176,39 @@ pub fn Text(
     view! {
         <g
             style:opacity=move || if visible.get() { 1 } else { 0 }
-            style:visibility=move || { if visible.get() { "visible" } else { "hidden" } }
+            style:visibility=move || if visible.get() { "visible" } else { "hidden" }
             style:transition=transition
         >
             <rect x=f.x y=f.y width=f.width height=f.height fill="white" on:click=on_click></rect>
-            {rects.iter().enumerate().map(|(i, r)| word(i, r, false)).collect_view()}
-            {(erase_top > 0.0 || erase_bottom > 0.0)
-                .then(|| { rects.iter().map(erase).collect_view() })}
+            {rects.iter().enumerate().map(|(i, r)| word.clone()(i, r, false)).collect_view()}
+            {rects.iter().map(erase).collect_view()}
 
-            {lattice
-                .then(|| {
-                    let width = font_size / 2;
-                    let dx = 5 * width;
-                    let count = f.width / dx;
-                    (0..count)
-                        .map(|i| {
-                            view! {
-                                <rect
-                                    x=f.x + dx / 2 + i * dx
-                                    y=f.y
-                                    width=width
-                                    height=f.height
-                                    rx=width / 2
-                                    stroke=color
-                                    stroke-width="6"
-                                    fill="white"
-                                    pointer-events="none"
-                                ></rect>
-                            }
-                        })
-                        .collect_view()
-                })}
+            {move || {
+                lattice
+                    .get()
+                    .then(|| {
+                        let width = font_size / 2;
+                        let dx = 5 * width;
+                        let count = f.width / dx;
+                        (0..count)
+                            .map(|i| {
+                                view! {
+                                    <rect
+                                        x=f.x + dx / 2 + i * dx
+                                        y=f.y
+                                        width=width
+                                        height=f.height
+                                        rx=width / 2
+                                        stroke=color
+                                        stroke-width="6"
+                                        fill="white"
+                                        pointer-events="none"
+                                    ></rect>
+                                }
+                            })
+                            .collect_view()
+                    })
+            }}
 
             {rects
                 .iter()
@@ -203,7 +230,7 @@ pub fn Text(
                 })
                 .collect_view()}
 
-            {rects.iter().enumerate().map(|(i, r)| word(i, r, true)).collect_view()}
+            {rects.iter().enumerate().map(|(i, r)| word.clone()(i, r, true)).collect_view()}
         </g>
     }
 }
