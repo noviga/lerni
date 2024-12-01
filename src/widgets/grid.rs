@@ -1,4 +1,4 @@
-use leptos::*;
+use leptos::prelude::*;
 
 use crate::{use_frame, use_frames, Color, Frame};
 
@@ -12,7 +12,7 @@ pub fn Grid(
     #[prop(default = Color::Transparent)] background_color: Color,
     #[prop(optional)] spacing: i32,
     #[prop(optional)] padding: i32,
-    #[prop(default = true.into(), into)] visible: MaybeSignal<bool>,
+    #[prop(default = true.into(), into)] visible: Signal<bool>,
     #[prop(default = "all .3s".to_string(), into)] transition: String,
     children: Children,
 ) -> impl IntoView {
@@ -29,7 +29,7 @@ pub fn Grid(
 
     {
         let frames = use_frames();
-        let mut frames = frames.borrow_mut();
+        let mut frames = frames.lock().unwrap();
         for i in (0..max).rev() {
             let x = f.x + border_width / 2 + (width + spacing) * (i as i32 % cols);
             let y = f.y + border_width / 2 + (height + spacing) * (i as i32 / cols);
@@ -63,7 +63,7 @@ pub fn Grid(
 
     view! {
         <g
-            style:opacity=move || if visible.get() { 1 } else { 0 }
+            style:opacity=move || if visible.get() { "1" } else { "0" }
             style:visibility=move || { if visible.get() { "visible" } else { "hidden" } }
             style:transition=transition
         >

@@ -1,10 +1,10 @@
-use leptos::*;
+use leptos::{logging, prelude::*};
 use lerni::*;
 
 /// Buttons example.
 #[component]
 pub fn Buttons() -> impl IntoView {
-    let (counter, set_counter) = create_signal(0);
+    let (counter, set_counter) = signal(0);
     let on_click = move |_| {
         logging::log!("Clicked");
         set_counter.set(counter.get() + 1);

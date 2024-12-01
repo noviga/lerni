@@ -1,14 +1,14 @@
-use leptos::*;
+use leptos::prelude::*;
 
 use crate::{use_frame, use_frames, Frame};
 
 /// Stack of widgets.
 #[component]
-pub fn Stack(count: usize, children: Children) -> impl IntoView {
+pub fn Stack(count: usize, children: ChildrenFragment) -> impl IntoView {
     let f = use_frame();
     {
         let frames = use_frames();
-        let mut frames = frames.borrow_mut();
+        let mut frames = frames.lock().unwrap();
         for _ in 0..count {
             let frame = Frame {
                 x: f.x,

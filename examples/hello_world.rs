@@ -1,4 +1,4 @@
-use leptos::{ev::keydown, *};
+use leptos::{ev::keydown, prelude::*};
 use leptos_use::use_event_listener;
 use lerni::*;
 
@@ -13,7 +13,7 @@ pub fn HelloWorld() -> impl IntoView {
             <Slide background_color=Color::PaleGreen>
                 <Label angle=-10>"← World!"</Label>
             </Slide>
-            <Counter/>
+            <Counter />
         </SlideShow>
     }
 }
@@ -21,9 +21,9 @@ pub fn HelloWorld() -> impl IntoView {
 /// Counter component.
 #[component]
 pub fn Counter() -> impl IntoView {
-    let (counter, set_counter) = create_signal(0);
+    let (counter, set_counter) = signal(0);
 
-    let node_ref = create_node_ref();
+    let node_ref = NodeRef::new();
     _ = use_event_listener(document().body(), keydown, move |e| {
         if is_active_slide(node_ref) {
             if e.key() == "Enter" {
@@ -34,18 +34,8 @@ pub fn Counter() -> impl IntoView {
         }
     });
 
-    create_effect(move |_| {
-        if let Some(el) = node_ref.get() {
-            let panel_item =
-                view! { <label class="label is-large">"Counter: " {move || counter.get()}</label> };
-            _ = el.on_mount(move |_| mount_on_panel(node_ref, panel_item));
-        }
-    });
-
-    let on_click = move |(x, y)| logging::log!("({}, {})", x, y);
-
     view! {
-        <Slide node_ref=node_ref on_click=on_click on_refresh=move |_| set_counter.set(0)>
+        <Slide node_ref=node_ref>
             <Label>
                 "Counter (press 'Enter' and 'Escape' to change): " {move || counter.get()}
             </Label>

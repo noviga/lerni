@@ -30,7 +30,7 @@ jobs:
         uses: jetli/wasm-bindgen-action@v0.2.0
         with:
           # Sync version with `Cargo.toml`
-          version: "0.2.93"
+          version: "0.2.99"
 
       - name: Install wasm-opt
         run: sudo apt-get install -y binaryen

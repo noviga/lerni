@@ -1,29 +1,29 @@
-use leptos::{ev::keydown, *};
+use leptos::{ev::keydown, prelude::*};
 use leptos_use::use_event_listener;
 use lerni::*;
 
 /// Text example.
 #[component]
 pub fn TextExample() -> impl IntoView {
-    let word_count1 = create_rw_signal(0);
-    let words_read1 = create_rw_signal(0);
-    let letters_read1 = create_rw_signal(0);
-    let letters_total1 = create_rw_signal(0);
+    let word_count1 = RwSignal::new(0);
+    let words_read1 = RwSignal::new(0);
+    let letters_read1 = RwSignal::new(0);
+    let letters_total1 = RwSignal::new(0);
 
-    let words_read2 = create_rw_signal(0);
-    let letters_read2 = create_rw_signal(0);
-    let letters_total2 = create_rw_signal(0);
+    let words_read2 = RwSignal::new(0);
+    let letters_read2 = RwSignal::new(0);
+    let letters_total2 = RwSignal::new(0);
 
-    let words_read3 = create_rw_signal(0);
-    let letters_read3 = create_rw_signal(0);
-    let letters_total3 = create_rw_signal(0);
+    let words_read3 = RwSignal::new(0);
+    let letters_read3 = RwSignal::new(0);
+    let letters_total3 = RwSignal::new(0);
 
-    let (lattice, set_lattice) = create_signal(true);
-    let (reverse, set_reverse) = create_signal(true);
-    let (shuffle, set_shuffle) = create_signal(true);
-    let (erase, set_erase) = create_signal(0.3);
+    let (lattice, set_lattice) = signal(true);
+    let (reverse, set_reverse) = signal(true);
+    let (shuffle, set_shuffle) = signal(true);
+    let (erase, set_erase) = signal(0.3);
 
-    let node_ref = create_node_ref();
+    let node_ref = NodeRef::new();
     _ = use_event_listener(document().body(), keydown, move |e| {
         if is_active_slide(node_ref) {
             if e.key() == " " {

@@ -1,5 +1,6 @@
 use derive_more::Display;
-use leptos::{Attribute, IntoAttribute};
+use leptos::attr::AttributeValue;
+use leptos::prelude::*;
 
 // TODO: Define all colors
 
@@ -311,12 +312,51 @@ pub enum Color {
     YellowGreen,
 }
 
-impl IntoAttribute for Color {
-    fn into_attribute(self) -> Attribute {
-        Attribute::String(self.to_string().into())
+impl AttributeValue for Color {
+    type AsyncOutput = Self;
+    type State = (web_sys::Element, Color);
+    type Cloneable = Self;
+    type CloneableOwned = Self;
+
+    fn html_len(&self) -> usize {
+        self.to_string().len()
     }
 
-    fn into_attribute_boxed(self: Box<Self>) -> leptos::Attribute {
-        self.into_attribute()
+    fn to_html(self, key: &str, buf: &mut String) {
+        <String as AttributeValue>::to_html(self.to_string(), key, buf);
+    }
+
+    fn to_template(_key: &str, _buf: &mut String) {}
+
+    fn hydrate<const FROM_SERVER: bool>(self, key: &str, el: &web_sys::Element) -> Self::State {
+        let (el, _) = <String as AttributeValue>::hydrate::<FROM_SERVER>(self.to_string(), key, el);
+        (el, self)
+    }
+
+    fn build(self, el: &web_sys::Element, key: &str) -> Self::State {
+        Dom::set_attribute(el, key, &self.to_string());
+        (el.clone(), self)
+    }
+
+    fn rebuild(self, key: &str, state: &mut Self::State) {
+        let (el, prev_value) = state;
+        if self != *prev_value {
+            Dom::set_attribute(el, key, &self.to_string());
+        }
+        *prev_value = self;
+    }
+
+    fn into_cloneable(self) -> Self::Cloneable {
+        self
+    }
+
+    fn into_cloneable_owned(self) -> Self::CloneableOwned {
+        self
+    }
+
+    fn dry_resolve(&mut self) {}
+
+    async fn resolve(self) -> Self::AsyncOutput {
+        self
     }
 }

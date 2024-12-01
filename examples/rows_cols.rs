@@ -1,4 +1,4 @@
-use leptos::*;
+use leptos::prelude::*;
 use lerni::*;
 
 /// Rows and columns layout example.

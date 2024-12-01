@@ -1,10 +1,10 @@
-use leptos::*;
+use leptos::prelude::*;
 use lerni::*;
 
 /// Blur example.
 #[component]
 pub fn Blur() -> impl IntoView {
-    let (blur, set_blur) = create_signal(false);
+    let (blur, set_blur) = signal(false);
     let on_click = move |_| set_blur.set(!blur.get());
 
     view! {

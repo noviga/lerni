@@ -1,11 +1,11 @@
-use leptos::{html::Div, *};
+use leptos::{html::Div, mount, prelude::*};
 
 /// Start function.
 ///
 /// # Example
 ///
 /// ```no_run
-/// use leptos::*;
+/// use leptos::prelude::*;
 /// use lerni::*;
 ///
 /// #[component]
@@ -25,7 +25,7 @@ where
     F: Fn() -> N + 'static,
     N: IntoView,
 {
-    leptos::mount_to_body(f);
+    mount::mount_to_body(f);
 }
 
 /// Keyboard key codes.
@@ -93,28 +93,15 @@ pub fn slide_number(node_ref: NodeRef<Div>) -> Option<usize> {
 }
 
 /// Mount a child view on a panel.
-pub fn mount_on_panel(node_ref: NodeRef<Div>, item: impl IntoView) {
+pub fn mount_on_panel(node_ref: NodeRef<Div>, _item: AnyView) {
     let panel_item_refs: Option<Vec<NodeRef<Div>>> = use_context();
     if let Some(panel_item_refs) = panel_item_refs {
         if let Some(n) = slide_number(node_ref) {
             if let Some(panel_item_ref) = panel_item_refs.get(n) {
-                if let Some(el) = panel_item_ref.get_untracked() {
-                    _ = el.child(item);
+                if let Some(_el) = panel_item_ref.get_untracked() {
+                    //el.append_child(item);
                 }
             }
         }
-    }
-}
-
-/// Get the strings from a view.
-pub fn view_to_strings(view: View) -> Vec<String> {
-    match view {
-        View::Text(text) => vec![text.content.into_owned()],
-        View::Component(component) => component
-            .children
-            .into_iter()
-            .flat_map(view_to_strings)
-            .collect(),
-        _ => Default::default(),
     }
 }

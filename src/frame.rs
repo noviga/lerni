@@ -1,8 +1,8 @@
 extern crate alloc;
 
-use alloc::{collections::VecDeque, rc::Rc};
-use core::cell::RefCell;
-use leptos::{expect_context, provide_context, use_context};
+use alloc::{collections::VecDeque, sync::Arc};
+use leptos::prelude::{expect_context, provide_context, use_context};
+use std::sync::Mutex;
 
 /// Frame within which the widget will be rendered.
 #[derive(Clone, Default, Debug)]
@@ -35,7 +35,7 @@ pub struct SvgFrame {
 pub struct Frames(VecDeque<Frame>);
 
 /// Frames stack reference.
-pub type FramesRef = Rc<RefCell<Frames>>;
+pub type FramesRef = Arc<Mutex<Frames>>;
 
 impl Frames {
     /// Pushes a new child frame.
@@ -63,17 +63,17 @@ impl Frames {
 pub fn provide_frame(frame: Frame) {
     let frames: Option<FramesRef> = use_context();
     if let Some(frames) = frames {
-        frames.borrow_mut().0.push_back(frame);
+        frames.lock().unwrap().0.push_back(frame);
     } else {
         let frames = Frames([frame].into());
-        provide_context(Rc::new(RefCell::new(frames)));
+        provide_context(Arc::new(Mutex::new(frames)));
     }
 }
 
 /// Returns the current frame.
 pub fn use_frame() -> Frame {
     let frames: FramesRef = expect_context();
-    let mut frames = frames.borrow_mut();
+    let mut frames = frames.lock().unwrap();
     frames.pop()
 }
 
