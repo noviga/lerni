@@ -21,7 +21,8 @@ pub fn SlideShow(#[prop(optional)] current: usize, children: ChildrenFragment) -
 
     let page = RwSignal::new(current);
     let children = children().nodes;
-    let count = children.len();
+    // TODO: Wait for `StaticVec` has `len()`
+    let count = children.iter().len();
 
     _ = use_event_listener(document(), keydown, move |e| {
         if e.key() == "ArrowLeft" || e.key() == "ArrowUp" {
