@@ -1,6 +1,6 @@
 use leptos::prelude::*;
 
-use crate::{use_frame, Align, Color, Flip, Size, VAlign};
+use crate::{Align, Color, Flip, Size, VAlign, use_frame};
 
 #[component]
 pub fn Label(

@@ -1,6 +1,6 @@
 use leptos::{logging, prelude::*};
 
-use crate::{use_frame, use_frames, Color, Frame};
+use crate::{Color, Frame, use_frame, use_frames};
 
 /// Column of widgets.
 #[component]

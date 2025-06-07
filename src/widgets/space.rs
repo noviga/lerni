@@ -1,4 +1,4 @@
-use leptos::{component, view, IntoView};
+use leptos::{IntoView, component, view};
 
 use crate::use_frame;
 

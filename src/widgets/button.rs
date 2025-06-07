@@ -1,7 +1,7 @@
 use leptos::prelude::*;
 use web_sys::MouseEvent;
 
-use crate::{provide_frame, use_frame, Align, Color, Frame, Label, Size, VAlign};
+use crate::{Align, Color, Frame, Label, Size, VAlign, provide_frame, use_frame};
 
 const WIDTH: i32 = 400;
 const HEIGHT: i32 = 150;

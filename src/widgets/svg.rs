@@ -1,6 +1,6 @@
 use leptos::prelude::*;
 
-use crate::{use_frame, Align, Frame, VAlign};
+use crate::{Align, Frame, VAlign, use_frame};
 
 struct SvgProperties {
     width: i32,

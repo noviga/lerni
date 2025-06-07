@@ -1,12 +1,12 @@
 use leptos::{
-    ev::{resize, MouseEvent},
+    ev::{MouseEvent, resize},
     html::Div,
     prelude::*,
     svg::Svg,
 };
 use leptos_use::*;
 
-use crate::{is_active_slide, provide_frame, Color, Frame, PointerSignal, RefreshSignal, SvgFrame};
+use crate::{Color, Frame, PointerSignal, RefreshSignal, SvgFrame, is_active_slide, provide_frame};
 
 const WIDTH: i32 = 1920;
 const HEIGHT: i32 = 1080;

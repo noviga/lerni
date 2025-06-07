@@ -198,7 +198,7 @@ impl SlideShow {
 
 #[cfg(test)]
 mod tests {
-    use super::{SlideShow, BUTTON_COUNT};
+    use super::{BUTTON_COUNT, SlideShow};
 
     #[test]
     fn page_list() {

@@ -1,6 +1,6 @@
 use leptos::prelude::*;
 
-use crate::{use_frame, use_frames, Color, Frame};
+use crate::{Color, Frame, use_frame, use_frames};
 
 /// Grid layout widget.
 #[component]

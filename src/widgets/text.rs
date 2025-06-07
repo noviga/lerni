@@ -2,11 +2,11 @@ extern crate alloc;
 
 use alloc::rc::Rc;
 use leptos::prelude::*;
-use rand::{prelude::SliceRandom, rngs::OsRng, Rng};
+use rand::{Rng, prelude::SliceRandom, rngs::OsRng};
 use wasm_bindgen::JsValue;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, MouseEvent};
 
-use crate::{into_strings::IntoStrings, use_frame, Color, Frame, SvgFrame, VAlign};
+use crate::{Color, Frame, SvgFrame, VAlign, into_strings::IntoStrings, use_frame};
 
 #[derive(Debug, Clone)]
 struct TextProperties<'a> {

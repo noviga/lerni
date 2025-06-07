@@ -1,6 +1,6 @@
 use leptos::prelude::*;
 
-use crate::{use_frame, use_frames, Frame};
+use crate::{Frame, use_frame, use_frames};
 
 /// Stack of widgets.
 #[component]
