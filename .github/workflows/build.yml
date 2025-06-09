@@ -32,9 +32,6 @@ jobs:
           # Sync version with `Cargo.toml`
           version: "0.2.100"
 
-      - name: Install wasm-opt
-        run: sudo apt-get install -y binaryen
-
       - name: Cache
         uses: Swatinem/rust-cache@v2
 
