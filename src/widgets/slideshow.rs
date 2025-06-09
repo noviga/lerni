@@ -1,9 +1,12 @@
 use leptos::{
     ev::{keydown, resize},
-    *,
+    prelude::*,
 };
 use leptos_use::*;
-use std::collections::BTreeSet;
+use std::{
+    collections::{BTreeSet, VecDeque},
+    sync::{Arc, Mutex},
+};
 use web_sys::MouseEvent;
 
 use crate::{PointerSignal, RefreshSignal};
@@ -13,15 +16,19 @@ const PAGINATION_WIDTH: i32 = 40;
 const CONTROL_PANEL_HEIGHT: i32 = 64;
 
 #[component]
-pub fn SlideShow(#[prop(optional)] current: usize, children: Children) -> impl IntoView {
-    let refresh = create_rw_signal(());
+pub fn SlideShow(#[prop(optional)] current: usize, children: ChildrenFragment) -> impl IntoView {
+    let refresh = RwSignal::new(());
     provide_context(RefreshSignal::new(refresh.read_only()));
-    let pointer = create_rw_signal(true);
+    let pointer = RwSignal::new(true);
     provide_context(PointerSignal::new(pointer.read_only()));
 
-    let page = create_rw_signal(current);
+    let panels = Arc::new(Mutex::new(VecDeque::<AnyView>::new()));
+    provide_context(Arc::clone(&panels));
+
+    let page = RwSignal::new(current);
     let children = children().nodes;
-    let count = children.len();
+    // TODO: Wait for `StaticVec` has `len()`
+    let count = children.iter().len();
 
     _ = use_event_listener(document(), keydown, move |e| {
         if e.key() == "ArrowLeft" || e.key() == "ArrowUp" {
@@ -33,32 +40,22 @@ pub fn SlideShow(#[prop(optional)] current: usize, children: Children) -> impl I
         }
     });
 
-    let (width, set_width) =
-        create_signal(crate::calc_width(PAGINATION_WIDTH, CONTROL_PANEL_HEIGHT));
+    let (width, set_width) = signal(crate::calc_width(PAGINATION_WIDTH, CONTROL_PANEL_HEIGHT));
 
     _ = use_event_listener(window(), resize, move |_| {
         set_width.set(crate::calc_width(PAGINATION_WIDTH, CONTROL_PANEL_HEIGHT));
     });
 
     let mut panel_items = Vec::with_capacity(count);
-    let mut panel_item_refs = Vec::with_capacity(count);
+    let mut panels = panels.lock().unwrap();
     let children = children
         .into_iter()
         .enumerate()
         .map(|(i, child)| {
-            let panel_item_ref = create_node_ref();
-            panel_item_refs.push(panel_item_ref);
-            panel_items
-                .push(view! { <div node_ref=panel_item_ref hidden=move || i != page.get()></div> });
-            view! {
-                <div number=i hidden=move || i != page.get()>
-                    {child}
-                </div>
-            }
+            panel_items.push(view! { <div hidden=move || i != page.get()>{panels.pop_front()}</div> });
+            view! { <div hidden=move || i != page.get()>{child}</div> }
         })
         .collect_view();
-
-    provide_context(panel_item_refs);
 
     view! {
         <div
@@ -76,7 +73,7 @@ pub fn SlideShow(#[prop(optional)] current: usize, children: Children) -> impl I
                     </ControlPanel>
                 </div>
                 <div class="pl-0 mt-4 pr-0" style:width="40px">
-                    <Pagination page=page count=count/>
+                    <Pagination page=page count=count />
                 </div>
             </div>
         </div>
@@ -133,7 +130,7 @@ fn Pagination(page: RwSignal<usize>, count: usize) -> impl IntoView {
     let mut prev = None;
     let pages = (0..count)
         .map(|i| {
-            let view = view! { <PageButton index=i count=count current=page/> };
+            let view = view! { <PageButton index=i count=count current=page /> };
             prev = Some(i);
             view
         })

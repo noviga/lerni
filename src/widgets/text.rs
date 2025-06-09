@@ -1,12 +1,12 @@
 extern crate alloc;
 
 use alloc::rc::Rc;
-use leptos::*;
-use rand::{prelude::SliceRandom, rngs::OsRng, Rng};
+use leptos::prelude::*;
+use rand::{Rng, prelude::SliceRandom, rngs::OsRng};
 use wasm_bindgen::JsValue;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, MouseEvent};
 
-use crate::{use_frame, utils, Color, Frame, SvgFrame, VAlign};
+use crate::{Color, Frame, SvgFrame, VAlign, into_strings::IntoStrings, use_frame};
 
 #[derive(Debug, Clone)]
 struct TextProperties<'a> {
@@ -35,7 +35,7 @@ struct Output {
 
 /// Text widget.
 #[component]
-pub fn Text(
+pub fn Text<T: IntoStrings>(
     #[prop(optional)] bold: bool,
     #[prop(optional)] font_size: i32,
     #[prop(default = Color::Black)] color: Color,
@@ -44,19 +44,19 @@ pub fn Text(
     #[prop(default = 1.4)] indent: f32,
     #[prop(default = VAlign::Top)] valign: VAlign,
     #[prop(default = Color::PaleGreen)] marker_color: Color,
-    #[prop(optional, into)] lattice: MaybeSignal<bool>,
-    #[prop(optional, into)] reverse_words: MaybeSignal<bool>,
-    #[prop(optional, into)] shuffle_letters: MaybeSignal<bool>,
-    #[prop(optional, into)] erase_top: MaybeSignal<f32>,
-    #[prop(optional, into)] erase_bottom: MaybeSignal<f32>,
+    #[prop(optional, into)] lattice: Signal<bool>,
+    #[prop(optional, into)] reverse_words: Signal<bool>,
+    #[prop(optional, into)] shuffle_letters: Signal<bool>,
+    #[prop(optional, into)] erase_top: Signal<f32>,
+    #[prop(optional, into)] erase_bottom: Signal<f32>,
     #[prop(optional, into)] words_read: RwSignal<usize>,
     #[prop(optional, into)] word_count: RwSignal<usize>,
     #[prop(optional, into)] letters_read: RwSignal<usize>,
     #[prop(optional, into)] letters_total: RwSignal<usize>,
     #[prop(optional, into)] on_click: Option<Callback<MouseEvent>>,
-    #[prop(default = true.into(), into)] visible: MaybeSignal<bool>,
+    #[prop(default = true.into(), into)] visible: Signal<bool>,
     #[prop(default = "all .3s".to_string(), into)] transition: String,
-    children: Children,
+    children: TypedChildren<T>,
 ) -> impl IntoView {
     let props = TextProperties {
         bold,
@@ -65,7 +65,8 @@ pub fn Text(
         line_height,
         indent,
     };
-    let children = children().nodes.collect_view();
+    let children = children.into_inner();
+    let sentences = children().into_inner().into_strings();
     let f = use_frame();
     let Output {
         words,
@@ -73,7 +74,7 @@ pub fn Text(
         letter_counters,
         font_size,
         canvas,
-    } = wrap(children, &props, &f, &valign);
+    } = wrap(sentences, &props, &f, &valign);
 
     letters_total.set(letter_counters.iter().sum());
     word_count.set(words.len());
@@ -165,17 +166,17 @@ pub fn Text(
             }
         }
         if let Some(cb) = on_click {
-            cb.call(e);
+            cb.run(e);
         }
     };
 
-    create_effect(move |_| letters_read.set(letter_counters[0..words_read.get()].iter().sum()));
+    Effect::new(move |_| letters_read.set(letter_counters[0..words_read.get()].iter().sum()));
 
     let expand = text_width(" ", &canvas) / 2 + 1;
 
     view! {
         <g
-            style:opacity=move || if visible.get() { 1 } else { 0 }
+            style:opacity=move || if visible.get() { "1" } else { "0" }
             style:visibility=move || if visible.get() { "visible" } else { "hidden" }
             style:transition=transition
         >
@@ -337,9 +338,7 @@ fn text_height(sentences: &[String], props: &TextProperties, width: i32) -> i32 
     y
 }
 
-fn wrap(children: View, props: &TextProperties, frame: &Frame, valign: &VAlign) -> Output {
-    let sentences = utils::view_to_strings(children);
-
+fn wrap(sentences: Vec<String>, props: &TextProperties, frame: &Frame, valign: &VAlign) -> Output {
     let mut props = props.clone();
     if props.font_size == 0 {
         loop {

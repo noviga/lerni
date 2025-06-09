@@ -1,6 +1,6 @@
-use leptos::*;
+use leptos::prelude::*;
 
-use crate::{use_frame, Align, Color, Flip, Size, VAlign};
+use crate::{Align, Color, Flip, Size, VAlign, use_frame};
 
 #[component]
 pub fn Label(
@@ -9,9 +9,9 @@ pub fn Label(
     #[prop(default = 48.into(), into)] font_size: Size,
     #[prop(default = Align::Center)] align: Align,
     #[prop(default = VAlign::Middle)] valign: VAlign,
-    #[prop(default = Color::Black.into(), into)] color: MaybeSignal<Color>,
-    #[prop(default = Color::Transparent.into(), into)] background_color: MaybeSignal<Color>,
-    #[prop(default = true.into(), into)] visible: MaybeSignal<bool>,
+    #[prop(default = Color::Black.into(), into)] color: Signal<Color>,
+    #[prop(default = Color::Transparent.into(), into)] background_color: Signal<Color>,
+    #[prop(default = true.into(), into)] visible: Signal<bool>,
     #[prop(default = "all .3s".to_string(), into)] transition: String,
     #[prop(optional)] angle: i32,
     #[prop(optional)] flip: Flip,
@@ -39,7 +39,7 @@ pub fn Label(
 
     view! {
         <g
-            style:opacity=move || if visible.get() { 1 } else { 0 }
+            style:opacity=move || if visible.get() { "1" } else { "0" }
             style:visibility=move || { if visible.get() { "visible" } else { "hidden" } }
             style:transition=transition
         >

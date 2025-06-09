@@ -1,4 +1,4 @@
-use leptos::*;
+use leptos::{logging, prelude::*};
 use lerni::*;
 
 /// Grid layout example.
@@ -28,7 +28,7 @@ pub fn GridExample() -> impl IntoView {
                 </Button>
                 <Label align=Align::Right>"6"</Label>
                 <Label align=Align::Left>"7"</Label>
-                <Image src="/img/lerni-bg.svg"/>
+                <Image src="/img/lerni-bg.svg" />
                 <Grid cols=4 rows=2 border_width=4 spacing=20>
                     <Label valign=VAlign::Top>"9"</Label>
                     <Label valign=VAlign::Bottom>"10"</Label>

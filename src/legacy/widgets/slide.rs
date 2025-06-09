@@ -1,5 +1,5 @@
 use web_sys::SvgElement;
-use yew::{prelude::*, ContextProvider};
+use yew::{ContextProvider, prelude::*};
 
 use crate::{properties::Color, utils, widgets::Frame};
 

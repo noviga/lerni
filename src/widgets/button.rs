@@ -1,14 +1,14 @@
-use leptos::*;
+use leptos::prelude::*;
 use web_sys::MouseEvent;
 
-use crate::{provide_frame, use_frame, Align, Color, Frame, Label, Size, VAlign};
+use crate::{Align, Color, Frame, Label, Size, VAlign, provide_frame, use_frame};
 
 const WIDTH: i32 = 400;
 const HEIGHT: i32 = 150;
 
 #[component]
-pub fn Button(
-    #[prop(optional, into)] on_click: Option<Callback<MouseEvent>>,
+pub fn Button<F>(
+    #[prop(optional)] on_click: Option<F>,
     #[prop(optional, into)] on_mousedown: Option<Callback<MouseEvent>>,
     #[prop(optional, into)] on_mouseup: Option<Callback<MouseEvent>>,
     #[prop(optional)] text_bold: bool,
@@ -18,18 +18,21 @@ pub fn Button(
     #[prop(default = false)] rounded: bool,
     #[prop(optional, into)] font: String,
     #[prop(default = 48.into(), into)] font_size: Size,
-    #[prop(default = Color::AliceBlue.into(), into)] color: MaybeSignal<Color>,
-    #[prop(default = Color::Black.into(), into)] text_color: MaybeSignal<Color>,
-    #[prop(default = 12.into(), into)] border_width: MaybeSignal<i32>,
-    #[prop(default = Color::RoyalBlue.into(), into)] border_color: MaybeSignal<Color>,
+    #[prop(default = Color::AliceBlue.into(), into)] color: Signal<Color>,
+    #[prop(default = Color::Black.into(), into)] text_color: Signal<Color>,
+    #[prop(default = 12.into(), into)] border_width: Signal<i32>,
+    #[prop(default = Color::RoyalBlue.into(), into)] border_color: Signal<Color>,
     #[prop(default = Align::Center)] align: Align,
     #[prop(default = VAlign::Middle)] valign: VAlign,
     #[prop(optional)] margin: i32,
-    #[prop(optional, into)] image: MaybeSignal<String>,
-    #[prop(default = true.into(), into)] visible: MaybeSignal<bool>,
+    #[prop(optional, into)] image: Signal<String>,
+    #[prop(default = true.into(), into)] visible: Signal<bool>,
     #[prop(default = "all .3s".to_string(), into)] transition: String,
     children: Children,
-) -> impl IntoView {
+) -> impl IntoView
+where
+    F: Fn(MouseEvent) + 'static,
+{
     let f = use_frame();
 
     let width = width.map(|s| s.into_pixels(f.width));
@@ -82,30 +85,30 @@ pub fn Button(
     let width = width - border_width.get();
     let height = height - border_width.get();
 
-    let (border, set_border) = create_signal(border_width.get());
+    let (border, set_border) = signal(border_width.get());
     let on_mousedown = move |e| {
         set_border.set(border_width.get() + 6);
         if let Some(cb) = on_mousedown {
-            cb.call(e);
+            cb.run(e);
         }
     };
     let on_mouseup = move |e| {
         set_border.set(border_width.get());
         if let Some(cb) = on_mouseup {
-            cb.call(e);
+            cb.run(e);
         }
     };
 
     view! {
         <g
-            style:opacity=move || if visible.get() { 1 } else { 0 }
+            style:opacity=move || if visible.get() { "1" } else { "0" }
             style:visibility=move || { if visible.get() { "visible" } else { "hidden" } }
             style:transition=transition
         >
             <rect
                 on:click=move |e| {
-                    if let Some(cb) = on_click {
-                        cb.call(e);
+                    if let Some(cb) = &on_click {
+                        cb(e);
                     }
                 }
 

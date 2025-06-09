@@ -1,6 +1,6 @@
-use leptos::*;
+use leptos::prelude::*;
 
-use crate::{use_frame, Align, Frame, VAlign};
+use crate::{Align, Frame, VAlign, use_frame};
 
 struct SvgProperties {
     width: i32,
@@ -22,7 +22,7 @@ pub fn Svg(
     #[prop(default = 1.0)] scale: f32,
     #[prop(optional)] flip_x: bool,
     #[prop(optional)] flip_y: bool,
-    #[prop(default = true.into(), into)] visible: MaybeSignal<bool>,
+    #[prop(default = true.into(), into)] visible: Signal<bool>,
     #[prop(default = "all .3s".to_string(), into)] transition: String,
     children: Children,
 ) -> impl IntoView {
@@ -41,7 +41,7 @@ pub fn Svg(
     view! {
         <g
             transform=transform
-            style:opacity=move || if visible.get() { 1 } else { 0 }
+            style:opacity=move || if visible.get() { "1" } else { "0" }
             style:visibility=move || { if visible.get() { "visible" } else { "hidden" } }
             style:transition=transition
         >
@@ -60,7 +60,7 @@ pub fn SvgFile(
     #[prop(default = 1.0)] scale: f32,
     #[prop(optional)] flip_x: bool,
     #[prop(optional)] flip_y: bool,
-    #[prop(default = true.into(), into)] visible: MaybeSignal<bool>,
+    #[prop(default = true.into(), into)] visible: Signal<bool>,
     #[prop(default = "all .3s".to_string(), into)] transition: String,
     src: &'static str,
 ) -> impl IntoView {
@@ -80,7 +80,7 @@ pub fn SvgFile(
         <g
             transform=transform
             inner_html=src
-            style:opacity=move || if visible.get() { 1 } else { 0 }
+            style:opacity=move || if visible.get() { "1" } else { "0" }
             style:visibility=move || { if visible.get() { "visible" } else { "hidden" } }
             style:transition=transition
         ></g>

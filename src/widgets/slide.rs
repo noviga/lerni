@@ -1,12 +1,16 @@
 use leptos::{
-    ev::{resize, MouseEvent},
+    ev::{MouseEvent, resize},
     html::Div,
+    prelude::*,
     svg::Svg,
-    *,
 };
 use leptos_use::*;
+use std::{
+    collections::VecDeque,
+    sync::{Arc, Mutex},
+};
 
-use crate::{is_active_slide, provide_frame, Color, Frame, PointerSignal, RefreshSignal, SvgFrame};
+use crate::{Color, Frame, PointerSignal, RefreshSignal, SvgFrame, is_active_slide, provide_frame};
 
 const WIDTH: i32 = 1920;
 const HEIGHT: i32 = 1080;
@@ -19,16 +23,23 @@ pub fn Slide(
     #[prop(default = HEIGHT)] height: i32,
     #[prop(optional)] background_color: Color,
     #[prop(optional, into)] background_image: String,
-    #[prop(optional, into)] blur: MaybeSignal<bool>,
+    #[prop(optional, into)] blur: Signal<bool>,
     #[prop(default = 15)] blur_radius: i32,
     #[prop(optional)] node_ref: Option<NodeRef<Div>>,
     #[prop(optional, into)] on_click: Option<Callback<(i32, i32)>>,
     #[prop(optional, into)] on_refresh: Option<Callback<()>>,
+    #[prop(optional)] panel: Option<AnyView>,
     children: Children,
 ) -> impl IntoView {
+    let panels: Option<Arc<Mutex<VecDeque<AnyView>>>> = use_context();
+    if let Some(panels) = panels {
+        let mut panels = panels.lock().unwrap();
+        panels.push_back(panel.unwrap_or_else(|| view!().into_any()));
+    }
+
     let refresh_signal = use_context::<RefreshSignal>();
     let pointer_signal = use_context::<PointerSignal>();
-    let (slide_width, set_slide_width) = create_signal(crate::calc_width(0, SLIDE_MARGIN));
+    let (slide_width, set_slide_width) = signal(crate::calc_width(0, SLIDE_MARGIN));
 
     // Standalone slide usage (not within a slideshow)
     let is_standalone = pointer_signal.is_none();
@@ -48,8 +59,8 @@ pub fn Slide(
 
     let view_box = format!("0 0 {width} {height}");
 
-    let svg_ref: NodeRef<Svg> = create_node_ref();
-    let (pointer_position, set_pointer_position) = create_signal((0, 0));
+    let svg_ref = NodeRef::<Svg>::new();
+    let (pointer_position, set_pointer_position) = signal((0, 0));
     let on_mousemove = move |e: MouseEvent| {
         let mut px = e.offset_x();
         let mut py = e.offset_y();
@@ -66,15 +77,15 @@ pub fn Slide(
         set_pointer_position.set((px, py));
     };
     let on_mouse_click = move |e: MouseEvent| {
-        if let Some(cb) = on_click {
+        if let Some(f) = &on_click {
             if let Some(svg) = svg_ref.get() {
                 let x = e.offset_x() * WIDTH / svg.client_width();
                 let y = e.offset_y() * HEIGHT / svg.client_height();
-                cb.call((x, y));
+                f.run((x, y));
             }
         }
     };
-    let (pointer_in, set_pointer_in) = create_signal(false);
+    let (pointer_in, set_pointer_in) = signal(false);
     let pointer_visible =
         move || pointer_signal.map(|s| s.0.get()).unwrap_or_default() && pointer_in.get();
 
@@ -99,15 +110,15 @@ pub fn Slide(
         Default::default()
     };
 
-    let node_ref = node_ref.unwrap_or_else(create_node_ref);
+    let node_ref = node_ref.unwrap_or_else(NodeRef::new);
 
-    create_effect(move |_| {
+    Effect::new(move |_| {
         if let Some(refresh) = refresh_signal {
             refresh.0.get();
         }
         if is_active_slide(node_ref) {
             if let Some(cb) = on_refresh {
-                cb.call(())
+                cb.run(())
             }
         }
     });
@@ -142,7 +153,7 @@ pub fn Slide(
                         ></rect>
                         {children()}
 
-                        <Pointer position=pointer_position visible=pointer_visible/>
+                        <Pointer position=pointer_position visible=pointer_visible />
                     </svg>
                 </figure>
             </div>
@@ -153,7 +164,7 @@ pub fn Slide(
 #[component]
 fn Pointer<F>(position: ReadSignal<(i32, i32)>, visible: F) -> impl IntoView
 where
-    F: Fn() -> bool + 'static,
+    F: Fn() -> bool + Send + 'static,
 {
     view! {
         <circle

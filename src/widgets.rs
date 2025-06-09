@@ -26,7 +26,7 @@ pub use stack::Stack;
 pub use svg::{Svg, SvgFile};
 pub use text::Text;
 
-use leptos::ReadSignal;
+use leptos::prelude::ReadSignal;
 
 /// Size in pixels or percent.
 #[derive(Clone, Copy, Debug)]
