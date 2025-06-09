@@ -80,28 +80,3 @@ pub fn is_active_slide(node_ref: NodeRef<Div>) -> bool {
 
     false
 }
-
-/// Check whether a slide is visible.
-pub fn slide_number(node_ref: NodeRef<Div>) -> Option<usize> {
-    if let Some(node) = node_ref.get_untracked() {
-        if let Some(parent) = node.parent_element() {
-            return parent.get_attribute("number").and_then(|n| n.parse().ok());
-        }
-    }
-
-    None
-}
-
-/// Mount a child view on a panel.
-pub fn mount_on_panel(node_ref: NodeRef<Div>, _item: AnyView) {
-    let panel_item_refs: Option<Vec<NodeRef<Div>>> = use_context();
-    if let Some(panel_item_refs) = panel_item_refs {
-        if let Some(n) = slide_number(node_ref) {
-            if let Some(panel_item_ref) = panel_item_refs.get(n) {
-                if let Some(_el) = panel_item_ref.get_untracked() {
-                    //el.append_child(item);
-                }
-            }
-        }
-    }
-}

@@ -1,4 +1,4 @@
-use leptos::{ev::keydown, prelude::*};
+use leptos::{ev::keydown, logging, prelude::*};
 use leptos_use::use_event_listener;
 use lerni::*;
 
@@ -34,8 +34,13 @@ pub fn Counter() -> impl IntoView {
         }
     });
 
+    let panel = view! { <label class="label is-large">"Counter: " {move || counter.get()}</label> }
+        .into_any();
+
+    let on_click = |x, y| logging::log!("({}, {})", x, y);
+
     view! {
-        <Slide node_ref=node_ref>
+        <Slide node_ref panel on_click on_refresh=move || set_counter.set(0)>
             <Label>
                 "Counter (press 'Enter' and 'Escape' to change): " {move || counter.get()}
             </Label>

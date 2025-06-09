@@ -3,7 +3,10 @@ use leptos::{
     prelude::*,
 };
 use leptos_use::*;
-use std::collections::BTreeSet;
+use std::{
+    collections::{BTreeSet, VecDeque},
+    sync::{Arc, Mutex},
+};
 use web_sys::MouseEvent;
 
 use crate::{PointerSignal, RefreshSignal};
@@ -18,6 +21,9 @@ pub fn SlideShow(#[prop(optional)] current: usize, children: ChildrenFragment) -
     provide_context(RefreshSignal::new(refresh.read_only()));
     let pointer = RwSignal::new(true);
     provide_context(PointerSignal::new(pointer.read_only()));
+
+    let panels = Arc::new(Mutex::new(VecDeque::<AnyView>::new()));
+    provide_context(Arc::clone(&panels));
 
     let page = RwSignal::new(current);
     let children = children().nodes;
@@ -41,20 +47,15 @@ pub fn SlideShow(#[prop(optional)] current: usize, children: ChildrenFragment) -
     });
 
     let mut panel_items = Vec::with_capacity(count);
-    let mut panel_item_refs = Vec::with_capacity(count);
+    let mut panels = panels.lock().unwrap();
     let children = children
         .into_iter()
         .enumerate()
         .map(|(i, child)| {
-            let panel_item_ref = NodeRef::new();
-            panel_item_refs.push(panel_item_ref);
-            panel_items
-                .push(view! { <div node_ref=panel_item_ref hidden=move || i != page.get()></div> });
+            panel_items.push(view! { <div hidden=move || i != page.get()>{panels.pop_front()}</div> });
             view! { <div hidden=move || i != page.get()>{child}</div> }
         })
         .collect_view();
-
-    provide_context(panel_item_refs);
 
     view! {
         <div

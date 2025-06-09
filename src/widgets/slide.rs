@@ -5,6 +5,10 @@ use leptos::{
     svg::Svg,
 };
 use leptos_use::*;
+use std::{
+    collections::VecDeque,
+    sync::{Arc, Mutex},
+};
 
 use crate::{Color, Frame, PointerSignal, RefreshSignal, SvgFrame, is_active_slide, provide_frame};
 
@@ -22,10 +26,17 @@ pub fn Slide(
     #[prop(optional, into)] blur: Signal<bool>,
     #[prop(default = 15)] blur_radius: i32,
     #[prop(optional)] node_ref: Option<NodeRef<Div>>,
-    #[prop(optional, into)] on_click: Option<Box<dyn Fn(i32, i32) + 'static>>,
+    #[prop(optional, into)] on_click: Option<Callback<(i32, i32)>>,
     #[prop(optional, into)] on_refresh: Option<Callback<()>>,
+    #[prop(optional)] panel: Option<AnyView>,
     children: Children,
 ) -> impl IntoView {
+    let panels: Option<Arc<Mutex<VecDeque<AnyView>>>> = use_context();
+    if let Some(panels) = panels {
+        let mut panels = panels.lock().unwrap();
+        panels.push_back(panel.unwrap_or_else(|| view!().into_any()));
+    }
+
     let refresh_signal = use_context::<RefreshSignal>();
     let pointer_signal = use_context::<PointerSignal>();
     let (slide_width, set_slide_width) = signal(crate::calc_width(0, SLIDE_MARGIN));
@@ -70,7 +81,7 @@ pub fn Slide(
             if let Some(svg) = svg_ref.get() {
                 let x = e.offset_x() * WIDTH / svg.client_width();
                 let y = e.offset_y() * HEIGHT / svg.client_height();
-                f(x, y);
+                f.run((x, y));
             }
         }
     };

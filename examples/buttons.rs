@@ -20,16 +20,16 @@ pub fn Buttons() -> impl IntoView {
     view! {
         <Slide>
             <Grid cols=3 rows=3>
-                <Button on_click=on_click visible=Signal::derive(move || counter.get() % 2 == 0)>
+                <Button on_click visible=Signal::derive(move || counter.get() % 2 == 0)>
                     "Alice"
                 </Button>
-                <Button width=300 rounded=true color=bob_color on_click=on_click>
+                <Button width=300 rounded=true color=bob_color on_click>
                     "Bob"
                 </Button>
-                <Button font_size=72 text_color=Color::DarkCyan on_click=on_click>
+                <Button font_size=72 text_color=Color::DarkCyan on_click>
                     "Charlie"
                 </Button>
-                <Button on_click=on_click>
+                <Button on_click>
                     <tspan font-size="96" fill="red" alignment-baseline="central">
                         "Da"
                     </tspan>
@@ -38,24 +38,19 @@ pub fn Buttons() -> impl IntoView {
                     </tspan>
                 </Button>
                 <Label font_size=Size::Percent(50)>{counter}</Label>
-                <Button text_bold=true align=Align::Right on_click=on_click>
+                <Button text_bold=true align=Align::Right on_click>
                     "Eve"
                 </Button>
-                <Button
-                    width=Size::Percent(50)
-                    align=Align::Right
-                    valign=VAlign::Bottom
-                    on_click=on_click
-                >
+                <Button width=Size::Percent(50) align=Align::Right valign=VAlign::Bottom on_click>
                     "Ferdie"
                 </Button>
-                <Button color=Color::Honeydew border_color=Color::ForestGreen on_click=on_click>
+                <Button color=Color::Honeydew border_color=Color::ForestGreen on_click>
                     "George"
                 </Button>
                 <Button
                     align=Align::Fill
                     valign=VAlign::Fill
-                    on_click=on_click
+                    on_click
                     image="/img/lerni-bg.svg"
                     margin=20
                 >

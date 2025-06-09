@@ -9,9 +9,7 @@ pub fn Blur() -> impl IntoView {
 
     view! {
         <Slide blur=blur background_color=Color::MistyRose>
-            <Button on_click=on_click>
-                "Blur " {move || if blur.get() { "ON" } else { "OFF" }}
-            </Button>
+            <Button on_click>"Blur " {move || if blur.get() { "ON" } else { "OFF" }}</Button>
         </Slide>
     }
 }
