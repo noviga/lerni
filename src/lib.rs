@@ -9,6 +9,7 @@ pub use legacy::*;
 
 #[cfg(not(feature = "legacy"))]
 pub use frame::*;
+pub use into_strings::IntoStrings;
 pub use properties::*;
 pub use utils::*;
 pub use widgets::*;

@@ -2,7 +2,7 @@ extern crate alloc;
 
 use alloc::rc::Rc;
 use leptos::prelude::*;
-use rand::{Rng, prelude::SliceRandom, rngs::OsRng};
+use rand::{Rng, prelude::SliceRandom};
 use wasm_bindgen::JsValue;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, MouseEvent};
 
@@ -260,12 +260,12 @@ fn shuffle_word(word: &str) -> String {
     let mut last = 0;
 
     let shuffle = |word: &str| -> String {
-        let mut rng = OsRng;
+        let mut rng = rand::rng();
         let mut word: Vec<_> = word.chars().collect();
         let len = word.len();
         if len > 3 {
-            let start = rng.gen_range(1..len / 2);
-            let end = rng.gen_range((len + 1) / 2..len);
+            let start = rng.random_range(1..len / 2);
+            let end = rng.random_range((len + 1) / 2..len);
             word[start..end].shuffle(&mut rng);
         }
         word.into_iter().collect()

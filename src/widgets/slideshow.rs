@@ -52,7 +52,8 @@ pub fn SlideShow(#[prop(optional)] current: usize, children: ChildrenFragment) -
         .into_iter()
         .enumerate()
         .map(|(i, child)| {
-            panel_items.push(view! { <div hidden=move || i != page.get()>{panels.pop_front()}</div> });
+            panel_items
+                .push(view! { <div hidden=move || i != page.get()>{panels.pop_front()}</div> });
             view! { <div hidden=move || i != page.get()>{child}</div> }
         })
         .collect_view();
