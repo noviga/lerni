@@ -30,7 +30,7 @@ jobs:
         uses: jetli/wasm-bindgen-action@v0.2.0
         with:
           # Sync version with `Cargo.toml`
-          version: "0.2.100"
+          version: "0.2.105"
 
       - name: Cache
         uses: Swatinem/rust-cache@v2
@@ -46,7 +46,7 @@ jobs:
         if: github.event_name == 'push'
         uses: actions/upload-pages-artifact@v4
         with:
-            path: dist
+          path: dist
 
       - name: Deploy to GitHub Pages
         if: github.event_name == 'push'
