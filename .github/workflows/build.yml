@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Install toolchain
         uses: dtolnay/rust-toolchain@stable
@@ -30,7 +30,7 @@ jobs:
         uses: jetli/wasm-bindgen-action@v0.2.0
         with:
           # Sync version with `Cargo.toml`
-          version: "0.2.100"
+          version: "0.2.105"
 
       - name: Cache
         uses: Swatinem/rust-cache@v2
@@ -44,9 +44,9 @@ jobs:
 
       - name: Upload Pages artifact
         if: github.event_name == 'push'
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4
         with:
-            path: dist
+          path: dist
 
       - name: Deploy to GitHub Pages
         if: github.event_name == 'push'
