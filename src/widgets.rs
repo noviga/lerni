@@ -24,7 +24,7 @@ pub use slideshow::SlideShow;
 pub use space::Space;
 pub use stack::Stack;
 pub use svg::{Svg, SvgFile};
-pub use text::Text;
+pub use text::{Strings, Text};
 
 use leptos::prelude::ReadSignal;
 

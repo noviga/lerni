@@ -6,7 +6,7 @@ use rand::{Rng, prelude::SliceRandom};
 use wasm_bindgen::JsValue;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, MouseEvent};
 
-use crate::{Color, Frame, SvgFrame, VAlign, into_strings::IntoStrings, use_frame};
+use crate::{Color, Frame, IntoStrings, SvgFrame, VAlign, use_frame};
 
 #[derive(Debug, Clone)]
 struct TextProperties<'a> {
@@ -33,6 +33,13 @@ struct Output {
     pub canvas: CanvasRenderingContext2d,
 }
 
+/// Text strings
+#[slot]
+pub struct Strings<T> {
+    /// Strings children
+    children: TypedChildren<T>,
+}
+
 /// Text widget.
 #[component]
 pub fn Text<T: IntoStrings>(
@@ -56,7 +63,7 @@ pub fn Text<T: IntoStrings>(
     #[prop(optional, into)] on_click: Option<Callback<MouseEvent>>,
     #[prop(default = true.into(), into)] visible: Signal<bool>,
     #[prop(default = "all .3s".to_string(), into)] transition: String,
-    children: TypedChildren<T>,
+    #[prop(default = vec![])] strings: Vec<Strings<T>>,
 ) -> impl IntoView {
     let props = TextProperties {
         bold,
@@ -65,8 +72,11 @@ pub fn Text<T: IntoStrings>(
         line_height,
         indent,
     };
-    let children = children.into_inner();
-    let sentences = children().into_inner().into_strings();
+    let sentences = strings
+        .into_iter()
+        .map(|s| (s.children.into_inner())().into_inner().into_strings())
+        .flatten()
+        .collect();
     let f = use_frame();
     let Output {
         words,
