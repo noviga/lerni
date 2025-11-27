@@ -20,7 +20,7 @@ pub use image::Image;
 pub use label::Label;
 pub use row::Row;
 pub use slide::Slide;
-pub use slideshow::SlideShow;
+pub use slideshow::{SlideSet, SlideShow};
 pub use space::Space;
 pub use stack::Stack;
 pub use svg::{Svg, SvgFile};
