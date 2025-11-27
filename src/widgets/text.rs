@@ -64,6 +64,7 @@ pub fn Text<T: IntoStrings>(
     #[prop(default = true.into(), into)] visible: Signal<bool>,
     #[prop(default = "all .3s".to_string(), into)] transition: String,
     #[prop(default = vec![])] strings: Vec<Strings<T>>,
+    #[prop(optional)] children: Option<TypedChildren<T>>,
 ) -> impl IntoView {
     let props = TextProperties {
         bold,
@@ -72,11 +73,15 @@ pub fn Text<T: IntoStrings>(
         line_height,
         indent,
     };
-    let sentences = strings
-        .into_iter()
-        .map(|s| (s.children.into_inner())().into_inner().into_strings())
-        .flatten()
-        .collect();
+    let mut sentences = children
+        .map(|c| (c.into_inner())().into_inner().into_strings())
+        .unwrap_or_default();
+    sentences.extend(
+        strings
+            .into_iter()
+            .map(|s| (s.children.into_inner())().into_inner().into_strings())
+            .flatten(),
+    );
     let f = use_frame();
     let Output {
         words,

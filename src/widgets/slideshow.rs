@@ -15,8 +15,19 @@ const BUTTON_COUNT: usize = 6;
 const PAGINATION_WIDTH: i32 = 40;
 const CONTROL_PANEL_HEIGHT: i32 = 64;
 
+/// Slide set is used when you have more that 16 slides inside the `SlideShow`
+#[slot]
+pub struct SlideSet {
+    /// Slides inside the set (max. 16)
+    children: ChildrenFragment,
+}
+
 #[component]
-pub fn SlideShow(#[prop(optional)] current: usize, children: ChildrenFragment) -> impl IntoView {
+pub fn SlideShow(
+    #[prop(optional)] current: usize,
+    #[prop(default = vec![])] slide_set: Vec<SlideSet>,
+    #[prop(optional)] children: Option<ChildrenFragment>,
+) -> impl IntoView {
     let refresh = RwSignal::new(());
     provide_context(RefreshSignal::new(refresh.read_only()));
     let pointer = RwSignal::new(true);
@@ -26,9 +37,14 @@ pub fn SlideShow(#[prop(optional)] current: usize, children: ChildrenFragment) -
     provide_context(Arc::clone(&panels));
 
     let page = RwSignal::new(current);
-    let children = children().nodes;
-    // TODO: Wait for `StaticVec` has `len()`
-    let count = children.iter().len();
+    let mut children = children.map(|c| Vec::from(c().nodes)).unwrap_or_default();
+    children.extend(
+        slide_set
+            .into_iter()
+            .map(|c| Vec::from((c.children)().nodes))
+            .flatten(),
+    );
+    let count = children.len();
 
     _ = use_event_listener(document(), keydown, move |e| {
         if e.key() == "ArrowLeft" || e.key() == "ArrowUp" {

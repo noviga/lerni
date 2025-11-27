@@ -47,17 +47,13 @@ pub fn TextExample() -> impl IntoView {
                         letters_read=letters_read1
                         letters_total=letters_total1
                     >
-                        <Strings slot>
-                            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-                            "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
-                        </Strings>
+                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                        "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
                     </Text>
                     <Label>{words_read1} "w (" {letters_read1} " / " {letters_total1} ")"</Label>
                     <Text valign=VAlign::Bottom reverse_words=reverse>
-                        <Strings slot>
-                            "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
-                            "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
-                        </Strings>
+                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+                        "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat."
                     </Text>
                     <Row cols=2 spacing=10>
                         <Button
@@ -88,10 +84,8 @@ pub fn TextExample() -> impl IntoView {
                         letters_read=letters_read2
                         letters_total=letters_total2
                     >
-                        <Strings slot>
-                            "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-                            "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-                        </Strings>
+                        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+                        "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
                     </Text>
                     <Label>{words_read2} "w (" {letters_read2} " / " {letters_total2} ")"</Label>
                     <Text
@@ -102,10 +96,8 @@ pub fn TextExample() -> impl IntoView {
                         letters_read=letters_read3
                         letters_total=letters_total3
                     >
-                        <Strings slot>
-                            "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
-                            "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
-                        </Strings>
+                        "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
+                        "Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum."
                     </Text>
                     <Label>{words_read3} "w (" {letters_read3} " / " {letters_total3} ")"</Label>
                     <Row cols=2 spacing=10>
