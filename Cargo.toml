@@ -13,7 +13,7 @@ getrandom = { version = "0.3", features = ["wasm_js"] }
 gloo-events = "0.2"
 gloo-utils = "0.2"
 leptos = { version = "0.8", features = ["csr"] }
-leptos-use = "0.16"
+leptos-use = "0.17"
 rand = { version = "0.9", default-features = false, features = ["thread_rng"] }
 wasm-bindgen = "0.2.105"
 
