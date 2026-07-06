@@ -37,10 +37,6 @@ fmt-check:
 	@echo ──────────── Check format ─────────────────────
 	@cargo fmt --all -- --check
 
-legacy:
-	@echo ──────────── Build legacy release ─────────────
-	@cargo b -rF legacy
-
 linter:
 	@echo ──────────── Run linter ───────────────────────
 	@cargo clippy --all-targets -- --no-deps -D warnings -A clippy::derive_partial_eq_without_eq

@@ -2,58 +2,58 @@
 name = "lerni"
 version = "0.0.6"
 edition = "2024"
-license = "MIT"
 description = "Lerni content framework"
 repository = "https://github.com/noviga/lerni"
-include = ["src/**/*.rs", "examples/**/*.rs"]
+license = "MIT"
+include = ["examples/**/*.rs", "src/**/*.rs"]
+
+[[example]]
+crate-type = ["cdylib"]
+name = "blur"
+
+[[example]]
+crate-type = ["cdylib"]
+name = "buttons"
+
+[[example]]
+crate-type = ["cdylib"]
+name = "grid"
+
+[[example]]
+crate-type = ["cdylib"]
+name = "hello_world"
+
+[[example]]
+crate-type = ["cdylib"]
+name = "rows_cols"
+
+[[example]]
+crate-type = ["cdylib"]
+name = "stack"
+
+[[example]]
+crate-type = ["cdylib"]
+name = "svg"
+
+[[example]]
+crate-type = ["cdylib"]
+name = "text"
 
 [dependencies]
-derive_more = { version = "2.0", features = ["display"] }
-getrandom = { version = "0.3", features = ["wasm_js"] }
-gloo-events = "0.2"
-gloo-utils = "0.2"
+derive_more = { version = "2.1", features = ["display"] }
+getrandom = { version = "0.4", features = ["wasm_js"] }
+gloo-events = "0.3"
+gloo-utils = "0.3"
 leptos = { version = "0.8", features = ["csr"] }
-leptos-use = "0.16"
-rand = { version = "0.9", default-features = false, features = ["thread_rng"] }
-wasm-bindgen = "0.2.105"
+leptos-use = "0.19"
+rand = { version = "0.10", default-features = false, features = ["thread_rng"] }
+wasm-bindgen = "0.2.126"
 
 [dependencies.web-sys]
 version = "0.3"
 features = [
-    "CanvasRenderingContext2d",
-    "HtmlCanvasElement",
-    "SvgElement",
-    "TextMetrics",
+  "CanvasRenderingContext2d",
+  "HtmlCanvasElement",
+  "SvgElement",
+  "TextMetrics",
 ]
-
-[[example]]
-name = "blur"
-crate-type = ["cdylib"]
-
-[[example]]
-name = "buttons"
-crate-type = ["cdylib"]
-
-[[example]]
-name = "grid"
-crate-type = ["cdylib"]
-
-[[example]]
-name = "hello_world"
-crate-type = ["cdylib"]
-
-[[example]]
-name = "rows_cols"
-crate-type = ["cdylib"]
-
-[[example]]
-name = "stack"
-crate-type = ["cdylib"]
-
-[[example]]
-name = "svg"
-crate-type = ["cdylib"]
-
-[[example]]
-name = "text"
-crate-type = ["cdylib"]
