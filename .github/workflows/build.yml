@@ -30,7 +30,7 @@ jobs:
         uses: jetli/wasm-bindgen-action@v0.2.0
         with:
           # Sync version with `Cargo.toml`
-          version: "0.2.105"
+          version: "0.2.126"
 
       - name: Cache
         uses: Swatinem/rust-cache@v2
