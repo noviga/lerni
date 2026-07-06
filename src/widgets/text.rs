@@ -2,7 +2,7 @@ extern crate alloc;
 
 use alloc::rc::Rc;
 use leptos::prelude::*;
-use rand::{Rng, prelude::SliceRandom};
+use rand::{RngExt, prelude::SliceRandom};
 use wasm_bindgen::JsValue;
 use web_sys::{CanvasRenderingContext2d, HtmlCanvasElement, MouseEvent};
 

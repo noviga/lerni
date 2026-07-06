@@ -27,7 +27,7 @@ pub fn Label(
     let (y, baseline) = match valign {
         VAlign::Top => (f.y, "hanging"),
         VAlign::Middle | VAlign::Fill => ((f.y + f.height / 2), "central"),
-        VAlign::Bottom => (f.y + f.height, "text-top"),
+        VAlign::Bottom => (f.y + f.height, "text-after-edge"),
     };
 
     let mut transform = format!("rotate({angle} {x} {y})");
